@@ -66,6 +66,8 @@ public final class AethoriaStats extends JavaPlugin implements Listener, Command
     private boolean authMe;
     private boolean hideNames;
     private long startedAt;
+    private static final long WARMUP_MS = 120_000L;
+    private volatile long readyAt = Long.MAX_VALUE;
     private int sendIntervalSec = 120;
     private int skipCycles;
     private Path dataFile;
@@ -107,6 +109,8 @@ public final class AethoriaStats extends JavaPlugin implements Listener, Command
         if (cmd != null) cmd.setExecutor(this);
 
         Bukkit.getScheduler().runTaskTimer(this, ticks, 1L, 1L);
+        // la première tâche du scheduler s'exécute quand le serveur a fini de charger : c'est là que le chrono démarre
+        Bukkit.getScheduler().runTask(this, this::markReady);
         // les joueurs déjà connectés (rechargement du plugin)
         for (Player p : Bukkit.getOnlinePlayers()) {
             if (!authMe || isAuthenticated(p)) startSession(p);
@@ -537,7 +541,14 @@ public final class AethoriaStats extends JavaPlugin implements Listener, Command
     public void onServerLoad(ServerLoadEvent e) {
         if (e.getType() == ServerLoadEvent.LoadType.STARTUP) {
             data.bootMs = Math.max(0, System.currentTimeMillis() - startedAt);
+            markReady();
         }
+    }
+
+    /** Le serveur est prêt : on repart de zéro et on ignore les 2 premières minutes. */
+    private void markReady() {
+        readyAt = System.currentTimeMillis();
+        ticks.ignoreFor(WARMUP_MS);
     }
 
     private void recordDeathCause(Player p) {
@@ -668,6 +679,8 @@ public final class AethoriaStats extends JavaPlugin implements Listener, Command
         l.ramUsedMb = (rt.totalMemory() - rt.freeMemory()) / 1048576L;
         l.ramMaxMb = rt.maxMemory() / 1048576L;
         l.maxPlayers = Bukkit.getMaxPlayers();
+        long left = readyAt == Long.MAX_VALUE ? WARMUP_MS : readyAt + WARMUP_MS - System.currentTimeMillis();
+        l.warmupSec = (int) Math.max(0, (left + 999) / 1000);
         l.tps1 = ticks.tps(60);
         l.tps5 = ticks.tps(300);
         l.tps15 = ticks.tps(900);

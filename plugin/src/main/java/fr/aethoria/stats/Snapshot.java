@@ -45,6 +45,8 @@ public final class Snapshot {
         public long ramMaxMb;
         public int maxPlayers;
         public double tps1 = 20, tps5 = 20, tps15 = 20, mspt = 50;
+        /** Secondes restantes de la période de démarrage (mesures ignorées), 0 si terminée. */
+        public int warmupSec;
         public final List<OnlinePlayer> online = new ArrayList<>();
         public final List<WorldInfo> worlds = new ArrayList<>();
     }
@@ -92,6 +94,7 @@ public final class Snapshot {
         srv.put("startedAt", live.startedAt);
         srv.put("uptimeMs", Math.max(0, now - live.startedAt));
         srv.put("bootMs", d.bootMs);
+        srv.put("warmupSec", live.warmupSec);
         srv.put("cores", live.cores);
         srv.put("ramUsedMb", live.ramUsedMb);
         srv.put("ramMaxMb", live.ramMaxMb);

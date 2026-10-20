@@ -153,6 +153,23 @@ public final class ApiTest {
         api.start("127.0.0.1", 0);
         base = "http://127.0.0.1:" + api.port();
 
+        // --- TPS : le démarrage est ignoré ---
+        TickMonitor tm = new TickMonitor();
+        tm.ignoreFor(300);
+        long until = System.currentTimeMillis() + 150;
+        while (System.currentTimeMillis() < until) {
+            tm.run();
+            Thread.sleep(2);
+        }
+        check(tm.tps(60) == 20.0 && tm.takeMin() == 20.0, "TPS : rien n'est mesuré pendant la période de démarrage");
+        Thread.sleep(250);
+        long end2 = System.currentTimeMillis() + 2300;
+        while (System.currentTimeMillis() < end2) {
+            tm.run();
+            Thread.sleep(50);
+        }
+        check(tm.tps(60) > 15 && tm.tps(60) <= 20.0, "TPS : mesuré normalement après la période (" + tm.tps(60) + ")");
+
         // --- hash ---
         String h = Auth.hash("abcdefghij");
         check(h.startsWith("pbkdf2$210000$") && !h.contains("abcdefghij"), "hash PBKDF2 salé, sans mot de passe en clair");

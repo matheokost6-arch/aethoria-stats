@@ -12,10 +12,17 @@ public final class TickMonitor implements Runnable {
     private long lastTick = binStart;
     private double msptAvg = 50;
     private double minBin = 20;
+    private long ignoreUntil;
 
     @Override
     public void run() {
         long now = System.nanoTime();
+        if (now < ignoreUntil) { // démarrage : on ne mesure pas
+            ticks = 0;
+            binStart = now;
+            lastTick = now;
+            return;
+        }
         ticks++;
         double interval = (now - lastTick) / 1e6;
         lastTick = now;
@@ -38,6 +45,19 @@ public final class TickMonitor implements Runnable {
         double sum = 0;
         for (int i = 1; i <= n; i++) sum += tpsBins[(idx - i + BINS) % BINS];
         return sum / n;
+    }
+
+    /** Efface les mesures et ignore les {@code ms} millisecondes qui suivent (chargement du serveur). */
+    public void ignoreFor(long ms) {
+        java.util.Arrays.fill(tpsBins, 0);
+        count = 0;
+        idx = 0;
+        minBin = 20;
+        msptAvg = 50;
+        ticks = 0;
+        binStart = System.nanoTime();
+        lastTick = binStart;
+        ignoreUntil = binStart + ms * 1_000_000L;
     }
 
     /** Plus bas TPS d'une seconde depuis le dernier appel (puis remise à 20). */

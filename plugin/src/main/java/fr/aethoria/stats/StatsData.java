@@ -268,6 +268,10 @@ public final class StatsData {
         factionsBaselined = true;
     }
 
+    public static void bumpBy(Map<String, Integer> m, String key, int n, int cap) {
+        for (int i = 0; i < n && i < 1000; i++) bump(m, key, cap);
+    }
+
     public void addAdvancement(long now, String player, String key) {
         advancements.add(new String[] {String.valueOf(now), player, key});
         while (advancements.size() > 30) advancements.remove(0);

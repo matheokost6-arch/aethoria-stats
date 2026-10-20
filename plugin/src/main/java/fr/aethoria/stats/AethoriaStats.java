@@ -127,7 +127,7 @@ public final class AethoriaStats extends JavaPlugin implements Listener, Command
         long period = Math.max(30, sendIntervalSec) * 20L;
         Bukkit.getScheduler().runTaskTimer(this, this::sendCycle, 20L * 20, period);
 
-        hookConsoleForClearLag();
+        hookConsole();
         Bukkit.getScheduler().runTaskTimerAsynchronously(this, this::pollExport, 100L, 60L * 20L);
         Bukkit.getScheduler().runTaskTimer(this, () -> latestStats = buildJson(), 60L,
                 Math.max(5, getConfig().getInt("api.stats-refresh-seconds", 20)) * 20L);
@@ -466,6 +466,7 @@ public final class AethoriaStats extends JavaPlugin implements Listener, Command
         StatsData.PlayerRec r = data.players.get(uuid);
         online.put(p.getUniqueId(), r);
         refreshStats(p, r, true);
+        trackKills(p);
         boolean brandNew = !known && now - first < 10 * 60_000L;
         data.log(now, brandNew ? "first" : "join", brandNew ? p.getName() + " découvre le royaume pour la première fois" : p.getName() + " s'est connecté");
         if (data.noteOnline(data.active.size(), now)) {
@@ -478,6 +479,8 @@ public final class AethoriaStats extends JavaPlugin implements Listener, Command
         if (r == null) return;
         long now = System.currentTimeMillis();
         refreshStats(p, r, false);
+        trackKills(p);
+        killBase.remove(p.getUniqueId());
         long before = r.playMs;
         data.endSession(r.uuid, now);
         long mins = Math.max(0, (r.playMs - before) / 60_000L);
@@ -520,20 +523,30 @@ public final class AethoriaStats extends JavaPlugin implements Listener, Command
 
     private static final java.util.Set<String> SECRET_COMMANDS = java.util.Set.of("login", "l", "log", "register", "reg",
             "changepassword", "cp", "unregister", "email", "captcha", "verification", "totp", "2fa");
-    private static final java.util.regex.Pattern CLEARLAG = java.util.regex.Pattern.compile(
-            "(?i)(?:clear\\s?lag.*?removed\\s+(\\d+))|(?:removed\\s+(\\d+)\\s+(?:entities|entit))|(?:balayeurs.*?:\\s*(\\d+))");
 
-    private void hookConsoleForClearLag() {
+    private final java.util.concurrent.ConcurrentLinkedQueue<String[]> advPending = new java.util.concurrent.ConcurrentLinkedQueue<>();
+    private final java.util.concurrent.ConcurrentLinkedQueue<String> cmdPending = new java.util.concurrent.ConcurrentLinkedQueue<>();
+
+    /**
+     * Chat (nombre seulement), commandes (nom seul), succès et ClearLag sont lus dans le journal du serveur,
+     * sans écouter d'événements : le plugin n'ajoute ainsi aucun écouteur de plus dans Bukkit.
+     */
+    private void hookConsole() {
         console.setListener(text -> {
-            if (text.length() > 300) return;
-            java.util.regex.Matcher m = CLEARLAG.matcher(text);
-            if (m.find()) {
-                String n = m.group(1) != null ? m.group(1) : m.group(2) != null ? m.group(2) : m.group(3);
-                try {
-                    clearPending.add(new long[] {System.currentTimeMillis(), Long.parseLong(n)});
-                } catch (NumberFormatException ignored) {
-                    // nombre illisible : ignoré
+            String[] k = LogLines.classify(text);
+            if (k == null) return;
+            switch (k[0]) {
+                case "chat" -> chatPending.incrementAndGet(); // le contenu n'est jamais lu
+                case "cmd" -> { if (cmdPending.size() < 2000) cmdPending.add(k[1]); }
+                case "adv" -> { if (advPending.size() < 200) advPending.add(new String[] {String.valueOf(System.currentTimeMillis()), k[1], k[2]}); }
+                case "clearlag" -> {
+                    try {
+                        clearPending.add(new long[] {System.currentTimeMillis(), Long.parseLong(k[1])});
+                    } catch (NumberFormatException ignored) {
+                        // nombre illisible : ignoré
+                    }
                 }
+                default -> { }
             }
         });
     }
@@ -545,50 +558,48 @@ public final class AethoriaStats extends JavaPlugin implements Listener, Command
         if (n > 0) data.chatByDay.merge(data.dayOf(now), (int) n, Integer::sum);
         long[] c;
         while ((c = clearPending.poll()) != null) data.addClearlag(c[0], c[1]);
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onChatCount(AsyncPlayerChatEvent e) {
-        chatPending.incrementAndGet(); // le contenu du message n'est jamais lu
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onCommandCount(PlayerCommandPreprocessEvent e) {
-        String msg = e.getMessage();
-        if (msg.length() < 2) return;
-        int sp = msg.indexOf(' ');
-        String name = (sp < 0 ? msg.substring(1) : msg.substring(1, sp)).toLowerCase();
-        int colon = name.indexOf(':');
-        if (colon >= 0) name = name.substring(colon + 1);
-        if (name.isEmpty() || name.length() > 24 || SECRET_COMMANDS.contains(name) || !name.matches("[a-z0-9_.-]+")) return;
-        StatsData.bump(data.commands, name, 150);
-        data.commandsByDay.merge(data.dayOf(System.currentTimeMillis()), 1, Integer::sum);
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onAdvancement(PlayerAdvancementDoneEvent e) {
-        String key = e.getAdvancement().getKey().getKey();
-        if (key.startsWith("recipes/") || !online.containsKey(e.getPlayer().getUniqueId())) return;
-        data.addAdvancement(System.currentTimeMillis(), e.getPlayer().getName(), key);
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onMobKilled(EntityDeathEvent e) {
-        if (e.getEntity() instanceof Player || e.getEntity().getKiller() == null) return;
-        StatsData.bump(data.mobsKilled, e.getEntityType().name(), 80);
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onServerLoad(ServerLoadEvent e) {
-        if (e.getType() == ServerLoadEvent.LoadType.STARTUP) {
-            data.bootMs = Math.max(0, System.currentTimeMillis() - startedAt);
-            markReady();
+        String cmd;
+        while ((cmd = cmdPending.poll()) != null) {
+            String name = cmd.toLowerCase();
+            int colon = name.indexOf(':');
+            if (colon >= 0) name = name.substring(colon + 1);
+            if (name.isEmpty() || name.length() > 24 || SECRET_COMMANDS.contains(name) || !name.matches("[a-z0-9_.-]+")) continue;
+            StatsData.bump(data.commands, name, 150);
+            data.commandsByDay.merge(data.dayOf(now), 1, Integer::sum);
         }
+        String[] adv;
+        while ((adv = advPending.poll()) != null) {
+            Player pl = Bukkit.getPlayerExact(adv[1]);
+            if (pl != null && online.containsKey(pl.getUniqueId())) data.addAdvancement(Long.parseLong(adv[0]), pl.getName(), "log/" + adv[2]);
+        }
+    }
+
+    // monstres tués : différence des statistiques Bukkit (KILL_ENTITY), sans écouter la mort des créatures
+    private final Map<UUID, int[]> killBase = new HashMap<>();
+    private final java.util.Set<org.bukkit.entity.EntityType> badKillTypes = new java.util.HashSet<>();
+
+    private void trackKills(Player p) {
+        org.bukkit.entity.EntityType[] all = org.bukkit.entity.EntityType.values();
+        int[] cur = new int[all.length];
+        int[] base = killBase.get(p.getUniqueId());
+        for (int i = 0; i < all.length; i++) {
+            org.bukkit.entity.EntityType t = all[i];
+            if (t == org.bukkit.entity.EntityType.PLAYER || t == org.bukkit.entity.EntityType.UNKNOWN || badKillTypes.contains(t)) continue;
+            try {
+                cur[i] = p.getStatistic(Statistic.KILL_ENTITY, t);
+            } catch (RuntimeException ex) {
+                badKillTypes.add(t);
+                continue;
+            }
+            if (base != null && cur[i] > base[i]) StatsData.bumpBy(data.mobsKilled, t.name(), cur[i] - base[i], 80);
+        }
+        killBase.put(p.getUniqueId(), cur);
     }
 
     /** Le serveur est prêt : on repart de zéro et on ignore les 2 premières minutes. */
     private void markReady() {
         readyAt = System.currentTimeMillis();
+        if (data.bootMs == 0) data.bootMs = Math.max(0, readyAt - startedAt);
         ticks.ignoreFor(WARMUP_MS);
     }
 
@@ -669,7 +680,10 @@ public final class AethoriaStats extends JavaPlugin implements Listener, Command
         long now = System.currentTimeMillis();
         for (Player p : Bukkit.getOnlinePlayers()) {
             StatsData.PlayerRec r = online.get(p.getUniqueId());
-            if (r != null) refreshStats(p, r, false);
+            if (r != null) {
+                refreshStats(p, r, false);
+                trackKills(p);
+            }
         }
         refreshWorlds();
         Runtime rt = Runtime.getRuntime();

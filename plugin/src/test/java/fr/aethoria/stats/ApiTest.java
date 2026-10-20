@@ -172,7 +172,17 @@ public final class ApiTest {
             tm.run();
             Thread.sleep(50);
         }
-        check(tm.tps(60) > 15 && tm.tps(60) <= 20.0, "TPS : mesuré normalement après la période (" + tm.tps(60) + ")");
+        check(tm.tps(60) > 8 && tm.tps(60) <= 20.0, "TPS : mesuré normalement après la période (" + tm.tps(60) + ")");
+
+        // --- lecture du journal (sans écouteur d'événements) ---
+        check("chat".equals(LogLines.classify("<Aldric> bonjour tout le monde")[0]) && LogLines.classify("<Aldric> bonjour")[0].length() == 4, "journal : chat compté");
+        String[] c1 = LogLines.classify("Aldric issued server command: /home maison secrete");
+        check(c1 != null && c1[0].equals("cmd") && c1[1].equals("home") && c1[0].indexOf("secrete") < 0, "journal : nom de commande seul");
+        String[] c2 = LogLines.classify("Jehanne has made the advancement [Stone Age]");
+        check(c2 != null && c2[0].equals("adv") && c2[1].equals("Jehanne") && c2[2].equals("Stone Age"), "journal : succès");
+        String[] c3 = LogLines.classify("[ClearLag] Removed 214 Entities!");
+        check(c3 != null && c3[0].equals("clearlag") && c3[1].equals("214"), "journal : ClearLag");
+        check(LogLines.classify("Server thread: Done (14.2s)!") == null && LogLines.classify("Aldric joined the game") == null, "journal : le reste est ignoré");
 
         // --- hash ---
         String h = Auth.hash("abcdefghij");

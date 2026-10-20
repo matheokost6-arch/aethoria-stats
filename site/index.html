@@ -273,19 +273,185 @@ footer { margin-top: 26px; text-align: center; color: #cdbb97; font-size: .85rem
   table.heat td { height: 22px; }
 }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+/* ---- navigation ---- */
+.topbar { position: sticky; top: 0; z-index: 15; background: linear-gradient(180deg, #2a1b10, #1b120b); border-bottom: 2px solid var(--wood-edge); box-shadow: 0 4px 14px rgba(0,0,0,.5); }
+.topbar-in { max-width: 1200px; margin: 0 auto; padding: 0 16px; display: flex; align-items: center; gap: 12px; min-height: 52px; flex-wrap: wrap; }
+.logo { font-family: "Cinzel", Georgia, serif; font-weight: 700; font-size: 1.25rem; color: var(--gold); text-decoration: none; letter-spacing: .04em; margin-right: 8px; }
+.burger { display: none; margin-left: auto; font: inherit; font-size: 1rem; min-height: 44px; min-width: 44px; padding: 6px 12px; cursor: pointer; background: #3a2514; color: var(--gold-soft); border: 2px solid var(--gold); border-radius: 8px; }
+#menu { flex: 1 1 auto; }
+ul.menu { list-style: none; margin: 0; padding: 0; display: flex; gap: 2px; flex-wrap: wrap; align-items: center; }
+ul.menu > li { position: relative; }
+.menu a, .top-btn {
+  display: block; font: inherit; font-size: .95rem; color: var(--parch); text-decoration: none; background: none; border: 0;
+  padding: 12px 14px; min-height: 44px; cursor: pointer; border-radius: 6px; text-align: left; width: 100%;
+}
+.menu a:hover, .top-btn:hover, .menu a[aria-current="page"], .top-btn.cur { background: rgba(217,164,65,.18); color: var(--gold-soft); }
+.top-btn::after { content: " \25BE"; font-size: .8em; }
+.top-btn[aria-expanded="true"]::after { content: " \25B4"; }
+ul.sub { list-style: none; margin: 0; padding: 6px; position: absolute; left: 0; top: 100%; min-width: 230px; z-index: 16; background: #261910; border: 2px solid var(--wood-edge); border-radius: 8px; box-shadow: 0 10px 24px rgba(0,0,0,.6); }
+ul.sub[hidden] { display: none; }
+ul.sub .btn { width: 100%; margin: 4px 0; }
+.menu li:last-child ul.sub { left: auto; right: 0; }
+@media (max-width: 860px) {
+  .burger { display: inline-block; }
+  #menu { flex-basis: 100%; display: none; padding-bottom: 10px; }
+  #menu.open { display: block; }
+  ul.menu { flex-direction: column; align-items: stretch; gap: 0; }
+  ul.sub { position: static; box-shadow: none; border: 0; border-left: 3px solid var(--gold); border-radius: 0; background: transparent; margin: 0 0 6px 10px; padding: 0 0 0 4px; }
+  .menu li:last-child ul.sub { right: auto; }
+}
+
+/* ---- vues ---- */
+.view[hidden] { display: none; }
+.view { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; }
+section.card, dialog { scroll-margin-top: 70px; }
+.card > h2 { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.card > h2 .t { flex: 1 1 auto; }
+.help {
+  font: inherit; font-weight: 700; width: 30px; height: 30px; min-height: 30px; padding: 0; border-radius: 50%; cursor: pointer;
+  border: 2px solid #6a4a22; background: #fbf3de; color: #4a2c0c; line-height: 1;
+}
+.help:hover, .help[aria-expanded="true"] { background: #3a2514; color: var(--gold-soft); }
+.helpbox { margin: 0 0 12px; padding: 10px 14px; border-left: 4px solid var(--gold); background: rgba(255,255,255,.5); border-radius: 0 8px 8px 0; font-size: .95rem; }
+.helpbox[hidden] { display: none; }
+.caption { margin: 10px 0 0; font-size: .95rem; color: var(--ink); background: rgba(217,164,65,.16); border-radius: 8px; padding: 8px 12px; }
+.caption:empty { display: none; }
+.sentence { margin: 12px 0 0; padding: 12px 16px; border-radius: var(--radius); font-size: 1.1rem; font-weight: 600; border: 2px solid; }
+.sentence.ok { background: #1c3322; border-color: #4f8a56; color: #dff3dc; }
+.sentence.warn { background: #3a2c10; border-color: #b8892f; color: #fbe6b4; }
+.sentence.bad { background: #3b1f14; border-color: #b4553a; color: #ffe2d4; }
+
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
+a.tile { display: block; text-decoration: none; color: var(--ink); background: rgba(255,255,255,.4); border: 2px solid var(--line); border-radius: 10px; padding: 12px 14px; }
+a.tile:hover, a.tile:focus-visible { background: rgba(255,255,255,.7); border-color: #8a6a3a; }
+a.tile strong { display: block; font-family: "Cinzel", Georgia, serif; font-size: 1.05rem; color: #3b2208; }
+a.tile span { font-size: .9rem; color: var(--ink-soft); }
+a.tile small { display: block; margin-top: 4px; font-size: .8rem; color: #6a4a22; }
+
+dl.facts { display: grid; grid-template-columns: minmax(0, auto) minmax(0, 1fr); gap: 6px 16px; margin: 0; }
+dl.facts dt { color: var(--ink-soft); }
+dl.facts dd { margin: 0; font-weight: 600; overflow-wrap: anywhere; }
+.twocol { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+@media (max-width: 900px) { .twocol { grid-template-columns: minmax(0, 1fr); } }
+
+.bars { list-style: none; margin: 0; padding: 0; }
+.bars li { display: grid; grid-template-columns: minmax(80px, 38%) 1fr auto; gap: 10px; align-items: center; padding: 4px 0; }
+.bars .bar { margin: 0; }
+.bars .lbl { overflow-wrap: anywhere; font-size: .95rem; }
+.bars .val { font-variant-numeric: tabular-nums; font-weight: 600; font-size: .92rem; white-space: nowrap; }
+.bars.alt .bar > i { background: linear-gradient(90deg, #7a2415, #b8442a); }
+button.namelink { font: inherit; font-weight: 700; color: #4a2c0c; background: none; border: 0; padding: 2px 0; cursor: pointer; text-decoration: underline dotted; text-underline-offset: 3px; text-align: left; }
+button.namelink:hover { color: #8a5a00; text-decoration-style: solid; }
+
+.mixbar { display: flex; height: 22px; border-radius: 11px; overflow: hidden; border: 1px solid var(--line); margin: 8px 0; }
+.mixbar i { display: block; height: 100%; }
+.mixlegend { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; font-size: .93rem; }
+.mixlegend li::before { content: ""; display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 8px; background: var(--c); vertical-align: -1px; }
+
+.searchrow { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+.searchrow input { flex: 1 1 220px; }
+ul.results { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+ul.results li button { font: inherit; cursor: pointer; background: #3a2514; color: var(--parch); border: 0; border-radius: 999px; padding: 7px 14px; min-height: 40px; }
+ul.results li button:hover { background: #523420; }
+
+.skeleton { background: linear-gradient(90deg, rgba(255,255,255,.12), rgba(255,255,255,.28), rgba(255,255,255,.12)); background-size: 200% 100%; animation: shimmer 1.4s infinite; border-radius: 10px; height: 110px; }
+@keyframes shimmer { to { background-position: -200% 0; } }
+.loading { display: grid; gap: 14px; margin-top: 16px; }
+.errbox { margin-top: 16px; padding: 16px 18px; border-radius: var(--radius); background: #3b1f14; border: 2px solid #b4553a; color: #ffe2d4; }
+.errbox[hidden], .loading[hidden] { display: none; }
+.errbox .btn { margin-top: 8px; }
+
+/* fiche joueur */
+#dlg-player { max-width: min(680px, 96vw); }
+.pcard-head { display: flex; gap: 14px; align-items: center; margin-bottom: 8px; }
+.pcard-head img { width: 64px; height: 64px; border-radius: 8px; border: 2px solid #6a4a22; image-rendering: pixelated; background: #3a2514; }
+.pcard-head h2 { border: 0; margin: 0; padding: 0; }
+.pcard-head p { margin: 2px 0 0; color: var(--ink-soft); font-size: .92rem; }
+.statgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; margin: 8px 0; }
+.statgrid div { background: rgba(255,255,255,.4); border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; }
+.statgrid b { display: block; font-family: "Cinzel", Georgia, serif; font-size: 1.15rem; color: #3b2208; }
+.statgrid span { font-size: .8rem; color: var(--ink-soft); }
+.hourstrip { display: grid; grid-template-columns: repeat(24, 1fr); gap: 2px; margin: 6px 0 2px; }
+.hourstrip i { display: block; height: 24px; border-radius: 3px; background: rgba(43,27,14,.08); }
+.hourlbl { display: flex; justify-content: space-between; font-size: .72rem; color: var(--ink-soft); }
+.ranks { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 4px 12px; margin: 6px 0 0; padding: 0; list-style: none; font-size: .92rem; }
+
+.seg.small button { min-height: 34px; padding: 4px 12px; font-size: .85rem; }
+.toolbar .grow { flex: 1 1 auto; }
+.advrow { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; padding: 6px 0; border-bottom: 1px dashed var(--line); }
+.advrow:last-child { border-bottom: 0; }
+.advrow .time { grid-column: 1 / -1; font-size: .78rem; color: var(--ink-soft); }
+@media print { .topbar, .adminbar { display: none; } }
+
+.chip button.namelink { color: var(--gold-soft); text-decoration-color: var(--gold-soft); }
 </style>
 </head>
 <body>
 <a class="skip" href="#contenu">Aller au contenu</a>
+<header class="topbar">
+  <div class="topbar-in">
+    <a class="logo" href="#/accueil">Aethoria</a>
+    <button type="button" class="burger" id="burger" aria-expanded="false" aria-controls="menu" aria-label="Ouvrir le menu">Menu</button>
+    <nav id="menu" aria-label="Navigation principale">
+      <ul class="menu">
+        <li><a href="#/accueil" data-view="accueil">Accueil</a></li>
+        <li class="has-sub">
+          <button type="button" class="top-btn" aria-expanded="false" aria-haspopup="true" aria-controls="m-serveur" data-view="serveur">Serveur</button>
+          <ul class="sub" id="m-serveur" hidden>
+            <li><a href="#/serveur/etat">État du serveur</a></li>
+            <li><a href="#/serveur/performance">Performance (TPS)</a></li>
+            <li><a href="#/serveur/machine">Machine et mémoire</a></li>
+            <li><a href="#/serveur/charge">Chunks et entités</a></li>
+            <li><a href="#/serveur/mondes">Les mondes</a></li>
+          </ul>
+        </li>
+        <li class="has-sub">
+          <button type="button" class="top-btn" aria-expanded="false" aria-haspopup="true" aria-controls="m-joueurs" data-view="joueurs">Joueurs</button>
+          <ul class="sub" id="m-joueurs" hidden>
+            <li><a href="#/joueurs/enligne">En ligne maintenant</a></li>
+            <li><a href="#/joueurs/recherche">Chercher un joueur</a></li>
+            <li><a href="#/joueurs/nouveaux">Nouveaux joueurs</a></li>
+            <li><a href="#/joueurs/fidelite">Fidélité</a></li>
+            <li><a href="#/joueurs/classements">Classements</a></li>
+          </ul>
+        </li>
+        <li class="has-sub">
+          <button type="button" class="top-btn" aria-expanded="false" aria-haspopup="true" aria-controls="m-activite" data-view="activite">Activité</button>
+          <ul class="sub" id="m-activite" hidden>
+            <li><a href="#/activite/courbes">Joueurs au fil du temps</a></li>
+            <li><a href="#/activite/heatmap">Heures les plus animées</a></li>
+            <li><a href="#/activite/heures">Record par heure</a></li>
+            <li><a href="#/activite/sessions">Visites et discussions</a></li>
+          </ul>
+        </li>
+        <li class="has-sub">
+          <button type="button" class="top-btn" aria-expanded="false" aria-haspopup="true" aria-controls="m-journal" data-view="journal">Journal</button>
+          <ul class="sub" id="m-journal" hidden>
+            <li><a href="#/journal/evenements">Événements récents</a></li>
+            <li><a href="#/journal/succes">Succès débloqués</a></li>
+            <li><a href="#/journal/morts">Les morts</a></li>
+            <li><a href="#/journal/monstres">Monstres tués</a></li>
+            <li><a href="#/journal/commandes">Commandes utilisées</a></li>
+          </ul>
+        </li>
+        <li class="has-sub">
+          <button type="button" class="top-btn" aria-expanded="false" aria-haspopup="true" aria-controls="m-admin" data-view="admin">Admin</button>
+          <ul class="sub" id="m-admin" hidden>
+            <li><a href="#/admin">Panneau d'administration</a></li>
+            <li><button type="button" class="btn small" id="btn-admin">Se connecter</button></li>
+            <li><button type="button" class="btn small" id="btn-logout" hidden>Se déconnecter</button></li>
+          </ul>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
 <div class="wrap">
   <header class="top">
     <div class="brand">
       <h1>Aethoria</h1>
       <p>Registre du royaume : les chiffres du serveur en direct</p>
-      <div class="adminbar">
-        <button type="button" class="btn" id="btn-admin">Admin</button>
-        <button type="button" class="btn" id="btn-logout" hidden>Se déconnecter</button>
-      </div>
     </div>
     <div class="status" id="status" role="status" aria-live="polite">
       <div><span class="lbl">Serveur</span><span class="val" id="st-state">Chargement...</span><span class="sub" id="st-age">&nbsp;</span></div>
@@ -293,10 +459,205 @@ footer { margin-top: 26px; text-align: center; color: #cdbb97; font-size: .85rem
       <div><span class="lbl">TPS (1 min)</span><span class="val" id="st-tps">-</span><span class="sub" id="st-tps-sub">&nbsp;</span></div>
       <div><span class="lbl">En marche depuis</span><span class="val" id="st-uptime">-</span><span class="sub" id="st-version">&nbsp;</span></div>
     </div>
+    <p class="sentence warn" id="sentence" role="status" aria-live="polite">Chargement des statistiques...</p>
     <p class="notice" id="notice" hidden></p>
   </header>
 
-  <main id="contenu">
+  <div class="loading" id="loading" aria-hidden="true"><div class="skeleton"></div><div class="skeleton" style="height:260px"></div><div class="skeleton"></div></div>
+  <div class="errbox" id="errbox" role="alert" hidden>
+    <strong id="err-title">Impossible de joindre le serveur de statistiques.</strong>
+    <p id="err-text" style="margin:6px 0 0"></p>
+    <button type="button" class="btn" id="err-retry">Réessayer</button>
+  </div>
+
+  <main id="contenu" tabindex="-1">
+
+    <!-- ===================== ACCUEIL ===================== -->
+    <div class="view" id="v-accueil" data-view="accueil" hidden>
+      <section class="card" id="s-sommaire" aria-labelledby="h-sommaire">
+        <h2 id="h-sommaire"><span class="t">Où veux-tu aller ?</span></h2>
+        <div class="tiles">
+          <a class="tile" href="#/serveur"><strong>Serveur</strong><span>Est-ce que ça lague ? Mémoire, mondes, machine.</span><small>État, performance, machine, chunks, mondes</small></a>
+          <a class="tile" href="#/joueurs"><strong>Joueurs</strong><span>Qui est là, qui vient d'arriver, qui est le meilleur.</span><small>En ligne, recherche, nouveaux, fidélité, classements</small></a>
+          <a class="tile" href="#/activite"><strong>Activité</strong><span>À quelle heure il y a le plus de monde.</span><small>Courbes, heures animées, visites, discussions</small></a>
+          <a class="tile" href="#/journal"><strong>Journal</strong><span>Ce qui se passe : connexions, morts, succès.</span><small>Événements, succès, morts, monstres, commandes</small></a>
+          <a class="tile" href="#/admin"><strong>Admin</strong><span>Réservé à l'équipe : console et modération.</span><small>Connexion nécessaire</small></a>
+        </div>
+      </section>
+      <section class="card" id="s-kpi" aria-labelledby="h-kpi">
+        <h2 id="h-kpi" data-help="kpi"><span class="t">En un coup d'oeil</span></h2>
+        <div class="kpis" id="kpis"></div>
+      </section>
+      <section class="card" id="s-records" aria-labelledby="h-records">
+        <h2 id="h-records" data-help="records"><span class="t">Les records du royaume</span></h2>
+        <div class="kpis" id="records"></div>
+      </section>
+    </div>
+
+    <!-- ===================== SERVEUR ===================== -->
+    <div class="view" id="v-serveur" data-view="serveur" hidden>
+      <section class="card" id="s-etat" aria-labelledby="h-etat">
+        <h2 id="h-etat" data-help="etat"><span class="t">État du serveur</span></h2>
+        <div class="twocol">
+          <dl class="facts" id="etat-facts"></dl>
+          <div>
+            <h3 class="panel-h3">Les pires moments de lag (24 h)</h3>
+            <ul class="plain rows" id="lag-spikes"></ul>
+          </div>
+        </div>
+        <p class="caption" id="cap-etat"></p>
+      </section>
+      <section class="card" id="s-performance" aria-labelledby="h-perf">
+        <h2 id="h-perf" data-help="perf"><span class="t">Performance : le TPS dans le temps</span></h2>
+        <div class="toolbar"><div class="seg small" role="group" aria-label="Période" data-range="server"></div></div>
+        <div class="chart"><canvas id="ch-tps" role="img" aria-label="TPS dans le temps"></canvas></div>
+        <p class="caption" id="cap-perf"></p>
+      </section>
+      <section class="card" id="s-machine" aria-labelledby="h-mach">
+        <h2 id="h-mach" data-help="machine"><span class="t">Machine et mémoire</span></h2>
+        <dl class="mach" id="mach"></dl>
+        <div class="bar" id="ram-bar" role="img"><i></i></div>
+        <div class="chart small"><canvas id="ch-ram" role="img" aria-label="Mémoire utilisée au fil du temps"></canvas></div>
+        <p class="caption" id="cap-ram"></p>
+      </section>
+      <section class="card" id="s-charge" aria-labelledby="h-charge">
+        <h2 id="h-charge" data-help="charge"><span class="t">Chunks et entités</span></h2>
+        <div class="chart small"><canvas id="ch-load" role="img" aria-label="Chunks et entités au fil du temps"></canvas></div>
+        <p class="caption" id="cap-load"></p>
+        <p class="caption" id="cap-clearlag"></p>
+      </section>
+      <section class="card" id="s-mondes" aria-labelledby="h-worlds">
+        <h2 id="h-worlds" data-help="mondes"><span class="t">Les mondes</span></h2>
+        <div class="tablewrap"><table class="data" id="worlds"></table></div>
+      </section>
+    </div>
+
+    <!-- ===================== JOUEURS ===================== -->
+    <div class="view" id="v-joueurs" data-view="joueurs" hidden>
+      <section class="card" id="s-enligne" aria-labelledby="h-online">
+        <h2 id="h-online" data-help="enligne"><span class="t">Joueurs en ligne</span></h2>
+        <div id="online"></div>
+      </section>
+      <section class="card" id="s-recherche" aria-labelledby="h-search">
+        <h2 id="h-search" data-help="recherche"><span class="t">Chercher un joueur</span></h2>
+        <form class="searchrow" id="search-form" role="search">
+          <label class="sr-only" for="search-q">Pseudo du joueur</label>
+          <input type="search" id="search-q" placeholder="Tape un pseudo..." autocomplete="off" spellcheck="false">
+          <button type="submit" class="btn">Chercher</button>
+        </form>
+        <ul class="results" id="search-res" aria-live="polite"></ul>
+        <p class="hint" id="search-hint"></p>
+      </section>
+      <div class="twocol">
+        <section class="card" id="s-nouveaux" aria-labelledby="h-new">
+          <h2 id="h-new" data-help="nouveaux"><span class="t">Nouveaux joueurs</span></h2>
+          <div class="toolbar"><div class="seg small" role="group" aria-label="Période" data-range="new"></div></div>
+          <div class="chart small"><canvas id="ch-new" role="img" aria-label="Nouveaux joueurs par jour"></canvas></div>
+          <p class="caption" id="new-sum"></p>
+          <h3 class="panel-h3">Derniers arrivés</h3>
+          <ul class="plain rows" id="recent"></ul>
+          <h3 class="panel-h3">Anniversaires</h3>
+          <ul class="plain rows" id="birthdays"></ul>
+        </section>
+        <section class="card" id="s-fidelite" aria-labelledby="h-ret">
+          <h2 id="h-ret" data-help="fidelite"><span class="t">Les nouveaux reviennent-ils ?</span></h2>
+          <div class="ret" id="ret"></div>
+          <p class="caption" id="cap-ret"></p>
+          <h3 class="panel-h3">Qui sont nos joueurs ?</h3>
+          <div class="mixbar" id="mixbar" role="img"></div>
+          <ul class="mixlegend" id="mixlegend"></ul>
+          <p class="caption" id="cap-mix"></p>
+        </section>
+      </div>
+      <section class="card" id="s-classements" aria-labelledby="h-board">
+        <h2 id="h-board" data-help="classements"><span class="t">Classements</span></h2>
+        <div class="tabs" role="tablist" aria-label="Choisir un classement" id="tabs"></div>
+        <div class="toolbar">
+          <div class="seg small" role="group" aria-label="Période du classement" id="board-range" hidden></div>
+          <span class="grow"></span>
+          <button type="button" class="btn small" id="csv">Exporter en CSV</button>
+        </div>
+        <div id="board" role="tabpanel" tabindex="0"></div>
+        <p class="caption" id="cap-board"></p>
+      </section>
+    </div>
+
+    <!-- ===================== ACTIVITE ===================== -->
+    <div class="view" id="v-activite" data-view="activite" hidden>
+      <section class="card" id="s-courbes" aria-labelledby="h-hist">
+        <h2 id="h-hist" data-help="courbes"><span class="t">Joueurs au fil du temps</span></h2>
+        <div class="toolbar"><div class="seg small" role="group" aria-label="Période" data-range="act"></div></div>
+        <div class="chart"><canvas id="ch-hist" role="img" aria-label="Courbe du nombre de joueurs"></canvas></div>
+        <p class="caption" id="hist-sum"></p>
+      </section>
+      <section class="card" id="s-heatmap" aria-labelledby="h-heat">
+        <h2 id="h-heat" data-help="heatmap"><span class="t">Quand le royaume est-il animé ?</span></h2>
+        <div class="heat-scroll"><table class="heat" id="heat"></table></div>
+        <div class="legend"><span>Calme</span><span class="ramp" aria-hidden="true"></span><span>Très animé</span></div>
+        <p class="caption" id="heat-sum"></p>
+      </section>
+      <section class="card" id="s-heures" aria-labelledby="h-peakh">
+        <h2 id="h-peakh" data-help="heures"><span class="t">Record de joueurs, heure par heure</span></h2>
+        <div class="chart small"><canvas id="ch-peakh" role="img" aria-label="Record de joueurs par heure"></canvas></div>
+        <p class="caption" id="cap-peakh"></p>
+      </section>
+      <div class="twocol" id="s-sessions">
+        <section class="card" aria-labelledby="h-ses">
+          <h2 id="h-ses" data-help="sessions"><span class="t">Connexions par jour</span></h2>
+          <div class="chart small"><canvas id="ch-ses" role="img" aria-label="Connexions par jour"></canvas></div>
+          <p class="caption" id="cap-ses"></p>
+        </section>
+        <section class="card" aria-labelledby="h-avg">
+          <h2 id="h-avg" data-help="duree"><span class="t">Durée moyenne d'une visite</span></h2>
+          <div class="chart small"><canvas id="ch-avg" role="img" aria-label="Durée moyenne d'une visite par jour"></canvas></div>
+          <p class="caption" id="cap-avg"></p>
+        </section>
+      </div>
+      <section class="card" id="s-chat" aria-labelledby="h-chat">
+        <h2 id="h-chat" data-help="chat"><span class="t">Messages dans le chat par jour</span></h2>
+        <div class="chart small"><canvas id="ch-chat" role="img" aria-label="Messages de chat par jour"></canvas></div>
+        <p class="caption" id="cap-chat"></p>
+      </section>
+    </div>
+
+    <!-- ===================== JOURNAL ===================== -->
+    <div class="view" id="v-journal" data-view="journal" hidden>
+      <section class="card" id="s-evenements" aria-labelledby="h-log">
+        <h2 id="h-log" data-help="evenements"><span class="t">Événements récents</span></h2>
+        <div class="loglist" tabindex="0" aria-label="Journal, défilement possible"><ul class="plain log" id="log"></ul></div>
+      </section>
+      <section class="card" id="s-succes" aria-labelledby="h-adv">
+        <h2 id="h-adv" data-help="succes"><span class="t">Succès débloqués</span></h2>
+        <div id="adv"></div>
+      </section>
+      <div class="twocol">
+        <section class="card" id="s-morts" aria-labelledby="h-deaths">
+          <h2 id="h-deaths" data-help="morts"><span class="t">Comment meurt-on ?</span></h2>
+          <ul class="bars alt" id="death-causes"></ul>
+          <h3 class="panel-h3">Qui nous tue le plus ?</h3>
+          <ul class="bars alt" id="killers"></ul>
+          <p class="caption" id="cap-deaths"></p>
+        </section>
+        <section class="card" id="s-monstres" aria-labelledby="h-mobs">
+          <h2 id="h-mobs" data-help="monstres"><span class="t">Monstres et animaux tués</span></h2>
+          <ul class="bars" id="mobs"></ul>
+          <p class="caption" id="cap-mobs"></p>
+        </section>
+      </div>
+      <section class="card" id="s-commandes" aria-labelledby="h-cmds">
+        <h2 id="h-cmds" data-help="commandes"><span class="t">Commandes les plus utilisées</span></h2>
+        <ul class="bars" id="cmds"></ul>
+        <p class="caption">Seul le nom de la commande est compté, jamais ce qui est écrit après.</p>
+      </section>
+    </div>
+
+    <!-- ===================== ADMIN ===================== -->
+    <div class="view" id="v-admin" data-view="admin" hidden>
+      <section class="card" id="admin-prompt" aria-labelledby="h-prompt">
+        <h2 id="h-prompt"><span class="t">Espace réservé à l'équipe</span></h2>
+        <p>Cette partie permet de suivre la console du serveur et de modérer les joueurs. Il faut un compte d'admin ou de modérateur.</p>
+        <button type="button" class="btn primary" id="prompt-login">Se connecter</button>
+      </section>
     <section class="card" id="admin" aria-labelledby="h-admin" hidden>
       <h2 id="h-admin">Panneau d'administration</h2>
       <p class="hint" id="admin-who" style="margin:0 0 10px"></p>
@@ -385,94 +746,17 @@ footer { margin-top: 26px; text-align: center; color: #cdbb97; font-size: .85rem
       </div>
     </section>
 
-    <section class="card" aria-labelledby="h-kpi">
-      <h2 id="h-kpi">En un coup d'oeil</h2>
-      <div class="kpis" id="kpis"></div>
-    </section>
 
-    <section class="card" aria-labelledby="h-hist">
-      <h2 id="h-hist">Joueurs et fluidité du serveur</h2>
-      <div class="toolbar">
-        <div class="seg" role="group" aria-label="Période affichée" id="range">
-          <button type="button" data-h="24" aria-pressed="true">24 h</button>
-          <button type="button" data-h="168" aria-pressed="false">7 jours</button>
-          <button type="button" data-h="336" aria-pressed="false">14 jours</button>
-        </div>
-      </div>
-      <div class="chart"><canvas id="ch-hist" role="img" aria-label="Courbe du nombre de joueurs et du TPS"></canvas></div>
-      <p class="hint" id="hist-sum"></p>
-    </section>
-
-    <div class="grid cols-2">
-      <section class="card" aria-labelledby="h-heat">
-        <h2 id="h-heat">Quand le royaume est-il animé ?</h2>
-        <div class="heat-scroll"><table class="heat" id="heat"></table></div>
-        <div class="legend"><span>Calme</span><span class="ramp" aria-hidden="true"></span><span>Très animé</span></div>
-        <p class="hint" id="heat-sum"></p>
-      </section>
-
-      <section class="card" aria-labelledby="h-ret">
-        <h2 id="h-ret">Les nouveaux reviennent-ils ?</h2>
-        <div class="ret" id="ret"></div>
-        <p class="hint">Part des joueurs arrivés il y a au moins 1, 7 ou 30 jours qui sont revenus jouer au moins une fois ce jour-là ou après.</p>
-      </section>
-    </div>
-
-    <div class="grid cols-2">
-      <section class="card" aria-labelledby="h-new">
-        <h2 id="h-new">Nouveaux joueurs par jour</h2>
-        <div class="chart small"><canvas id="ch-new" role="img" aria-label="Nombre de nouveaux joueurs par jour sur 30 jours"></canvas></div>
-        <p class="hint" id="new-sum"></p>
-      </section>
-      <section class="card" aria-labelledby="h-ses">
-        <h2 id="h-ses">Connexions par jour</h2>
-        <div class="chart small"><canvas id="ch-ses" role="img" aria-label="Nombre de sessions de jeu par jour sur 30 jours"></canvas></div>
-        <p class="hint">Une connexion = un joueur qui arrive sur le serveur.</p>
-      </section>
-    </div>
-
-    <div class="grid cols-2">
-      <section class="card" aria-labelledby="h-online">
-        <h2 id="h-online">Joueurs en ligne</h2>
-        <div id="online"></div>
-      </section>
-      <section class="card" aria-labelledby="h-recent">
-        <h2 id="h-recent">Derniers arrivés</h2>
-        <ul class="plain rows" id="recent"></ul>
-      </section>
-    </div>
-
-    <section class="card" aria-labelledby="h-board">
-      <h2 id="h-board">Classements</h2>
-      <div class="tabs" role="tablist" aria-label="Choisir un classement" id="tabs"></div>
-      <div id="board" role="tabpanel" tabindex="0"></div>
-    </section>
-
-    <div class="grid cols-2">
-      <section class="card" aria-labelledby="h-log">
-        <h2 id="h-log">Journal du royaume</h2>
-        <div class="loglist" tabindex="0" aria-label="Journal, défilement possible"><ul class="plain log" id="log"></ul></div>
-      </section>
-      <div class="grid">
-        <section class="card" aria-labelledby="h-worlds">
-          <h2 id="h-worlds">Les mondes</h2>
-          <div class="tablewrap"><table class="data" id="worlds"></table></div>
-        </section>
-        <section class="card" aria-labelledby="h-mach">
-          <h2 id="h-mach">La machine</h2>
-          <dl class="mach" id="mach"></dl>
-          <div class="bar" id="ram-bar" role="img"><i></i></div>
-          <div class="chart small"><canvas id="ch-ram" role="img" aria-label="Mémoire utilisée au fil du temps"></canvas></div>
-        </section>
-      </div>
     </div>
   </main>
 
   <footer>
-    <p>Aethoria - chiffres mis à jour par le serveur toutes les 20 secondes. Aucune adresse IP n'est publiée.</p>
+    <p>Aethoria - chiffres mis à jour par le serveur toutes les 20 secondes. Aucune adresse IP n'est publiée, et le contenu du chat n'est jamais lu.</p>
     <p id="foot-gen"></p>
   </footer>
 </div>
+
+<dialog id="dlg-player" aria-labelledby="pl-name"></dialog>
 <dialog id="dlg-login" aria-labelledby="login-h">
   <form id="login-form" autocomplete="off">
     <h2 id="login-h">Connexion au panneau</h2>
@@ -491,30 +775,68 @@ footer { margin-top: 26px; text-align: center; color: #cdbb97; font-size: .85rem
 "use strict";
 /* ==========================================================
    RÉGLAGES : changer ici l'adresse de l'API du serveur (sans / à la fin).
-   La page lit API_BASE + "/api/stats". Pour un essai local : ?api=http://127.0.0.1:8765
+   La page lit API_BASE + "/api/stats", "/api/players" et "/api/history".
+   Pour un essai local : ?api=http://127.0.0.1:8765
    ========================================================== */
 const API_BASE = "https://141-11-103-141.sslip.io";
 const REFRESH_MS = 30000;      // relecture des stats
 const FRESH_MIN = 3;           // données plus récentes que ça : "En ligne"
 const STALE_MIN = 10;          // au-delà : "Hors ligne"
-const DEMO_URL = "stats.sample.json";
 
 const params = new URLSearchParams(location.search);
 const DEMO = params.get("demo") === "1";
 const API_BASE_USED = (params.get("api") || API_BASE).replace(/\/+$/, "");
-const SOURCE = DEMO ? DEMO_URL : API_BASE_USED + "/api/stats";
+const URLS = DEMO
+  ? { stats: "stats.sample.json", players: "players.sample.json", history: "history.sample.json" }
+  : { stats: API_BASE_USED + "/api/stats", players: API_BASE_USED + "/api/players", history: API_BASE_USED + "/api/history" };
 
 const $ = (id) => document.getElementById(id);
 const nf = new Intl.NumberFormat("fr-FR");
 const DAYS = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"];
 const DAYS_SHORT = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
 
-let data = null;
-let lastFetchOk = 0;
+let data = null;       // stats.json (léger)
+let pdata = null;      // players.json (fiches)
+let hdata = null;      // history.json (courbes)
+let pTime = 0, hTime = 0;
 let fetchError = "";
-let rangeHours = 24;
+let curView = null;
+let prevView = "joueurs";
 let boardKey = "playtime";
+let boardPeriod = "total";
+const ranges = { server: 24, act: 24, new: 30 };
 const charts = {};
+
+/* ---------- textes d'aide (le « ? » de chaque carte) ---------- */
+const HELP = {
+  kpi: "Les chiffres les plus importants du serveur, d'un seul regard. « Actifs » veut dire : qui est venu jouer récemment.",
+  records: "Les meilleurs scores depuis que le serveur est suivi : la plus longue partie d'une traite, le plus de monde en même temps, et le joueur le plus actif de la semaine.",
+  etat: "Ici, tu vois si le serveur va bien. Le TPS, c'est sa vitesse : 20 = parfait, sous 15 ça lague. Le temps par tick doit rester sous 50 ms.",
+  perf: "Le TPS dans le temps. La ligne verte est la vitesse moyenne, la rouge pointillée les plus gros ralentissements. Quand elle plonge, le jeu a laggé.",
+  machine: "La RAM, c'est la mémoire de l'ordinateur du serveur. Si elle est presque pleine, il peut ralentir. Elle monte et redescend toute seule : c'est normal.",
+  charge: "Un chunk, c'est un morceau de carte de 16 x 16 blocs. Les entités sont tout ce qui bouge : monstres, animaux, objets au sol. Trop d'entités, et le serveur lague. ClearLag nettoie régulièrement.",
+  mondes: "Le royaume est fait de plusieurs mondes : la surface, le Nether et l'End. Pour chacun : combien de morceaux sont chargés, combien de créatures et d'objets, l'heure et la météo.",
+  enligne: "Les joueurs connectés maintenant, avec le temps depuis lequel ils jouent. Clique sur un pseudo pour voir sa fiche.",
+  recherche: "Tape le début d'un pseudo pour retrouver sa fiche : temps de jeu, records, classements.",
+  nouveaux: "Les joueurs qui viennent d'arriver. Le graphique compte les nouveaux inscrits jour par jour. Un anniversaire, c'est quand un joueur est inscrit depuis un mois ou un an pile.",
+  fidelite: "Combien de nouveaux reviennent ? J+1 veut dire « le lendemain de leur arrivée », J+7 « une semaine après ». Plus le pourcentage est haut, plus le serveur plaît.",
+  classements: "Les meilleurs joueurs, catégorie par catégorie. Pour le temps de jeu, tu peux choisir aujourd'hui, la semaine, le mois ou depuis toujours. Tu peux aussi exporter la liste en CSV.",
+  courbes: "Le nombre de joueurs connectés, mesuré toutes les 5 minutes. Les bosses sont les moments où il y a du monde.",
+  heatmap: "Chaque case est un jour et une heure. Plus elle est foncée, plus il y a eu de joueurs à ce moment-là. Pratique pour savoir quand venir.",
+  heures: "Pour chaque heure de la journée, le plus de joueurs qu'on ait jamais vus en même temps.",
+  sessions: "Une connexion, c'est un joueur qui arrive sur le serveur. Ce graphique les compte jour après jour.",
+  duree: "Combien de temps dure une visite en moyenne, jour par jour. Une visite longue veut dire que les joueurs s'amusent.",
+  chat: "Le nombre de messages écrits dans le chat chaque jour. On compte seulement les messages, jamais ce qu'ils disent.",
+  evenements: "Ce qui s'est passé récemment : arrivées, départs, premières visites, morts et records.",
+  succes: "Les succès (ou avancements) que les joueurs ont débloqués récemment : ce sont les petites récompenses du jeu.",
+  morts: "Les causes de mort des joueurs, et les créatures qui les ont tués. Un bon moyen de voir ce qui est dangereux.",
+  monstres: "Les créatures que les joueurs ont tuées le plus souvent depuis le début du suivi.",
+  commandes: "Les commandes que les joueurs tapent le plus (comme /home ou /spawn). On ne garde que le nom, jamais le reste."
+};
+
+const MOB_FR = { ZOMBIE: "Zombie", SKELETON: "Squelette", CREEPER: "Creeper", SPIDER: "Araignée", CAVE_SPIDER: "Araignée des cavernes", COW: "Vache", PIG: "Cochon", SHEEP: "Mouton", CHICKEN: "Poulet", ENDERMAN: "Enderman", SLIME: "Slime", BAT: "Chauve-souris", ZOMBIFIED_PIGLIN: "Cochon-zombie", WITCH: "Sorcière", DROWNED: "Noyé", PHANTOM: "Fantôme", PILLAGER: "Pillard", WOLF: "Loup", PLAYER: "Un autre joueur", BLAZE: "Blaze", GHAST: "Ghast", WITHER_SKELETON: "Wither squelette", HUSK: "Zombie momie", STRAY: "Vagabond", VINDICATOR: "Vindicateur", EVOKER: "Invocateur", RABBIT: "Lapin", HORSE: "Cheval", SQUID: "Pieuvre", SILVERFISH: "Poisson d'argent", GUARDIAN: "Gardien", MAGMA_CUBE: "Cube de magma", PIGLIN: "Piglin", HOGLIN: "Hoglin", IRON_GOLEM: "Golem de fer", VILLAGER: "Villageois", ENDER_DRAGON: "Dragon de l'End", WITHER: "Wither", SALMON: "Saumon", COD: "Morue", TURTLE: "Tortue", BEE: "Abeille", FOX: "Renard", GOAT: "Chèvre" };
+const ADV_FR = { "story/mine_stone": "Âge de pierre", "story/upgrade_tools": "Une meilleure pioche", "story/smelt_iron": "Acquérir du matériel", "story/obtain_armor": "Fais-toi chic", "story/iron_tools": "Des outils en fer", "story/enter_the_nether": "Nous devons aller plus profond", "story/follow_ender_eye": "L'oeil qui voit tout", "story/enter_the_end": "La fin ?", "story/form_obsidian": "Chasseur de glaçons", "nether/find_fortress": "Une forteresse terrible", "nether/obtain_crying_obsidian": "Qui découpe des oignons ?", "end/kill_dragon": "Libérer l'End", "adventure/kill_a_mob": "Chasseur de monstres", "adventure/trade": "Quel marché !", "adventure/sleep_in_bed": "Doux rêves", "husbandry/breed_an_animal": "Les parents", "husbandry/plant_seed": "Un petit coup de semis", "husbandry/tame_an_animal": "Meilleurs amis pour la vie" };
+const ADV_CAT = { story: "Histoire", nether: "Nether", end: "L'End", adventure: "Aventure", husbandry: "Ferme" };
 
 /* ---------- aides ---------- */
 function h(tag, attrs, ...kids) {
@@ -544,74 +866,147 @@ function ago(ts) {
   if (s < 3600) return "il y a " + Math.round(s / 60) + " min";
   if (s < 86400) return "il y a " + Math.round(s / 3600) + " h";
   const d = Math.round(s / 86400);
+  if (d >= 60) return "il y a " + Math.round(d / 30) + " mois";
   return "il y a " + d + (d > 1 ? " jours" : " jour");
 }
 function tz() { return (data && data.timezone) || undefined; }
-function fmtDateTime(ts) {
-  try { return new Intl.DateTimeFormat("fr-FR", { dateStyle: "long", timeStyle: "short", timeZone: tz() }).format(ts); }
+function fmt(opts, ts) {
+  try { return new Intl.DateTimeFormat("fr-FR", Object.assign({ timeZone: tz() }, opts)).format(ts); }
   catch (e) { return new Date(ts).toLocaleString("fr-FR"); }
 }
-function fmtDate(ts) {
-  try { return new Intl.DateTimeFormat("fr-FR", { dateStyle: "long", timeZone: tz() }).format(ts); }
-  catch (e) { return new Date(ts).toLocaleDateString("fr-FR"); }
-}
-function fmtClock(ts) {
-  try { return new Intl.DateTimeFormat("fr-FR", { hour: "2-digit", minute: "2-digit", timeZone: tz() }).format(ts); }
-  catch (e) { return new Date(ts).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" }); }
-}
-function fmtShort(ts, withDay) {
-  try {
-    return new Intl.DateTimeFormat("fr-FR", withDay ? { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit", timeZone: tz() } : { hour: "2-digit", minute: "2-digit", timeZone: tz() }).format(ts);
-  } catch (e) { return new Date(ts).toLocaleString("fr-FR"); }
-}
+function fmtDateTime(ts) { return fmt({ dateStyle: "long", timeStyle: "short" }, ts); }
+function fmtDate(ts) { return fmt({ dateStyle: "long" }, ts); }
+function fmtClock(ts) { return fmt({ hour: "2-digit", minute: "2-digit" }, ts); }
+function fmtShort(ts, withDay) { return fmt(withDay ? { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" } : { hour: "2-digit", minute: "2-digit" }, ts); }
+function fmtDay(ts) { return fmt({ weekday: "long", day: "numeric", month: "long" }, ts); }
+function hourOf(ts) { return +fmt({ hour: "2-digit", hourCycle: "h23" }, ts); }
 function tpsClass(t) { return t >= 19 ? "ok" : t >= 17 ? "warn" : "bad"; }
 function tpsLabel(t) { return t >= 19 ? "Fluide" : t >= 17 ? "Un peu ralenti" : "Ralenti"; }
+function mobName(t) { return MOB_FR[t] || (t.charAt(0) + t.slice(1).toLowerCase().replace(/_/g, " ")); }
+function advName(k) {
+  if (ADV_FR[k]) return ADV_FR[k];
+  const last = k.split("/").pop().replace(/_/g, " ");
+  return last.charAt(0).toUpperCase() + last.slice(1);
+}
+function advCat(k) { return ADV_CAT[k.split("/")[0]] || "Autre"; }
+function stateOf() {
+  if (!data) return { cls: "warn", text: "Chargement...", sub: "" };
+  const ageMin = (Date.now() - data.generatedAt) / 60000;
+  if (ageMin <= FRESH_MIN) return { cls: "ok", text: "En ligne", sub: "Mis à jour " + ago(data.generatedAt), age: ageMin };
+  if (ageMin <= STALE_MIN) return { cls: "warn", text: "Données anciennes", sub: "Mis à jour " + ago(data.generatedAt), age: ageMin };
+  return { cls: "bad", text: "Hors ligne", sub: "Dernier signe de vie " + ago(data.generatedAt), age: ageMin };
+}
+function nameButton(name) {
+  const b = h("button", { type: "button", class: "namelink", "aria-label": "Voir la fiche de " + name }, name);
+  b.addEventListener("click", () => { location.hash = "#/joueur/" + encodeURIComponent(name); });
+  return b;
+}
+function barList(el, rows, fmtVal) {
+  clear(el);
+  if (!rows.length) { el.append(h("li", { class: "empty" }, "Rien à afficher pour l'instant.")); return; }
+  const max = Math.max(1, ...rows.map((r) => r.value));
+  rows.forEach((r) => {
+    const bar = h("div", { class: "bar", "aria-hidden": "true" }, h("i"));
+    bar.firstChild.style.width = Math.max(2, 100 * r.value / max) + "%";
+    el.append(h("li", null, h("span", { class: "lbl" }, r.label), bar, h("span", { class: "val" }, fmtVal ? fmtVal(r.value) : num(r.value))));
+  });
+}
 
 /* ---------- chargement ---------- */
-function shiftTimes(d) {
-  const delta = Date.now() - d.generatedAt;
+async function getJson(url, shiftFn) {
+  const ctl = new AbortController();
+  const timer = setTimeout(() => ctl.abort(), 15000);
+  try {
+    const r = await fetch(url + (url.includes("?") ? "&" : "?") + "t=" + Date.now(), { cache: "no-store", signal: ctl.signal });
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    const d = await r.json();
+    return DEMO && shiftFn ? shiftFn(d) : d;
+  } catch (e) {
+    throw new Error(e.name === "AbortError" ? "le serveur met trop de temps à répondre" : e.message);
+  } finally { clearTimeout(timer); }
+}
+function shiftBy(d) { return Date.now() - d.generatedAt; }
+function shiftStats(d) {
+  const delta = shiftBy(d);
   const s = (o, k) => { if (o && typeof o[k] === "number" && o[k] > 0) o[k] += delta; };
   s(d, "generatedAt"); s(d.server, "startedAt"); s(d.players.record, "at");
+  d.server.lagSpikes.forEach((p) => s(p, "ts"));
   d.players.list.forEach((p) => s(p, "since"));
   d.newPlayers.recent.forEach((p) => s(p, "first"));
-  d.history.points.forEach((p) => { p[0] += delta; });
-  d.playerList.forEach((p) => { s(p, "first"); s(p, "last"); });
   d.log.forEach((l) => s(l, "ts"));
+  d.game.advancements.forEach((l) => s(l, "ts"));
+  s(d.game.clearlag, "lastAt"); s(d.records.longestSession, "at"); s(d.records.peakPlayers, "at");
   return d;
+}
+function shiftPlayers(d) {
+  const delta = shiftBy(d);
+  d.generatedAt += delta;
+  d.players.forEach((p) => { p.first += delta; p.last += delta; });
+  return d;
+}
+function shiftHistory(d) {
+  const delta = shiftBy(d);
+  d.generatedAt += delta;
+  d.points.forEach((p) => { p[0] += delta; });
+  return d;
+}
+async function ensurePlayers(force) {
+  if (pdata && !force && Date.now() - pTime < 55000) return pdata;
+  try { pdata = await getJson(URLS.players, shiftPlayers); pTime = Date.now(); }
+  catch (e) { if (!pdata) throw e; }
+  return pdata;
+}
+async function ensureHistory(force) {
+  if (hdata && !force && Date.now() - hTime < 55000) return hdata;
+  try { hdata = await getJson(URLS.history, shiftHistory); hTime = Date.now(); }
+  catch (e) { if (!hdata) throw e; }
+  return hdata;
 }
 async function load() {
   try {
-    const sep = SOURCE.includes("?") ? "&" : "?";
-    const r = await fetch(SOURCE + sep + "t=" + Date.now(), { cache: "no-store" });
-    if (!r.ok) throw new Error("HTTP " + r.status);
-    let d = await r.json();
-    if (DEMO) d = shiftTimes(d);
-    data = d;
-    lastFetchOk = Date.now();
+    data = await getJson(URLS.stats, shiftStats);
     fetchError = "";
-    renderAll();
+    $("errbox").hidden = true;
+    $("loading").hidden = true;
+    applyVisibility();
+    renderStatus();
+    renderView(true);
   } catch (e) {
-    fetchError = "Impossible de lire les statistiques (" + e.message + "). " + (data ? "Les dernières données connues restent affichées." : "Réessai automatique dans une minute.");
+    fetchError = e.message;
+    $("loading").hidden = true;
+    if (!data) {
+      $("errbox").hidden = false;
+      $("err-text").textContent = "Détail : " + e.message + ". Le serveur est peut-être en train de redémarrer. La page réessaie toute seule toutes les 30 secondes.";
+    }
     renderStatus();
   }
 }
 
-/* ---------- bandeau ---------- */
-function stateOf() {
-  if (!data) return { cls: "warn", text: "Chargement...", sub: "" };
-  const ageMin = (Date.now() - data.generatedAt) / 60000;
-  if (ageMin <= FRESH_MIN) return { cls: "ok", text: "En ligne", sub: "Mis à jour " + ago(data.generatedAt) };
-  if (ageMin <= STALE_MIN) return { cls: "warn", text: "Données anciennes", sub: "Mis à jour " + ago(data.generatedAt) };
-  return { cls: "bad", text: "Hors ligne", sub: "Dernier signe de vie " + ago(data.generatedAt) };
+/* ---------- bandeau et phrase d'état ---------- */
+function sentence() {
+  if (!data) {
+    return fetchError ? { cls: "bad", text: "Impossible de joindre le serveur de statistiques pour l'instant." } : { cls: "warn", text: "Chargement des statistiques..." };
+  }
+  const st = stateOf();
+  if (st.cls === "bad") return { cls: "bad", text: "Le serveur semble éteint ou ne répond plus (dernier signe de vie " + ago(data.generatedAt) + ")." };
+  const n = data.players.online, t = data.tps.m1;
+  const who = n === 0 ? "personne n'est connecté pour l'instant" : n === 1 ? "1 joueur est connecté" : n + " joueurs sont connectés";
+  const lag = t >= 19.5 ? "aucun lag" : t >= 17 ? "un petit ralentissement" : t >= 15 ? "ça ralentit un peu" : "ça lague";
+  const head = t >= 19 ? "Tout va bien : " : "Attention : ";
+  const stale = st.cls === "warn" ? " (données un peu anciennes)" : "";
+  return { cls: t >= 19 ? "ok" : t >= 15 ? "warn" : "bad", text: head + who + ", " + lag + "." + stale };
 }
 function renderStatus() {
   const st = stateOf();
-  const s = $("st-state");
-  clear(s).append(h("span", { class: "t-" + st.cls }, h("span", { class: "dot", "aria-hidden": "true" }), st.text));
+  clear($("st-state")).append(h("span", { class: "t-" + st.cls }, h("span", { class: "dot", "aria-hidden": "true" }), st.text));
   $("st-age").textContent = st.sub || " ";
+  const se = sentence(), sEl = $("sentence");
+  sEl.className = "sentence " + se.cls;
+  sEl.textContent = se.text;
   const note = $("notice");
-  note.hidden = !fetchError && !(DEMO);
-  note.textContent = fetchError || (DEMO ? "Mode démonstration : ces chiffres sont fictifs." : "");
+  const msg = (data && fetchError) ? "Connexion au serveur de statistiques perdue (" + fetchError + "). Les dernières données connues restent affichées." : (DEMO ? "Mode démonstration : ces chiffres sont fictifs." : "");
+  note.hidden = !msg;
+  note.textContent = msg;
   if (!data) return;
   const p = data.players, up = st.cls === "bad" ? null : data.server.uptimeMs + (Date.now() - data.generatedAt);
   $("st-players").textContent = st.cls === "bad" ? "0 / " + p.max : p.online + " / " + p.max;
@@ -625,26 +1020,7 @@ function renderStatus() {
   $("foot-gen").textContent = "Dernière mise à jour du serveur : " + fmtDateTime(data.generatedAt);
 }
 
-/* ---------- cartes KPI ---------- */
-function kpi(n, l, s) { return h("div", { class: "kpi" }, h("div", { class: "n" }, n), h("div", { class: "l" }, l), s ? h("div", { class: "s" }, s) : null); }
-function renderKpis() {
-  const d = data, r = d.retention, n = d.newPlayers;
-  const totalPlay = d.playerList.reduce((a, p) => a + p.playMs, 0);
-  const totalSess = d.playerList.reduce((a, p) => a + p.sessions, 0);
-  const box = clear($("kpis"));
-  box.append(
-    kpi(num(d.players.online), "En ligne maintenant", "sur " + d.players.max + " places"),
-    kpi(num(d.players.peakToday), "Pic du jour"),
-    kpi(num(d.players.record.count), "Record absolu", d.players.record.at ? fmtDate(d.players.record.at) : "pas encore de record"),
-    kpi(num(n.total), "Joueurs uniques", "depuis le début des relevés"),
-    kpi("+" + num(n.today), "Nouveaux aujourd'hui", num(n.d7) + " en 7 j, " + num(n.d30) + " en 30 j"),
-    kpi(num(r.active24h), "Actifs sur 24 h", num(r.active7d) + " sur 7 j, " + num(r.active30d) + " sur 30 j"),
-    kpi(num(r.regulars), "Joueurs qui restent", "au moins 3 jours sur les 7 derniers"),
-    kpi(totalSess ? dur(totalPlay / totalSess) : "-", "Durée moyenne d'une visite", num(totalSess) + " visites au total")
-  );
-}
-
-/* ---------- graphiques ---------- */
+/* ---------- graphiques : outils ---------- */
 const TEXT = "#4a3520", GRID = "rgba(43,27,14,.16)";
 function baseOptions() {
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -660,114 +1036,172 @@ function baseOptions() {
 }
 function setChart(key, canvasId, config) {
   if (!window.Chart) return;
-  if (charts[key]) {
-    charts[key].data = config.data;
-    charts[key].update();
-  } else {
-    charts[key] = new Chart($(canvasId), config);
-  }
+  const cv = $(canvasId);
+  if (!cv || !cv.offsetParent) return;
+  if (charts[key]) { charts[key].data = config.data; charts[key].update(); }
+  else charts[key] = new Chart(cv, config);
 }
-function bucketed() {
-  const from = data.generatedAt - rangeHours * 3600000;
-  const pts = data.history.points.filter((p) => p[0] >= from);
+function destroyCharts() { Object.keys(charts).forEach((k) => { charts[k].destroy(); delete charts[k]; }); }
+function bucketed(hours) {
+  const from = hdata.generatedAt - hours * 3600000;
+  const pts = hdata.points.filter((p) => p[0] >= from);
   const size = Math.max(1, Math.ceil(pts.length / 300));
   const out = [];
   for (let i = 0; i < pts.length; i += size) {
     const sl = pts.slice(i, i + size);
-    const avg = (k) => sl.reduce((a, p) => a + p[k], 0) / sl.length;
-    out.push({ ts: sl[sl.length - 1][0], players: avg(1), tps: avg(2), ram: avg(3), max: Math.max(...sl.map((p) => p[1])) });
+    const avg = (k) => sl.reduce((a, p) => a + (p[k] || 0), 0) / sl.length;
+    out.push({ ts: sl[sl.length - 1][0], players: avg(1), tps: avg(2), ram: avg(3), tpsMin: Math.min(...sl.map((p) => (p[4] === undefined ? p[2] : p[4]))), chunks: avg(5), ents: avg(6), maxPlayers: Math.max(...sl.map((p) => p[1])) });
   }
   return out;
 }
-function renderHistory() {
-  const pts = bucketed();
-  const withDay = rangeHours > 24;
-  const labels = pts.map((p) => fmtShort(p.ts, withDay));
-  const o = baseOptions();
-  o.scales.y.title = { display: true, text: "Joueurs", color: TEXT };
-  o.scales.y.suggestedMax = 4;
-  o.scales.y2 = { position: "right", min: 0, max: 20, ticks: { color: TEXT, stepSize: 5 }, grid: { drawOnChartArea: false }, title: { display: true, text: "TPS", color: TEXT } };
-  setChart("hist", "ch-hist", {
-    type: "line",
-    data: {
-      labels,
-      datasets: [
-        { label: "Joueurs en ligne", data: pts.map((p) => +p.players.toFixed(2)), borderColor: "#8a5a00", backgroundColor: "rgba(217,164,65,.38)", fill: true, tension: .25, pointRadius: 0, borderWidth: 2, yAxisID: "y" },
-        { label: "TPS", data: pts.map((p) => +p.tps.toFixed(2)), borderColor: "#1f6b2c", borderDash: [6, 4], tension: .25, pointRadius: 0, borderWidth: 2, yAxisID: "y2" }
-      ]
-    },
-    options: o
-  });
-  if (charts.hist) charts.hist.options = o;
-  const peak = pts.length ? Math.max(...pts.map((p) => p.max)) : 0;
-  const minTps = pts.length ? Math.min(...pts.map((p) => p.tps)) : 20;
-  const label = "Courbe sur " + (rangeHours === 24 ? "24 heures" : rangeHours / 24 + " jours") + " : maximum " + peak + " joueurs, TPS le plus bas " + dec(minTps, 1) + ".";
-  $("ch-hist").setAttribute("aria-label", label);
-  $("hist-sum").textContent = label;
-  // RAM
-  const o2 = baseOptions();
-  o2.plugins.legend.display = false;
-  o2.scales.y.title = { display: true, text: "Mo", color: TEXT };
-  setChart("ram", "ch-ram", {
-    type: "line",
-    data: { labels, datasets: [{ label: "Mémoire utilisée (Mo)", data: pts.map((p) => Math.round(p.ram)), borderColor: "#4b3a8a", backgroundColor: "rgba(75,58,138,.15)", fill: true, tension: .25, pointRadius: 0, borderWidth: 2 }] },
-    options: o2
-  });
+function labelsFor(pts, hours) { return pts.map((p) => fmtShort(p.ts, hours > 24)); }
+function periodName(hours) { return hours === 24 ? "les dernières 24 heures" : "les " + hours / 24 + " derniers jours"; }
+const dm = (day) => day.slice(8, 10) + "/" + day.slice(5, 7);
+
+/* ---------- vue Accueil ---------- */
+function kpi(n, l, s) { return h("div", { class: "kpi" }, h("div", { class: "n" }, n), h("div", { class: "l" }, l), s ? h("div", { class: "s" }, s) : null); }
+function renderKpis() {
+  const d = data, r = d.retention, n = d.newPlayers;
+  clear($("kpis")).append(
+    kpi(num(d.players.online), "En ligne maintenant", "sur " + d.players.max + " places"),
+    kpi(num(d.players.peakToday), "Pic du jour"),
+    kpi(num(n.total), "Joueurs uniques", "depuis le début des relevés"),
+    kpi("+" + num(n.today), "Nouveaux aujourd'hui", num(n.d7) + " en 7 j, " + num(n.d30) + " en 30 j"),
+    kpi(num(r.active24h), "Actifs sur 24 h", num(r.active7d) + " sur 7 j, " + num(r.active30d) + " sur 30 j"),
+    kpi(num(r.regulars), "Joueurs qui restent", "au moins 3 jours sur les 7 derniers"));
 }
-function renderDailyCharts() {
-  const nb = data.newByDay, sb = data.sessionsByDay;
-  const lab = (a) => a.map((x) => x.day.slice(8, 10) + "/" + x.day.slice(5, 7));
+function renderRecords() {
+  const rc = data.records, ls = rc.longestSession, wt = rc.weekTop, pk = rc.peakPlayers;
+  clear($("records")).append(
+    kpi(ls && ls.ms ? dur(ls.ms) : "-", "Plus longue session", ls && ls.ms ? ls.name + ", " + fmtDate(ls.at) : "pas encore de record"),
+    kpi(num(pk.count), "Plus de monde en même temps", pk.at ? fmtDate(pk.at) : "pas encore de record"),
+    kpi(wt && wt.name ? wt.name : "-", "Joueur de la semaine", wt && wt.ms ? dur(wt.ms) + " de jeu en 7 jours" : "pas encore de données"));
+}
+
+/* ---------- vue Serveur ---------- */
+function renderEtat() {
+  const s = data.server, t = data.tps, t24 = s.tps24h;
+  const tp = (v) => h("span", { class: "t-" + tpsClass(v), style: "filter:brightness(.55)" }, dec(v, 1));
+  const dl = clear($("etat-facts"));
+  const row = (a, ...b) => { dl.append(h("dt", null, a), h("dd", null, ...b)); };
+  row("TPS (vitesse)", tp(t.m1), " / ", tp(t.m5), " / ", tp(t.m15), h("div", { class: "hint", style: "margin:0;font-weight:400" }, "sur 1, 5 et 15 minutes"));
+  row("TPS sur 24 h", t24.avg === null ? "-" : "moyenne " + dec(t24.avg, 1) + ", plus bas " + dec(t24.min, 1));
+  row("Temps par tick", dec(t.mspt, 1) + " ms", h("div", { class: "hint", style: "margin:0;font-weight:400" }, "approximatif, doit rester sous 50 ms"));
+  row("En marche depuis", dur(s.uptimeMs + (Date.now() - data.generatedAt)));
+  row("Démarré le", fmtDateTime(s.startedAt));
+  if (s.bootMs > 0) row("Temps de démarrage", dec(s.bootMs / 1000, 0) + " secondes");
+  row("Version", s.version);
+  row("Plugins", num(s.plugins));
+  const ul = clear($("lag-spikes"));
+  if (!s.lagSpikes.length) ul.append(h("li", { class: "empty" }, "Aucun gros lag dans les dernières 24 heures."));
+  s.lagSpikes.forEach((p) => ul.append(h("li", null, h("span", null, fmtDay(p.ts) + " à " + fmtClock(p.ts)), h("span", { class: "when" }, "TPS " + dec(p.tps, 1)))));
+  $("cap-etat").textContent = t.m1 >= 19 ? "Le serveur tourne à pleine vitesse : " + dec(t.m1, 1) + " TPS sur 20." : "Le serveur est un peu ralenti : " + dec(t.m1, 1) + " TPS sur 20.";
+}
+function renderMachine() {
+  const s = data.server, pct = s.ramMaxMb ? 100 * s.ramUsedMb / s.ramMaxMb : 0;
+  const dl = clear($("mach"));
+  const row = (a, b) => { dl.append(h("dt", null, a), h("dd", null, b)); };
+  row("Mémoire", num(s.ramUsedMb) + " Mo sur " + num(s.ramMaxMb) + " Mo (" + dec(pct, 0) + " %)");
+  row("Coeurs du processeur", num(s.cores));
+  const bar = $("ram-bar");
+  bar.firstChild.style.width = Math.min(100, pct) + "%";
+  bar.setAttribute("aria-label", "Mémoire utilisée : " + dec(pct, 0) + " pour cent");
+}
+const ENV = { NORMAL: "Surface", NETHER: "Nether", THE_END: "L'End" };
+function gameClock(t) { const x = ((t / 1000 + 6) % 24); const hh = Math.floor(x); return hh + " h " + String(Math.floor((x - hh) * 60)).padStart(2, "0"); }
+function renderWorlds() {
+  const t = clear($("worlds"));
+  t.append(h("thead", null, h("tr", null, ...["Monde", "Chunks", "Entités", "Vivants", "Objets", "Heure", "Météo"].map((x, i) => h("th", { scope: "col", class: i > 0 && i < 5 ? "num" : null }, x)))));
+  const tb = h("tbody");
+  data.worlds.forEach((w) => tb.append(h("tr", null,
+    h("td", null, h("strong", null, w.name), h("div", { class: "hint", style: "margin:0" }, ENV[w.env] || w.env)),
+    h("td", { class: "num" }, num(w.chunks)), h("td", { class: "num" }, num(w.entities)),
+    h("td", { class: "num" }, num(w.living)), h("td", { class: "num" }, num(w.items)),
+    h("td", null, gameClock(w.time)), h("td", null, w.weather))));
+  t.append(tb);
+}
+function renderServerCharts() {
+  if (!hdata) return;
+  const hours = ranges.server, pts = bucketed(hours);
+  if (!pts.length) return;
+  const labels = labelsFor(pts, hours);
+  const o = baseOptions();
+  o.scales.y.max = 20; o.scales.y.ticks.stepSize = 5;
+  o.scales.y.title = { display: true, text: "TPS", color: TEXT };
+  setChart("tps", "ch-tps", { type: "line", data: { labels, datasets: [
+    { label: "TPS moyen", data: pts.map((p) => +p.tps.toFixed(2)), borderColor: "#1f6b2c", backgroundColor: "rgba(31,107,44,.12)", fill: true, tension: .2, pointRadius: 0, borderWidth: 2 },
+    { label: "Plus bas TPS", data: pts.map((p) => +p.tpsMin.toFixed(2)), borderColor: "#9a2f1a", borderDash: [5, 4], tension: .2, pointRadius: 0, borderWidth: 1.5 }] }, options: o });
+  const avg = pts.reduce((a, p) => a + p.tps, 0) / pts.length;
+  const worst = pts.reduce((a, p) => (p.tpsMin < a.tpsMin ? p : a), pts[0]);
+  const cap = "Sur " + periodName(hours) + ", le TPS moyen est de " + dec(avg, 1) + ". Le pire moment : " + dec(worst.tpsMin, 1) + " TPS, " + fmtDay(worst.ts) + " vers " + fmtClock(worst.ts) + ".";
+  $("cap-perf").textContent = cap;
+  $("ch-tps").setAttribute("aria-label", cap);
+
+  const o2 = baseOptions();
+  o2.scales.y.title = { display: true, text: "Mo", color: TEXT };
+  o2.scales.y.max = Math.ceil(data.server.ramMaxMb / 512) * 512;
+  setChart("ram", "ch-ram", { type: "line", data: { labels, datasets: [
+    { label: "Mémoire utilisée", data: pts.map((p) => Math.round(p.ram)), borderColor: "#4b3a8a", backgroundColor: "rgba(75,58,138,.15)", fill: true, tension: .2, pointRadius: 0, borderWidth: 2 },
+    { label: "Maximum possible", data: pts.map(() => data.server.ramMaxMb), borderColor: "#9a2f1a", borderDash: [2, 4], pointRadius: 0, borderWidth: 1 }] }, options: o2 });
+  const ramMax = Math.max(...pts.map((p) => p.ram));
+  $("cap-ram").textContent = "La mémoire utilisée varie entre " + num(Math.min(...pts.map((p) => p.ram))) + " et " + num(ramMax) + " Mo sur " + periodName(hours) + ", pour " + num(data.server.ramMaxMb) + " Mo disponibles.";
+
+  const o3 = baseOptions();
+  o3.scales.y.title = { display: true, text: "Chunks", color: TEXT };
+  o3.scales.y2 = { position: "right", beginAtZero: true, ticks: { color: TEXT, precision: 0 }, grid: { drawOnChartArea: false }, title: { display: true, text: "Entités", color: TEXT } };
+  setChart("load", "ch-load", { type: "line", data: { labels, datasets: [
+    { label: "Chunks chargés", data: pts.map((p) => Math.round(p.chunks)), borderColor: "#8a5a00", tension: .2, pointRadius: 0, borderWidth: 2, yAxisID: "y" },
+    { label: "Entités", data: pts.map((p) => Math.round(p.ents)), borderColor: "#9a2f1a", tension: .2, pointRadius: 0, borderWidth: 2, yAxisID: "y2" }] }, options: o3 });
+  const wl = data.worlds.reduce((a, w) => [a[0] + w.chunks, a[1] + w.entities], [0, 0]);
+  $("cap-load").textContent = "En ce moment : " + num(wl[0]) + " chunks chargés et " + num(wl[1]) + " entités (créatures et objets).";
+  const cl = data.game.clearlag;
+  $("cap-clearlag").textContent = cl.lastAt ? "Dernier nettoyage ClearLag : " + ago(cl.lastAt) + ", " + num(cl.lastRemoved) + " objets retirés. Aujourd'hui : " + num(cl.removedToday) + " retirés." : "Aucun passage de ClearLag repéré récemment.";
+}
+function renderServer() {
+  renderEtat(); renderMachine(); renderWorlds();
+  const hasH = !!hdata;
+  if (hasH) renderServerCharts();
+  else {
+    $("cap-perf").textContent = "Chargement des courbes...";
+    ensureHistory().then(() => { if (curView === "serveur") renderServerCharts(); }).catch((e) => { $("cap-perf").textContent = "Courbes indisponibles (" + e.message + ")."; });
+  }
+}
+
+/* ---------- vue Joueurs ---------- */
+function renderOnline() {
+  const box = clear($("online")), l = data.players.list, st = stateOf();
+  if (st.cls === "bad") { box.append(h("p", { class: "empty" }, "Le serveur ne répond plus : liste indisponible.")); return; }
+  if (!l.length) { box.append(h("p", { class: "empty" }, "Personne en ligne pour l'instant. Le royaume dort.")); return; }
+  const ul = h("ul", { class: "plain chips" });
+  l.slice().sort((a, b) => a.since - b.since).forEach((p) => {
+    const b = nameButton(p.name);
+    b.classList.add("chipname");
+    ul.append(h("li", { class: "chip" }, b, " ", h("small", null, "joue depuis " + dur(Date.now() - p.since) + (p.ping !== null && p.ping !== undefined ? ", " + p.ping + " ms" : ""))));
+  });
+  box.append(ul);
+  box.append(h("p", { class: "caption" }, l.length + (l.length > 1 ? " joueurs jouent" : " joueur joue") + " en ce moment. Le plus ancien connecté : " + l.slice().sort((a, b) => a.since - b.since)[0].name + ", depuis " + dur(Date.now() - Math.min(...l.map((p) => p.since))) + "."));
+}
+function renderNew() {
+  const days = ranges.new, nb = data.newByDay.slice(-days);
   const o = baseOptions();
   o.plugins.legend.display = false;
   o.scales.y.suggestedMax = 3;
-  setChart("new", "ch-new", {
-    type: "bar",
-    data: { labels: lab(nb), datasets: [{ label: "Nouveaux joueurs", data: nb.map((x) => x.n), backgroundColor: "#8a5a00", borderRadius: 3 }] },
-    options: o
-  });
-  const o2 = baseOptions();
-  o2.plugins.legend.display = false;
-  setChart("ses", "ch-ses", {
-    type: "bar",
-    data: { labels: lab(sb), datasets: [{ label: "Connexions", data: sb.map((x) => x.n), backgroundColor: "#9a2f1a", borderRadius: 3 }] },
-    options: o2
-  });
+  setChart("new", "ch-new", { type: "bar", data: { labels: nb.map((x) => dm(x.day)), datasets: [{ label: "Nouveaux joueurs", data: nb.map((x) => x.n), backgroundColor: "#8a5a00", borderRadius: 3 }] }, options: o });
   const tot = nb.reduce((a, x) => a + x.n, 0);
   const best = nb.reduce((a, x) => (x.n > a.n ? x : a), { n: -1, day: "" });
-  $("new-sum").textContent = tot + " nouveaux joueurs sur 30 jours" + (best.n > 0 ? ", record le " + best.day.slice(8, 10) + "/" + best.day.slice(5, 7) + " (" + best.n + ")." : ".");
-  $("ch-new").setAttribute("aria-label", "Nouveaux joueurs par jour sur 30 jours : " + tot + " au total.");
-  $("ch-ses").setAttribute("aria-label", "Connexions par jour sur 30 jours : " + sb.reduce((a, x) => a + x.n, 0) + " au total.");
+  const cap = tot + (tot > 1 ? " nouveaux joueurs" : " nouveau joueur") + " sur " + days + " jours" + (best.n > 0 ? ". Meilleur jour : le " + dm(best.day) + " avec " + best.n + "." : ".");
+  $("new-sum").textContent = cap;
+  $("ch-new").setAttribute("aria-label", "Nouveaux joueurs par jour. " + cap);
+  const ul = clear($("recent")), r = data.newPlayers.recent;
+  if (!r.length) ul.append(h("li", { class: "empty" }, "Personne pour l'instant."));
+  r.forEach((p) => ul.append(h("li", null, nameButton(p.name), h("span", { class: "when" }, ago(p.first)))));
+  const bl = clear($("birthdays")), b = data.newPlayers.anniversaries || [];
+  if (!b.length) bl.append(h("li", { class: "empty" }, "Aucun anniversaire aujourd'hui."));
+  b.forEach((p) => bl.append(h("li", null, nameButton(p.name), h("span", { class: "when" }, "inscrit il y a " + p.text))));
 }
-
-/* ---------- heatmap ---------- */
-function renderHeat() {
-  const g = data.activity.heatmap, max = Math.max(1, ...g.flat());
-  const t = clear($("heat"));
-  const head = h("tr", null, h("td"));
-  for (let c = 0; c < 24; c++) head.append(h("th", { scope: "col" }, h("span", { "aria-hidden": "true" }, c % 3 === 0 ? c : ""), h("span", { class: "sr-only" }, c + " h")));
-  t.append(h("thead", null, head));
-  const body = h("tbody");
-  let best = { v: -1, r: 0, c: 0 };
-  g.forEach((row, r) => {
-    const tr = h("tr", null, h("th", { scope: "row", class: "row" }, DAYS_SHORT[r]));
-    row.forEach((v, c) => {
-      if (v > best.v) best = { v, r, c };
-      const a = v <= 0 ? 0 : 0.1 + 0.9 * Math.pow(v / max, 0.7);
-      const td = h("td", { title: DAYS[r] + " " + c + " h : " + num(v / 60) + " h de jeu cumulées" }, h("span", { class: "sr-only" }, DAYS[r] + " " + c + " h : " + num(v) + " minutes"));
-      if (a > 0) td.style.background = "rgba(138,90,0," + a.toFixed(2) + ")";
-      tr.append(td);
-    });
-    body.append(tr);
-  });
-  t.append(body);
-  t.setAttribute("aria-label", "Activité par jour de la semaine et par heure");
-  $("heat-sum").textContent = best.v > 0 ? "Créneau le plus animé : " + DAYS[best.r].toLowerCase() + " vers " + best.c + " h." : "Pas encore assez de données.";
-}
-
-/* ---------- rétention ---------- */
 function renderRetention() {
   const box = clear($("ret"));
-  [["d1", "J+1", "le lendemain"], ["d7", "J+7", "au bout d'une semaine"], ["d30", "J+30", "au bout d'un mois"]].forEach(([k, name, txt]) => {
+  [["d1", "J+1", "le lendemain"], ["d7", "J+7", "une semaine après"], ["d30", "J+30", "un mois après"]].forEach(([k, name, txt]) => {
     const r = data.retention[k], rate = r.rate;
     const bar = h("div", { class: "bar", role: "img", "aria-label": rate === null ? "Pas encore de données" : dec(rate, 0) + " pour cent" }, h("i"));
     bar.firstChild.style.width = (rate === null ? 0 : Math.min(100, rate)) + "%";
@@ -775,42 +1209,24 @@ function renderRetention() {
       h("div", { class: "meta" }, name + " : revenus " + txt),
       h("div", { class: "pct" }, rate === null ? "-" : dec(rate, 0) + " %"),
       bar,
-      h("div", { class: "meta" }, rate === null ? "Pas encore assez de recul." : r.returned + " sur " + r.cohort + " joueurs")
-    ));
+      h("div", { class: "meta" }, rate === null ? "Pas encore assez de recul." : r.returned + " sur " + r.cohort + " joueurs")));
   });
-}
-
-/* ---------- joueurs, arrivées, journal ---------- */
-function renderOnline() {
-  const box = clear($("online")), l = data.players.list, st = stateOf();
-  if (st.cls === "bad") { box.append(h("p", { class: "empty" }, "Le serveur ne répond plus : liste indisponible.")); return; }
-  if (!l.length) { box.append(h("p", { class: "empty" }, "Personne en ligne pour l'instant. Le royaume dort.")); return; }
-  const ul = h("ul", { class: "plain chips" });
-  l.slice().sort((a, b) => a.since - b.since).forEach((p) => {
-    ul.append(h("li", { class: "chip" }, h("b", null, p.name), " ", h("small", null, "depuis " + dur(Date.now() - p.since) + (p.ping !== null && p.ping !== undefined ? ", " + p.ping + " ms" : ""))));
+  const d1 = data.retention.d1.rate;
+  $("cap-ret").textContent = d1 === null ? "Pas encore assez de nouveaux joueurs pour calculer." : "Sur 10 nouveaux joueurs, environ " + Math.round(d1 / 10) + " reviennent le lendemain.";
+  const mix = data.retention.mix, tot = Math.max(1, mix.total);
+  const parts = [["new", "Nouveaux", "arrivés il y a moins de 7 jours", "#1f6b2c"], ["regular", "Réguliers", "jouent au moins 3 jours par semaine", "#8a5a00"], ["old", "Anciens", "viennent de temps en temps", "#5a4a8a"], ["lost", "Perdus", "venus une fois, jamais revenus", "#9a2f1a"]];
+  const mb = clear($("mixbar")), ml = clear($("mixlegend"));
+  mb.setAttribute("aria-label", "Répartition des " + mix.total + " joueurs : " + parts.map((p) => mix[p[0]] + " " + p[1].toLowerCase()).join(", "));
+  parts.forEach(([k, name, desc, col]) => {
+    const seg = h("i", { title: name + " : " + mix[k] }); seg.style.width = 100 * mix[k] / tot + "%"; seg.style.background = col; mb.append(seg);
+    const li = h("li", null, h("strong", null, name + " : " + mix[k]), " (" + dec(100 * mix[k] / tot, 0) + " %) - " + desc); li.style.setProperty("--c", col); ml.append(li);
   });
-  box.append(ul);
-}
-function renderRecent() {
-  const ul = clear($("recent")), r = data.newPlayers.recent;
-  if (!r.length) { ul.append(h("li", { class: "empty" }, "Personne pour l'instant.")); return; }
-  r.forEach((p) => ul.append(h("li", null, h("strong", null, p.name), h("span", { class: "when" }, ago(p.first)))));
-}
-const LOG_LABEL = { first: "Première visite", join: "Arrivée", quit: "Départ", death: "Mort", record: "Record" };
-function renderLog() {
-  const ul = clear($("log"));
-  if (!data.log.length) { ul.append(h("li", { class: "empty" }, "Rien à signaler.")); return; }
-  data.log.forEach((e) => {
-    ul.append(h("li", null,
-      h("span", { class: "badge b-" + e.type }, LOG_LABEL[e.type] || e.type),
-      h("span", null, e.text),
-      h("span", { class: "time" }, fmtShort(e.ts, true) + " - " + ago(e.ts))));
-  });
+  $("cap-mix").textContent = mix.lost > 0 ? mix.lost + " joueur(s) sont venus une seule fois sans jamais revenir : ce sont ceux qu'il faut réussir à garder." : "Aucun joueur perdu pour l'instant.";
 }
 
 /* ---------- classements ---------- */
 const BOARDS = [
-  ["playtime", "Temps de jeu", (v) => dur(v)],
+  ["playtime", "Temps de jeu", (v) => dur(v), "min"],
   ["kills", "Joueurs vaincus", (v) => num(v)],
   ["mobKills", "Monstres tués", (v) => num(v)],
   ["deaths", "Morts", (v) => num(v)],
@@ -818,6 +1234,12 @@ const BOARDS = [
   ["placed", "Blocs posés", (v) => num(v)],
   ["distance", "Distance parcourue", (v) => (v >= 1000 ? dec(v / 1000, 1) + " km" : num(v) + " m")]
 ];
+const PERIODS = [["day", "Aujourd'hui", "playtimeDay"], ["week", "7 jours", "playtimeWeek"], ["month", "30 jours", "playtimeMonth"], ["total", "Depuis toujours", "playtime"]];
+function boardRows() {
+  const lb = data.leaderboards;
+  if (boardKey === "playtime") return lb[PERIODS.find((p) => p[0] === boardPeriod)[2]] || [];
+  return lb[boardKey] || [];
+}
 function renderTabs() {
   const tabs = clear($("tabs"));
   BOARDS.forEach(([k, name]) => {
@@ -832,56 +1254,350 @@ function renderTabs() {
     });
     tabs.append(b);
   });
+  const seg = $("board-range");
+  seg.hidden = boardKey !== "playtime";
+  clear(seg);
+  PERIODS.forEach(([k, name]) => {
+    const b = h("button", { type: "button", "aria-pressed": String(k === boardPeriod) }, name);
+    b.addEventListener("click", () => { boardPeriod = k; renderTabs(); renderBoard(); });
+    seg.append(b);
+  });
 }
 function renderBoard() {
-  const box = clear($("board")), def = BOARDS.find((b) => b[0] === boardKey), rows = (data.leaderboards[boardKey] || []).slice(0, 15);
+  const box = clear($("board")), def = BOARDS.find((b) => b[0] === boardKey), rows = boardRows().slice(0, 15);
   box.setAttribute("aria-labelledby", "tab-" + boardKey);
-  if (!rows.length) { box.append(h("p", { class: "empty" }, "Pas encore de données pour ce classement.")); return; }
+  if (!rows.length) { box.append(h("p", { class: "empty" }, "Pas encore de données pour ce classement.")); $("cap-board").textContent = ""; return; }
   const max = rows[0].value || 1;
   const t = h("table", { class: "data" }, h("thead", null, h("tr", null, h("th", { scope: "col" }, "#"), h("th", { scope: "col" }, "Joueur"), h("th", { scope: "col", class: "num" }, def[1]), h("th", { scope: "col" }, h("span", { class: "sr-only" }, "Part du premier")))));
   const tb = h("tbody");
   rows.forEach((r, i) => {
     const bar = h("div", { class: "bar", "aria-hidden": "true", style: "min-width:60px" }, h("i"));
     bar.firstChild.style.width = Math.max(2, 100 * r.value / max) + "%";
-    tb.append(h("tr", null, h("td", { class: "rank" }, String(i + 1)), h("td", null, h("strong", null, r.name)), h("td", { class: "num" }, def[2](r.value)), h("td", { style: "width:35%" }, bar)));
+    tb.append(h("tr", null, h("td", { class: "rank" }, String(i + 1)), h("td", null, nameButton(r.name)), h("td", { class: "num" }, def[2](r.value)), h("td", { style: "width:35%" }, bar)));
   });
   t.append(tb);
   box.append(h("div", { class: "tablewrap" }, t));
+  const per = boardKey === "playtime" ? " (" + PERIODS.find((p) => p[0] === boardPeriod)[1].toLowerCase() + ")" : "";
+  $("cap-board").textContent = "Classement « " + def[1] + " »" + per + " : en tête, " + rows[0].name + " avec " + def[2](rows[0].value) + ".";
+}
+function exportCsv() {
+  const def = BOARDS.find((b) => b[0] === boardKey);
+  let rows = boardRows().map((r) => [r.name, r.value]);
+  const field = { kills: "kills", mobKills: "mobKills", deaths: "deaths", broken: "broken", placed: "placed", distance: "distanceM", playtime: "playMs" }[boardKey];
+  if (pdata && (boardKey !== "playtime" || boardPeriod === "total")) {
+    rows = pdata.players.map((p) => [p.name, p[field]]).filter((r) => r[1] > 0).sort((a, b) => b[1] - a[1]);
+  }
+  const conv = (v) => (boardKey === "playtime" ? Math.round(v / 60000) : v);
+  const unit = boardKey === "playtime" ? "minutes" : boardKey === "distance" ? "metres" : "total";
+  const esc = (s) => '"' + String(s).replace(/"/g, '""') + '"';
+  const lines = ["rang;joueur;" + unit].concat(rows.map((r, i) => [i + 1, esc(r[0]), conv(r[1])].join(";")));
+  const blob = new Blob(["﻿" + lines.join("\r\n")], { type: "text/csv;charset=utf-8" });
+  const a = h("a", { href: URL.createObjectURL(blob), download: "classement-" + boardKey + (boardKey === "playtime" ? "-" + boardPeriod : "") + ".csv" });
+  document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  toast("Classement « " + def[1] + " » exporté (" + rows.length + " lignes).");
 }
 
-/* ---------- mondes et machine ---------- */
-const ENV = { NORMAL: "Surface", NETHER: "Nether", THE_END: "L'End" };
-function gameClock(t) { const x = ((t / 1000 + 6) % 24); const hh = Math.floor(x); return hh + " h " + String(Math.floor((x - hh) * 60)).padStart(2, "0"); }
-function renderWorlds() {
-  const t = clear($("worlds"));
-  t.append(h("thead", null, h("tr", null, ...["Monde", "Chunks", "Entités", "Vivants", "Objets", "Heure", "Météo"].map((x, i) => h("th", { scope: "col", class: i > 0 && i < 5 ? "num" : null }, x)))));
-  const tb = h("tbody");
-  data.worlds.forEach((w) => tb.append(h("tr", null,
-    h("td", null, h("strong", null, w.name), h("div", { class: "hint", style: "margin:0" }, ENV[w.env] || w.env)),
-    h("td", { class: "num" }, num(w.chunks)), h("td", { class: "num" }, num(w.entities)),
-    h("td", { class: "num" }, num(w.living)), h("td", { class: "num" }, num(w.items)),
-    h("td", null, gameClock(w.time)), h("td", null, w.weather))));
-  t.append(tb);
+/* ---------- recherche et fiche joueur ---------- */
+let searchTimer = 0;
+function runSearch() {
+  const q = $("search-q").value.trim().toLowerCase(), res = clear($("search-res"));
+  if (!pdata) { $("search-hint").textContent = "Chargement de la liste des joueurs..."; return; }
+  $("search-hint").textContent = num(pdata.total) + " joueurs connus.";
+  if (!q) { return; }
+  const found = pdata.players.filter((p) => p.name.toLowerCase().includes(q)).sort((a, b) => (a.name.toLowerCase().startsWith(q) ? 0 : 1) - (b.name.toLowerCase().startsWith(q) ? 0 : 1) || b.playMs - a.playMs).slice(0, 12);
+  if (!found.length) { res.append(h("li", { class: "empty" }, "Aucun joueur ne ressemble à « " + $("search-q").value.trim() + " ».")); return; }
+  found.forEach((p) => {
+    const b = h("button", { type: "button" }, p.name);
+    b.addEventListener("click", () => { location.hash = "#/joueur/" + encodeURIComponent(p.name); });
+    res.append(h("li", null, b));
+  });
 }
-function renderMachine() {
-  const s = data.server, pct = s.ramMaxMb ? 100 * s.ramUsedMb / s.ramMaxMb : 0;
-  const dl = clear($("mach"));
-  const row = (a, b) => { dl.append(h("dt", null, a), h("dd", null, b)); };
-  row("Mémoire", num(s.ramUsedMb) + " Mo sur " + num(s.ramMaxMb) + " Mo (" + dec(pct, 0) + " %)");
-  row("Coeurs", num(s.cores));
-  row("Temps par tick", dec(data.tps.mspt, 1) + " ms (approximatif)");
-  row("TPS 5 / 15 min", dec(data.tps.m5, 1) + " / " + dec(data.tps.m15, 1));
-  row("Plugins", num(s.plugins));
-  row("Démarré le", fmtDateTime(s.startedAt));
-  row("Version", s.version);
-  const bar = $("ram-bar");
-  bar.firstChild.style.width = Math.min(100, pct) + "%";
-  bar.setAttribute("aria-label", "Mémoire utilisée : " + dec(pct, 0) + " pour cent");
+function initSearch() {
+  $("search-form").addEventListener("submit", (ev) => { ev.preventDefault(); runSearch(); });
+  $("search-q").addEventListener("input", () => { clearTimeout(searchTimer); searchTimer = setTimeout(runSearch, 150); });
+}
+function rankText(r) { return r ? "n° " + r + " sur " + num(pdata.total) : "pas classé"; }
+async function openPlayerModal(name) {
+  const dlg = $("dlg-player");
+  clear(dlg).append(h("p", null, "Chargement de la fiche..."));
+  if (!dlg.open) dlg.showModal();
+  let p = null;
+  try { await ensurePlayers(); p = pdata.players.find((x) => x.name.toLowerCase() === name.toLowerCase()); }
+  catch (e) { clear(dlg).append(h("p", { class: "formerr" }, "Impossible de charger la liste des joueurs (" + e.message + ")."), closeRow(dlg)); return; }
+  clear(dlg);
+  if (!p) { dlg.append(h("h2", { id: "pl-name" }, "Joueur introuvable"), h("p", null, "Aucune fiche pour « " + name + " ». Seuls les 500 joueurs les plus actifs ont une fiche."), closeRow(dlg)); return; }
+  const now = Date.now(), st = p.online ? "En ligne maintenant" : "Vu " + ago(p.last);
+  const img = p.avatar === false ? h("div", { class: "ph", style: "width:64px;height:64px;border-radius:8px;background:#3a2514" })
+    : h("img", { src: "https://mc-heads.net/avatar/" + encodeURIComponent(p.name) + "/64", width: "64", height: "64", alt: "", loading: "lazy" });
+  img.addEventListener("error", () => { img.style.visibility = "hidden"; });
+  const hrsMax = Math.max(1, ...p.hours), strip = h("div", { class: "hourstrip", role: "img" });
+  p.hours.forEach((v, i) => { const c = h("i", { title: i + " h : " + dur(v) }); if (v > 0) c.style.background = "rgba(138,90,0," + (0.12 + 0.88 * Math.pow(v / hrsMax, .7)).toFixed(2) + ")"; strip.append(c); });
+  const favHour = p.hours.indexOf(hrsMax);
+  const favTxt = p.hours.some((v) => v > 0) ? "Joue surtout vers " + favHour + " h." : "Pas encore assez de données.";
+  strip.setAttribute("aria-label", "Heures préférées. " + favTxt);
+  const stat = (v, l) => h("div", null, h("b", null, v), h("span", null, l));
+  const rk = p.ranks;
+  dlg.append(
+    h("div", { class: "pcard-head" }, img, h("div", null, h("h2", { id: "pl-name" }, p.name), h("p", null, st + ". Inscrit le " + fmtDate(p.first) + " (" + ago(p.first).replace("il y a ", "il y a ") + ")."))),
+    h("h3", { class: "panel-h3" }, "Présence"),
+    h("div", { class: "statgrid" }, stat(dur(p.playMs), "Temps de jeu total"), stat(num(p.sessions), "Visites"), stat(p.sessions ? dur(p.avgSessionMs) : "-", "Visite moyenne"), stat(p.maxSessionMs ? dur(p.maxSessionMs) : "-", "Plus longue visite"), stat(p.streak + (p.streak > 1 ? " jours" : " jour"), "Jours d'affilée"), stat(num(p.days30) + " / 30", "Jours joués ce mois"), stat(dur(p.weekMs), "Cette semaine")),
+    h("h3", { class: "panel-h3" }, "Heures préférées"), strip,
+    h("div", { class: "hourlbl", "aria-hidden": "true" }, h("span", null, "0 h"), h("span", null, "6 h"), h("span", null, "12 h"), h("span", null, "18 h"), h("span", null, "23 h")),
+    h("p", { class: "caption" }, favTxt),
+    h("h3", { class: "panel-h3" }, "En jeu"),
+    h("div", { class: "statgrid" }, stat(num(p.mobKills), "Monstres tués"), stat(num(p.kills), "Joueurs vaincus"), stat(num(p.deaths), "Morts"), stat(num(p.broken), "Blocs cassés"), stat(num(p.placed), "Blocs posés"), stat(p.distanceM >= 1000 ? dec(p.distanceM / 1000, 1) + " km" : num(p.distanceM) + " m", "Distance")),
+    h("h3", { class: "panel-h3" }, "Classements"),
+    h("ul", { class: "ranks" }, ...BOARDS.map((b) => h("li", null, b[1] + " : ", h("strong", null, rankText(rk[b[0]]))))),
+    closeRow(dlg));
+  dlg.querySelector("button") && dlg.scrollTo(0, 0);
+}
+function closeRow(dlg) {
+  const b = h("button", { type: "button", class: "btn primary" }, "Fermer");
+  b.addEventListener("click", () => dlg.close());
+  return h("div", { class: "foot" }, b);
+}
+$("dlg-player").addEventListener("close", () => {
+  if (location.hash.startsWith("#/joueur/")) location.hash = "#/" + (prevView || "joueurs");
+});
+
+/* ---------- vue Activité ---------- */
+function renderActHistory() {
+  if (!hdata) return;
+  const hours = ranges.act, pts = bucketed(hours);
+  if (!pts.length) return;
+  const o = baseOptions();
+  o.scales.y.title = { display: true, text: "Joueurs", color: TEXT };
+  o.scales.y.suggestedMax = 4;
+  setChart("hist", "ch-hist", { type: "line", data: { labels: labelsFor(pts, hours), datasets: [
+    { label: "Joueurs en ligne", data: pts.map((p) => +p.players.toFixed(2)), borderColor: "#8a5a00", backgroundColor: "rgba(217,164,65,.38)", fill: true, tension: .25, pointRadius: 0, borderWidth: 2 }] }, options: o });
+  const top = pts.reduce((a, p) => (p.maxPlayers > a.maxPlayers ? p : a), pts[0]);
+  const cap = "Sur " + periodName(hours) + ", le plus de monde : " + top.maxPlayers + " joueurs, " + fmtDay(top.ts) + " vers " + fmtClock(top.ts) + ".";
+  $("hist-sum").textContent = cap;
+  $("ch-hist").setAttribute("aria-label", cap);
+}
+function renderHeat() {
+  const g = data.activity.heatmap, max = Math.max(1, ...g.flat());
+  const t = clear($("heat"));
+  const head = h("tr", null, h("td"));
+  for (let c = 0; c < 24; c++) head.append(h("th", { scope: "col" }, h("span", { "aria-hidden": "true" }, c % 3 === 0 ? c : ""), h("span", { class: "sr-only" }, c + " h")));
+  t.append(h("thead", null, head));
+  const body = h("tbody");
+  let best = { v: -1, r: 0, c: 0 }, low = { v: Infinity, r: 0, c: 0 };
+  g.forEach((row, r) => {
+    const tr = h("tr", null, h("th", { scope: "row", class: "row" }, DAYS_SHORT[r]));
+    row.forEach((v, c) => {
+      if (v > best.v) best = { v, r, c };
+      if (v < low.v) low = { v, r, c };
+      const a = v <= 0 ? 0 : 0.1 + 0.9 * Math.pow(v / max, 0.7);
+      const td = h("td", { title: DAYS[r] + " " + c + " h : " + num(v / 60) + " h de jeu cumulées" }, h("span", { class: "sr-only" }, DAYS[r] + " " + c + " h : " + num(v) + " minutes"));
+      if (a > 0) td.style.background = "rgba(138,90,0," + a.toFixed(2) + ")";
+      tr.append(td);
+    });
+    body.append(tr);
+  });
+  t.append(body);
+  t.setAttribute("aria-label", "Activité par jour de la semaine et par heure");
+  $("heat-sum").textContent = best.v > 0 ? "Le moment le plus animé : " + DAYS[best.r].toLowerCase() + " vers " + best.c + " h. Le plus calme : " + DAYS[low.r].toLowerCase() + " vers " + low.c + " h." : "Pas encore assez de données.";
+}
+function renderPeakHours() {
+  const a = data.players.peakByHour, o = baseOptions();
+  o.plugins.legend.display = false;
+  setChart("peakh", "ch-peakh", { type: "bar", data: { labels: a.map((_, i) => i + " h"), datasets: [{ label: "Record de joueurs", data: a, backgroundColor: "#8a5a00", borderRadius: 3 }] }, options: o });
+  const max = Math.max(...a);
+  $("cap-peakh").textContent = max > 0 ? "Record à " + a.indexOf(max) + " h : " + max + " joueurs en même temps." : "Pas encore de record.";
+  $("ch-peakh").setAttribute("aria-label", $("cap-peakh").textContent);
+}
+function renderSessions() {
+  const sb = data.sessionsByDay, o = baseOptions();
+  o.plugins.legend.display = false;
+  setChart("ses", "ch-ses", { type: "bar", data: { labels: sb.map((x) => dm(x.day)), datasets: [{ label: "Connexions", data: sb.map((x) => x.n), backgroundColor: "#9a2f1a", borderRadius: 3 }] }, options: o });
+  const tot = sb.reduce((a, x) => a + x.n, 0);
+  $("cap-ses").textContent = num(tot) + " connexions en 30 jours, soit environ " + num(tot / 30) + " par jour.";
+  $("ch-ses").setAttribute("aria-label", "Connexions par jour : " + $("cap-ses").textContent);
+  const av = data.players.avgSessionByDay, o2 = baseOptions();
+  o2.plugins.legend.display = false;
+  o2.scales.y.title = { display: true, text: "minutes", color: TEXT };
+  setChart("avg", "ch-avg", { type: "line", data: { labels: av.map((x) => dm(x.day)), datasets: [{ label: "Minutes par visite", data: av.map((x) => x.minutes), borderColor: "#4b3a8a", backgroundColor: "rgba(75,58,138,.15)", fill: true, tension: .25, borderWidth: 2, pointRadius: 2 }] }, options: o2 });
+  const last = av.filter((x) => x.n > 0).slice(-1)[0];
+  $("cap-avg").textContent = last ? "Le " + dm(last.day) + ", une visite a duré " + dec(last.minutes, 0) + " minutes en moyenne." : "Pas encore de visite terminée.";
+  $("ch-avg").setAttribute("aria-label", $("cap-avg").textContent);
+  const ch = data.activity.chatByDay, o3 = baseOptions();
+  o3.plugins.legend.display = false;
+  setChart("chat", "ch-chat", { type: "bar", data: { labels: ch.map((x) => dm(x.day)), datasets: [{ label: "Messages", data: ch.map((x) => x.n), backgroundColor: "#1f6b2c", borderRadius: 3 }] }, options: o3 });
+  const ct = ch.reduce((a, x) => a + x.n, 0);
+  $("cap-chat").textContent = ct ? num(ct) + " messages en 14 jours, soit environ " + num(ct / 14) + " par jour." : "Pas encore de messages comptés.";
+  $("ch-chat").setAttribute("aria-label", "Messages par jour : " + $("cap-chat").textContent);
+}
+function renderActivity() {
+  renderHeat(); renderPeakHours(); renderSessions();
+  if (hdata) renderActHistory();
+  else {
+    $("hist-sum").textContent = "Chargement des courbes...";
+    ensureHistory().then(() => { if (curView === "activite") renderActHistory(); }).catch((e) => { $("hist-sum").textContent = "Courbes indisponibles (" + e.message + ")."; });
+  }
 }
 
-function renderAll() {
-  renderStatus(); renderKpis(); renderHistory(); renderDailyCharts(); renderHeat(); renderRetention();
-  renderOnline(); renderRecent(); renderLog(); renderTabs(); renderBoard(); renderWorlds(); renderMachine();
+/* ---------- vue Journal ---------- */
+const LOG_LABEL = { first: "Première visite", join: "Arrivée", quit: "Départ", death: "Mort", record: "Record" };
+function renderJournal() {
+  const ul = clear($("log"));
+  if (!data.log.length) ul.append(h("li", { class: "empty" }, "Rien à signaler."));
+  data.log.forEach((e) => ul.append(h("li", null,
+    h("span", { class: "badge b-" + e.type }, LOG_LABEL[e.type] || e.type), h("span", null, e.text),
+    h("span", { class: "time" }, fmtShort(e.ts, true) + " - " + ago(e.ts)))));
+  const adv = clear($("adv")), al = data.game.advancements;
+  if (!al.length) adv.append(h("p", { class: "empty" }, "Aucun succès débloqué récemment."));
+  al.forEach((a) => adv.append(h("div", { class: "advrow" }, h("span", { class: "badge b-first" }, advCat(a.key)), h("span", null, h("strong", null, a.name), " : " + advName(a.key)), h("span", { class: "time" }, fmtShort(a.ts, true) + " - " + ago(a.ts)))));
+  const g = data.game;
+  barList($("death-causes"), g.deathCauses.map((x) => ({ label: x.label, value: x.n })));
+  barList($("killers"), g.killers.map((x) => ({ label: mobName(x.type), value: x.n })));
+  barList($("mobs"), g.mobsKilled.map((x) => ({ label: mobName(x.type), value: x.n })));
+  barList($("cmds"), g.commands.map((x) => ({ label: "/" + x.name, value: x.n })));
+  const tot = g.deathCauses.reduce((a, x) => a + x.n, 0);
+  $("cap-deaths").textContent = tot ? "La première cause de mort : " + g.deathCauses[0].label.toLowerCase() + " (" + num(g.deathCauses[0].n) + " fois sur " + num(tot) + ")." : "Aucune mort comptée pour l'instant.";
+  $("cap-mobs").textContent = g.mobsKilled.length ? "Le plus tué : " + mobName(g.mobsKilled[0].type).toLowerCase() + " (" + num(g.mobsKilled[0].n) + " fois)." : "";
+}
+
+/* ---------- vues, routage, rendu ---------- */
+const VIEWS = ["accueil", "serveur", "joueurs", "activite", "journal", "admin"];
+function applyVisibility() {
+  document.querySelectorAll(".view").forEach((el) => { el.hidden = el.dataset.view !== curView || (!data && curView !== "admin"); });
+}
+function renderView(refresh) {
+  if (!curView) return;
+  if (curView !== "admin" && !data) return;
+  switch (curView) {
+    case "accueil": renderKpis(); renderRecords(); break;
+    case "serveur": renderServer(); break;
+    case "joueurs":
+      renderOnline(); renderNew(); renderRetention();
+      if (!$("tabs").firstChild || !refresh) renderTabs();
+      renderBoard();
+      if (pdata) runSearch(); else ensurePlayers().then(() => { if (curView === "joueurs") runSearch(); }).catch(() => { $("search-hint").textContent = "Liste des joueurs indisponible."; });
+      break;
+    case "activite": renderActivity(); break;
+    case "journal": renderJournal(); break;
+    case "admin": onAdminView(); break;
+  }
+}
+function parseHash() {
+  let p = location.hash.replace(/^#\/?/, "");
+  const i = p.indexOf("/"), view = i < 0 ? p : p.slice(0, i), sub = i < 0 ? "" : p.slice(i + 1);
+  let s = sub;
+  try { s = decodeURIComponent(sub); } catch (e) { /* tel quel */ }
+  return { view, sub: s };
+}
+function scrollToSection(sub) {
+  const el = $("s-" + sub);
+  if (!el) return;
+  el.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+  if (!el.hasAttribute("tabindex")) el.setAttribute("tabindex", "-1");
+  el.focus({ preventScroll: true });
+}
+function switchView(v, sub) {
+  const changed = v !== curView;
+  if (changed) {
+    if (curView && curView !== "admin") prevView = curView;
+    if (curView === "admin") leaveAdmin();
+    curView = v;
+    destroyCharts();
+  }
+  applyVisibility();
+  document.querySelectorAll("#menu [data-view]").forEach((el) => {
+    const on = el.dataset.view === v;
+    if (el.tagName === "A") { if (on) el.setAttribute("aria-current", "page"); else el.removeAttribute("aria-current"); }
+    el.classList.toggle("cur", on && el.tagName !== "A");
+  });
+  if (changed) renderView(false);
+  if (sub) scrollToSection(sub);
+  else if (changed) window.scrollTo(0, 0);
+  closeMenus();
+}
+function route() {
+  const { view, sub } = parseHash();
+  if (view === "joueur" && sub) {
+    if (!curView) switchView("joueurs");
+    openPlayerModal(sub);
+    return;
+  }
+  if ($("dlg-player").open) $("dlg-player").close();
+  switchView(VIEWS.includes(view) ? view : "accueil", VIEWS.includes(view) ? sub : "");
+}
+
+/* ---------- menus déroulants ---------- */
+function closeMenus(except) {
+  document.querySelectorAll(".top-btn[aria-expanded='true']").forEach((b) => {
+    if (b === except) return;
+    b.setAttribute("aria-expanded", "false");
+    $(b.getAttribute("aria-controls")).hidden = true;
+  });
+}
+function closeAll() {
+  closeMenus();
+  $("menu").classList.remove("open");
+  $("burger").setAttribute("aria-expanded", "false");
+  $("burger").setAttribute("aria-label", "Ouvrir le menu");
+}
+function initMenus() {
+  document.querySelectorAll(".top-btn").forEach((b) => {
+    const sub = $(b.getAttribute("aria-controls"));
+    const toggle = (open) => {
+      closeMenus(b);
+      b.setAttribute("aria-expanded", String(open));
+      sub.hidden = !open;
+    };
+    b.addEventListener("click", () => toggle(sub.hidden));
+    b.addEventListener("keydown", (ev) => {
+      if (ev.key === "ArrowDown") { ev.preventDefault(); toggle(true); (sub.querySelector("a,button") || b).focus(); }
+      else if (ev.key === "Escape") { toggle(false); }
+    });
+    sub.addEventListener("keydown", (ev) => {
+      const items = Array.from(sub.querySelectorAll("a,button:not([hidden])")), i = items.indexOf(document.activeElement);
+      if (ev.key === "ArrowDown") { ev.preventDefault(); items[(i + 1) % items.length].focus(); }
+      else if (ev.key === "ArrowUp") { ev.preventDefault(); items[(i + items.length - 1) % items.length].focus(); }
+      else if (ev.key === "Home") { ev.preventDefault(); items[0].focus(); }
+      else if (ev.key === "End") { ev.preventDefault(); items[items.length - 1].focus(); }
+      else if (ev.key === "Escape") { ev.preventDefault(); toggle(false); b.focus(); }
+    });
+  });
+  document.addEventListener("click", (ev) => { if (!ev.target.closest(".has-sub")) closeMenus(); });
+  document.querySelectorAll("#menu a").forEach((a) => a.addEventListener("click", () => { closeAll(); }));
+  $("burger").addEventListener("click", () => {
+    const open = !$("menu").classList.contains("open");
+    $("menu").classList.toggle("open", open);
+    $("burger").setAttribute("aria-expanded", String(open));
+    $("burger").setAttribute("aria-label", open ? "Fermer le menu" : "Ouvrir le menu");
+  });
+}
+
+/* ---------- aide « ? » et périodes ---------- */
+function initHelp() {
+  document.querySelectorAll("[data-help]").forEach((hd) => {
+    const key = hd.dataset.help, text = HELP[key];
+    if (!text) return;
+    const box = h("p", { class: "helpbox", id: "help-" + key, hidden: true }, text);
+    const title = (hd.querySelector(".t") || hd).textContent;
+    const b = h("button", { type: "button", class: "help", "aria-expanded": "false", "aria-controls": "help-" + key, "aria-label": "Aide : " + title }, "?");
+    b.addEventListener("click", () => { const open = box.hidden; box.hidden = !open; b.setAttribute("aria-expanded", String(open)); });
+    hd.append(b);
+    hd.after(box);
+  });
+}
+const RANGE_OPTS = { server: [[24, "24 h"], [168, "7 jours"], [336, "14 jours"]], act: [[24, "24 h"], [168, "7 jours"], [336, "14 jours"]], new: [[7, "7 jours"], [14, "14 jours"], [30, "30 jours"]] };
+function initRanges() {
+  document.querySelectorAll(".seg[data-range]").forEach((seg) => {
+    const key = seg.dataset.range;
+    RANGE_OPTS[key].forEach(([v, label]) => {
+      const b = h("button", { type: "button", "aria-pressed": String(ranges[key] === v) }, label);
+      b.addEventListener("click", () => {
+        ranges[key] = v;
+        seg.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+        if (key === "server") renderServerCharts(); else if (key === "act") renderActHistory(); else renderNew();
+      });
+      seg.append(b);
+    });
+  });
 }
 
 /* ==========================================================
@@ -970,7 +1686,8 @@ async function doLogin(name, password) {
 }
 function showAdmin() {
   $("admin").hidden = !admin;
-  $("btn-admin").textContent = admin ? "Panneau admin" : "Admin";
+  $("admin-prompt").hidden = !!admin;
+  $("btn-admin").textContent = admin ? "Ouvrir le panneau" : "Se connecter";
   $("btn-logout").hidden = !admin;
   const who = $("admin-who");
   if (!admin) { who.textContent = ""; return; }
@@ -980,7 +1697,7 @@ function showAdmin() {
   $("con-note").textContent = isModo() ? "La commande libre est réservée aux administrateurs." : "Les commandes sont exécutées par la console du serveur et notées dans le journal d'audit.";
   durOptions($("sa-dur"));
   renderAdminTabs();
-  selectTab(adminTab);
+  if (curView === "admin") selectTab(adminTab);
 }
 function adminLogout(callApi, msg) {
   if (callApi && admin && !DEMO) { fetch(API_BASE_USED + "/api/logout", { method: "POST", headers: { "Authorization": "Bearer " + admin.token } }).catch(() => {}); }
@@ -1246,7 +1963,7 @@ $("con-clear").addEventListener("click", () => { conLines.length = 0; clear($("c
 
 /* ---------- boîte de connexion ---------- */
 $("btn-admin").addEventListener("click", () => {
-  if (admin) { $("admin").scrollIntoView({ behavior: "smooth" }); return; }
+  if (admin) { location.hash = "#/admin"; return; }
   $("login-err").textContent = "";
   $("dlg-login").showModal();
   $("login-name").focus();
@@ -1263,7 +1980,7 @@ $("login-form").addEventListener("submit", async (ev) => {
     saveAdmin();
     $("dlg-login").close();
     showAdmin();
-    $("admin").scrollIntoView({ behavior: "smooth" });
+    location.hash = "#/admin";
   } catch (e) { $("login-err").textContent = e.message; }
   btn.disabled = false;
 });
@@ -1345,19 +2062,33 @@ function demoApi(path, opts) {
   return Promise.reject(new Error("Introuvable."));
 }
 
+function onAdminView() { showAdmin(); }
+function leaveAdmin() { stopConsole(); clearInterval(plTimer); }
+$("prompt-login").addEventListener("click", () => $("btn-admin").click());
+
 /* ---------- démarrage ---------- */
-$("range").addEventListener("click", (ev) => {
-  const b = ev.target.closest("button[data-h]");
-  if (!b) return;
-  rangeHours = +b.dataset.h;
-  document.querySelectorAll("#range button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
-  if (data) renderHistory();
-});
+initHelp(); initRanges(); initMenus(); initSearch();
+$("csv").addEventListener("click", exportCsv);
+$("err-retry").addEventListener("click", () => { $("errbox").hidden = true; $("loading").hidden = false; load(); });
+window.addEventListener("hashchange", route);
+
 renderStatus();
+route();
 load();
 initAdmin();
+setTimeout(() => {
+if (params.get("menu")) { const b = document.querySelector('.top-btn[data-view="' + params.get("menu") + '"]'); if (b) b.click(); }
+if (params.get("help")) { const b = document.querySelector('#help-' + params.get("help")); if (b) { b.hidden = false; const t = document.querySelector('[aria-controls="help-' + params.get("help") + '"]'); if (t) t.setAttribute("aria-expanded", "true"); } }
+if (params.get("burger")) $("burger").click();
+}, 400);
 setInterval(load, REFRESH_MS);
-setInterval(() => { if (data) { renderStatus(); renderOnline(); renderRecent(); } }, 20000);
+setInterval(() => { if (data) { renderStatus(); if (curView === "joueurs") renderOnline(); } }, 20000);
+setInterval(() => {
+  if (!data) return;
+  if (curView === "serveur") ensureHistory(true).then(renderServerCharts).catch(() => {});
+  else if (curView === "activite") ensureHistory(true).then(renderActHistory).catch(() => {});
+  else if (curView === "joueurs") ensurePlayers(true).then(runSearch).catch(() => {});
+}, 60000);
 </script>
 </body>
 </html>

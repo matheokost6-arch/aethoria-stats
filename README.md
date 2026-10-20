@@ -38,11 +38,25 @@ Autres commandes : `/astats` (état), `/astats reload` (relit `config.yml` et le
 - Change les mots de passe uniquement depuis la console du serveur : `/astats setpass` refuse de tourner ailleurs, y compris depuis le panneau.
 - Mutes et joueurs immobilisés sont enregistrés dans `plugins/AethoriaStats/moderation.json` et survivent aux redémarrages.
 
+## Les données publiques
+
+Trois fichiers JSON publics, sans IP et sans contenu de chat (on compte seulement les messages) :
+
+- `GET /api/stats` : le résumé léger (environ 20 Ko) : état, TPS, records, classements, activité, morts, monstres, commandes (nom seul), succès, ClearLag.
+- `GET /api/players` : les fiches des 500 joueurs les plus actifs (série de jours, heures préférées, rangs...). Chargé seulement quand on ouvre « Joueurs » ou une fiche.
+- `GET /api/history` : un point toutes les 5 minutes sur 14 jours (joueurs, TPS moyen et minimal, RAM, chunks, entités). Chargé seulement dans « Serveur » et « Activité ».
+
+Mets `encode zstd gzip` dans le bloc Caddy : l'historique pèse moins de 40 Ko compressé. Les têtes de joueurs viennent de `mc-heads.net` par pseudo (le serveur est en mode hors ligne, l'UUID ne marcherait pas).
+
+Les redémarrages programmés (UltimateAutoRestart) ne sont pas affichés : ce plugin n'expose rien de lisible.
+
 ## La page
+
+Barre de menu fixe (Serveur, Joueurs, Activité, Journal, Admin) avec menus déroulants au clavier (flèches, Échap) et bouton « Menu » sur téléphone. Chaque vue a son adresse : `#/serveur`, `#/serveur/performance`, `#/joueurs/classements`, `#/joueur/<pseudo>` (fiche), `#/admin`. Chaque carte a un « ? » qui explique ses chiffres simplement, et une phrase sous chaque graphique.
 
 En haut du script de `site/index.html`, `API_BASE` donne l'adresse de l'API (par défaut `https://141-11-103-141.sslip.io`). Pour un essai local : `?api=http://127.0.0.1:8765`.
 
-Mode démonstration, sans serveur : ouvre la page depuis un petit serveur web local (`python -m http.server` dans `site/`) avec `?demo=1`. Le panneau admin y fonctionne avec un faux serveur : n'importe quel nom et mot de passe passent (nom `modo` pour essayer le rôle modérateur). Pour les captures : `?demo=1&admin=1&tab=players&dlg=1`.
+Mode démonstration, sans serveur : ouvre la page depuis un petit serveur web local (`python -m http.server` dans `site/`) avec `?demo=1`. Le panneau admin y fonctionne avec un faux serveur : n'importe quel nom et mot de passe passent (nom `modo` pour essayer le rôle modérateur). Pour les captures : `?demo=1&admin=1&tab=players&dlg=1#/admin`, `?demo=1&menu=joueurs`, `?demo=1&help=etat#/serveur`. Les fichiers de démonstration sont `site/stats.sample.json`, `players.sample.json` et `history.sample.json` (régénérés par `plugin/test.sh`).
 
 ## Reconstruire et tester
 

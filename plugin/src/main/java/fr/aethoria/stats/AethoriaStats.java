@@ -33,7 +33,13 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.entity.Projectile;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerAdvancementDoneEvent;
+import org.bukkit.event.server.ServerLoadEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -69,6 +75,10 @@ public final class AethoriaStats extends JavaPlugin implements Listener, Command
     private Auth auth;
     private HttpApi api;
     private final Moderation moderation = new Moderation();
+    private final java.util.concurrent.atomic.AtomicLong chatPending = new java.util.concurrent.atomic.AtomicLong();
+    private final java.util.concurrent.ConcurrentLinkedQueue<long[]> clearPending = new java.util.concurrent.ConcurrentLinkedQueue<>();
+    private volatile String latestPlayers = "{\"players\":[]}";
+    private volatile String latestHistory = "{\"points\":[]}";
     private volatile String latestStats = "{\"version\":1,\"starting\":true}";
 
     @Override
@@ -108,8 +118,10 @@ public final class AethoriaStats extends JavaPlugin implements Listener, Command
         long period = Math.max(30, sendIntervalSec) * 20L;
         Bukkit.getScheduler().runTaskTimer(this, this::sendCycle, 20L * 20, period);
 
+        hookConsoleForClearLag();
         Bukkit.getScheduler().runTaskTimer(this, () -> latestStats = buildJson(), 60L,
                 Math.max(5, getConfig().getInt("api.stats-refresh-seconds", 20)) * 20L);
+        Bukkit.getScheduler().runTaskTimer(this, this::refreshHeavyJson, 100L, 60L * 20L);
         startApi();
         getLogger().info("AethoriaStats actif" + (authMe ? " (sessions comptées après connexion AuthMe)." : "."));
     }
@@ -141,7 +153,7 @@ public final class AethoriaStats extends JavaPlugin implements Listener, Command
         try {
             var origins = new java.util.HashSet<>(getConfig().getStringList("api.allowed-origins"));
             var audit = new AuditLog(new File(getDataFolder(), "audit.log").toPath());
-            var backend = new AdminBackend(this, () -> data, () -> latestStats, moderation, audit, this::saveModeration,
+            var backend = new AdminBackend(this, () -> data, () -> latestStats, () -> latestPlayers, () -> latestHistory, moderation, audit, this::saveModeration,
                     u -> online.containsKey(u));
             api = new HttpApi(backend, auth, console, origins, m -> getLogger().warning(m));
             String bind = getConfig().getString("api.bind", "127.0.0.1");
@@ -444,6 +456,7 @@ public final class AethoriaStats extends JavaPlugin implements Listener, Command
         StatsData.PlayerRec r = online.get(e.getEntity().getUniqueId());
         if (r != null) r.deaths++;
         data.log(System.currentTimeMillis(), "death", msg);
+        recordDeathCause(e.getEntity());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -456,6 +469,106 @@ public final class AethoriaStats extends JavaPlugin implements Listener, Command
     public void onPlace(BlockPlaceEvent e) {
         StatsData.PlayerRec r = online.get(e.getPlayer().getUniqueId());
         if (r != null) r.placed++;
+    }
+
+    // ---- vie du royaume : chat (nombre seulement), commandes (nom seul), morts, monstres, succès ----
+
+    private static final java.util.Set<String> SECRET_COMMANDS = java.util.Set.of("login", "l", "log", "register", "reg",
+            "changepassword", "cp", "unregister", "email", "captcha", "verification", "totp", "2fa");
+    private static final java.util.regex.Pattern CLEARLAG = java.util.regex.Pattern.compile(
+            "(?i)(?:clear\\s?lag.*?removed\\s+(\\d+))|(?:removed\\s+(\\d+)\\s+(?:entities|entit))");
+
+    private void hookConsoleForClearLag() {
+        console.setListener(text -> {
+            if (text.length() > 300) return;
+            java.util.regex.Matcher m = CLEARLAG.matcher(text);
+            if (m.find()) {
+                String n = m.group(1) != null ? m.group(1) : m.group(2);
+                try {
+                    clearPending.add(new long[] {System.currentTimeMillis(), Long.parseLong(n)});
+                } catch (NumberFormatException ignored) {
+                    // nombre illisible : ignoré
+                }
+            }
+        });
+    }
+
+    /** Reprend sur le thread principal ce qui a été compté sur d'autres threads. */
+    private void drainPending() {
+        long n = chatPending.getAndSet(0);
+        long now = System.currentTimeMillis();
+        if (n > 0) data.chatByDay.merge(data.dayOf(now), (int) n, Integer::sum);
+        long[] c;
+        while ((c = clearPending.poll()) != null) data.addClearlag(c[0], c[1]);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onChatCount(AsyncPlayerChatEvent e) {
+        chatPending.incrementAndGet(); // le contenu du message n'est jamais lu
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onCommandCount(PlayerCommandPreprocessEvent e) {
+        String msg = e.getMessage();
+        if (msg.length() < 2) return;
+        int sp = msg.indexOf(' ');
+        String name = (sp < 0 ? msg.substring(1) : msg.substring(1, sp)).toLowerCase();
+        int colon = name.indexOf(':');
+        if (colon >= 0) name = name.substring(colon + 1);
+        if (name.isEmpty() || name.length() > 24 || SECRET_COMMANDS.contains(name) || !name.matches("[a-z0-9_.-]+")) return;
+        StatsData.bump(data.commands, name, 150);
+        data.commandsByDay.merge(data.dayOf(System.currentTimeMillis()), 1, Integer::sum);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onAdvancement(PlayerAdvancementDoneEvent e) {
+        String key = e.getAdvancement().getKey().getKey();
+        if (key.startsWith("recipes/") || !online.containsKey(e.getPlayer().getUniqueId())) return;
+        data.addAdvancement(System.currentTimeMillis(), e.getPlayer().getName(), key);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onMobKilled(EntityDeathEvent e) {
+        if (e.getEntity() instanceof Player || e.getEntity().getKiller() == null) return;
+        StatsData.bump(data.mobsKilled, e.getEntityType().name(), 80);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onServerLoad(ServerLoadEvent e) {
+        if (e.getType() == ServerLoadEvent.LoadType.STARTUP) {
+            data.bootMs = Math.max(0, System.currentTimeMillis() - startedAt);
+        }
+    }
+
+    private void recordDeathCause(Player p) {
+        EntityDamageEvent ev = p.getLastDamageCause();
+        String label = "Autre";
+        if (ev != null) {
+            switch (ev.getCause()) {
+                case FALL -> label = "Chute";
+                case FIRE, FIRE_TICK, LAVA, HOT_FLOOR -> label = "Feu et lave";
+                case DROWNING -> label = "Noyade";
+                case ENTITY_ATTACK, ENTITY_SWEEP_ATTACK -> label = "Combat (monstre ou joueur)";
+                case PROJECTILE -> label = "Flèche ou projectile";
+                case ENTITY_EXPLOSION, BLOCK_EXPLOSION -> label = "Explosion";
+                case STARVATION -> label = "Faim";
+                case SUFFOCATION, CRAMMING -> label = "Étouffement";
+                case VOID -> label = "Le vide";
+                case LIGHTNING -> label = "Foudre";
+                case MAGIC, POISON, WITHER, DRAGON_BREATH -> label = "Magie et poisons";
+                case CONTACT -> label = "Cactus et ronces";
+                case FALLING_BLOCK -> label = "Bloc qui tombe";
+                case FREEZE -> label = "Froid";
+                case SUICIDE -> label = "Commande";
+                default -> label = "Autre";
+            }
+            if (ev instanceof EntityDamageByEntityEvent by) {
+                Entity damager = by.getDamager();
+                if (damager instanceof Projectile pr && pr.getShooter() instanceof Entity shooter) damager = shooter;
+                StatsData.bump(data.killers, damager instanceof Player ? "PLAYER" : damager.getType().name(), 60);
+            }
+        }
+        StatsData.bump(data.deathCauses, label, 40);
     }
 
     // ---- statistiques Bukkit ----
@@ -509,7 +622,13 @@ public final class AethoriaStats extends JavaPlugin implements Listener, Command
         refreshWorlds();
         Runtime rt = Runtime.getRuntime();
         double ramMb = (rt.totalMemory() - rt.freeMemory()) / 1048576.0;
-        if (data.sample(now, data.active.size(), ticks.tps(60), ramMb)) {
+        int chunks = 0, ents = 0;
+        for (Snapshot.WorldInfo w : worldCache) {
+            chunks += w.chunks;
+            ents += w.entities;
+        }
+        drainPending();
+        if (data.sample(now, data.active.size(), ticks.tps(300), ramMb, ticks.takeMin(), chunks, ents)) {
             data.log(now, "record", "Nouveau record : " + data.recordCount + " joueurs en ligne");
         }
         saveAsync();
@@ -569,8 +688,17 @@ public final class AethoriaStats extends JavaPlugin implements Listener, Command
         return l;
     }
 
+    private void refreshHeavyJson() {
+        long now = System.currentTimeMillis();
+        drainPending();
+        data.checkpointAll(now);
+        latestPlayers = Json.write(Snapshot.players(data, now, hideNames));
+        latestHistory = Json.write(Snapshot.history(data, now));
+    }
+
     private String buildJson() {
         long now = System.currentTimeMillis();
+        drainPending();
         data.checkpointAll(now);
         return Json.write(Snapshot.build(data, live(), now, hideNames));
     }

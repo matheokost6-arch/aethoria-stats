@@ -27,6 +27,12 @@ public final class HttpApi {
         /** JSON public des statistiques (déjà construit, sans appel bloquant). */
         String statsJson();
 
+        /** JSON public des fiches joueurs. */
+        String playersJson();
+
+        /** JSON public de l'historique (courbes). */
+        String historyJson();
+
         /** Exécute une action. Renvoie {ok:boolean, message|error:String}. */
         Map<String, Object> action(Auth.Session who, Map<String, Object> req);
 
@@ -218,6 +224,10 @@ public final class HttpApi {
             }
             if (path.equals("/api/stats") && method.equals("GET")) {
                 send(ex, 200, backend.statsJson());
+            } else if (path.equals("/api/players") && method.equals("GET")) {
+                send(ex, 200, backend.playersJson());
+            } else if (path.equals("/api/history") && method.equals("GET")) {
+                send(ex, 200, backend.historyJson());
             } else if (path.equals("/api/ping") && method.equals("GET")) {
                 send(ex, 200, "{\"ok\":true}");
             } else if (path.equals("/api/login") && method.equals("POST")) {

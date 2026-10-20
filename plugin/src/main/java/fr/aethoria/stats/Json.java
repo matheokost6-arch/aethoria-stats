@@ -56,6 +56,13 @@ public final class Json {
                 write(sb, a[i]);
             }
             sb.append(']');
+        } else if (v instanceof long[] a) {
+            sb.append('[');
+            for (int i = 0; i < a.length; i++) {
+                if (i > 0) sb.append(',');
+                sb.append(a[i]);
+            }
+            sb.append(']');
         } else if (v instanceof int[] a) {
             sb.append('[');
             for (int i = 0; i < a.length; i++) {

@@ -36,6 +36,10 @@ public final class ApiTest {
 
         public String statsJson() { return stats; }
 
+        public String playersJson() { return "{\"players\":[{\"name\":\"Aldric\"}]}"; }
+
+        public String historyJson() { return "{\"points\":[]}"; }
+
         public Map<String, Object> action(Auth.Session who, Map<String, Object> req) {
             done.add(who.name + ":" + req.get("action") + ":" + req.get("target"));
             Map<String, Object> m = new LinkedHashMap<>();
@@ -164,6 +168,10 @@ public final class ApiTest {
         // --- public ---
         HttpResponse<String> r = call("GET", "/api/stats", null, null, "https://matheokost6-arch.github.io", null);
         check(r.statusCode() == 200 && "https://matheokost6-arch.github.io".equals(r.headers().firstValue("Access-Control-Allow-Origin").orElse("")), "GET /api/stats public + CORS pour l'origine autorisée");
+        r = call("GET", "/api/players", null, null, null, null);
+        check(r.statusCode() == 200 && r.body().contains("Aldric"), "GET /api/players public");
+        r = call("GET", "/api/history", null, null, null, null);
+        check(r.statusCode() == 200 && r.body().contains("points"), "GET /api/history public");
         r = call("GET", "/api/stats", null, null, "https://evil.example", null);
         check(r.statusCode() == 200 && r.headers().firstValue("Access-Control-Allow-Origin").isEmpty(), "pas de CORS pour une origine inconnue");
         r = call("GET", "/api/stats", null, null, "http://localhost:5500", null);

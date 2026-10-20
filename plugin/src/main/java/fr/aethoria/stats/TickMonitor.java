@@ -11,6 +11,7 @@ public final class TickMonitor implements Runnable {
     private int ticks;
     private long lastTick = binStart;
     private double msptAvg = 50;
+    private double minBin = 20;
 
     @Override
     public void run() {
@@ -22,6 +23,7 @@ public final class TickMonitor implements Runnable {
         long elapsed = now - binStart;
         if (elapsed >= 1_000_000_000L) {
             tpsBins[idx] = Math.min(20.0, ticks * 1e9 / elapsed);
+            if (tpsBins[idx] < minBin) minBin = tpsBins[idx];
             idx = (idx + 1) % BINS;
             if (count < BINS) count++;
             ticks = 0;
@@ -36,6 +38,13 @@ public final class TickMonitor implements Runnable {
         double sum = 0;
         for (int i = 1; i <= n; i++) sum += tpsBins[(idx - i + BINS) % BINS];
         return sum / n;
+    }
+
+    /** Plus bas TPS d'une seconde depuis le dernier appel (puis remise à 20). */
+    public double takeMin() {
+        double m = minBin;
+        minBin = 20;
+        return m;
     }
 
     /** Durée moyenne entre deux ticks, en ms (approximation du MSPT : 50 = serveur à la limite de 20 TPS). */

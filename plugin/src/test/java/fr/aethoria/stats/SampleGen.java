@@ -27,6 +27,12 @@ public final class SampleGen {
         "Hersende", "Ingeburge", "Jourdain", "Lothaire", "Melusine", "Norbert", "Ogier", "Pepin_Court", "Raoul"
     };
 
+    private static final String[] COMMANDS = {"spawn", "home", "sethome", "tpa", "msg", "warp", "kit", "shop", "balance", "pay", "claim", "trade", "help", "rules", "map"};
+    private static final String[] CAUSES = {"Combat (monstre ou joueur)", "Chute", "Feu et lave", "Explosion", "Flèche ou projectile", "Noyade", "Faim", "Étouffement", "Le vide", "Magie et poisons"};
+    private static final String[] KILLERS = {"ZOMBIE", "SKELETON", "CREEPER", "SPIDER", "ENDERMAN", "PLAYER", "WITCH", "DROWNED", "PILLAGER", "WOLF"};
+    private static final String[] MOBS = {"ZOMBIE", "SKELETON", "CREEPER", "SPIDER", "COW", "PIG", "SHEEP", "CHICKEN", "ENDERMAN", "SLIME", "BAT", "ZOMBIFIED_PIGLIN", "WITCH", "DROWNED", "PHANTOM"};
+    private static final String[] ADV = {"story/mine_stone", "story/upgrade_tools", "story/smelt_iron", "story/obtain_armor", "story/enter_the_nether", "story/follow_ender_eye", "nether/find_fortress", "nether/obtain_crying_obsidian", "end/kill_dragon", "adventure/kill_a_mob", "adventure/trade", "adventure/sleep_in_bed", "husbandry/breed_an_animal", "husbandry/plant_seed", "husbandry/tame_an_animal"};
+
     private static final class Sim {
         String uuid, name;
         long joinAt;
@@ -97,9 +103,19 @@ public final class SampleGen {
                         s.online = false;
                         d.log(t, "quit", s.name + " s'est déconnecté");
                     } else {
-                        r.mobKills += (int) (rnd.nextDouble() * 6);
+                        int mk = (int) (rnd.nextDouble() * 6);
+                        r.mobKills += mk;
+                        for (int q = 0; q < mk; q++) StatsData.bump(d.mobsKilled, MOBS[(int) (Math.pow(rnd.nextDouble(), 1.7) * MOBS.length)], 80);
+                        if (rnd.nextDouble() < 0.35) d.chatByDay.merge(d.dayOf(t), 1 + rnd.nextInt(3), Integer::sum);
+                        if (rnd.nextDouble() < 0.12) {
+                            StatsData.bump(d.commands, COMMANDS[(int) (Math.pow(rnd.nextDouble(), 1.6) * COMMANDS.length)], 150);
+                            d.commandsByDay.merge(d.dayOf(t), 1, Integer::sum);
+                        }
+                        if (rnd.nextDouble() < 0.004) d.addAdvancement(t, s.name, ADV[rnd.nextInt(ADV.length)]);
                         if (rnd.nextDouble() < 0.02) {
                             r.deaths++;
+                            StatsData.bump(d.deathCauses, CAUSES[(int) (Math.pow(rnd.nextDouble(), 1.8) * CAUSES.length)], 40);
+                            StatsData.bump(d.killers, KILLERS[(int) (Math.pow(rnd.nextDouble(), 1.6) * KILLERS.length)], 60);
                             String[] causes = {" a été tué par un Zombie", " est tombé de trop haut", " a été abattu par un Squelette", " a brûlé dans la lave", " a été explosé par un Creeper"};
                             d.log(t, "death", s.name + causes[rnd.nextInt(causes.length)]);
                         }
@@ -113,11 +129,14 @@ public final class SampleGen {
             double load = d.active.size();
             double tps = Math.min(20.0, 20.0 - Math.max(0, load - 7) * 0.08 - (rnd.nextDouble() < 0.01 ? 2.5 : 0) - rnd.nextDouble() * 0.15);
             double ram = 2800 + 1500 * Math.abs(Math.sin(t / 5_400_000.0)) + load * 55 + rnd.nextDouble() * 80;
-            if (d.sample(t, d.active.size(), tps, ram) && t - lastRecordLog > 0) {
+            if (t % (30 * 60_000L) == 0) d.addClearlag(t, 90 + rnd.nextInt(260));
+            double minTps = Math.max(2, tps - rnd.nextDouble() * (rnd.nextDouble() < 0.03 ? 9 : 1.5));
+            if (d.sample(t, d.active.size(), tps, ram, minTps, 380 + (int) load * 9 + rnd.nextInt(20), 1100 + (int) load * 40 + rnd.nextInt(120)) && t - lastRecordLog > 0) {
                 d.log(t, "record", "Nouveau record : " + d.recordCount + " joueurs en ligne");
             }
         }
 
+        d.bootMs = 41_300;
         // persistance : aller-retour sans perte
         String persisted = Json.write(d.toMap());
         StatsData back = StatsData.fromMap(Json.map(Json.parse(persisted)), zone);
@@ -165,8 +184,8 @@ public final class SampleGen {
         Object parsed = Json.parse(json);
         check(parsed instanceof Map, "stats.json est un objet JSON");
         check(Json.write(parsed).equals(json), "stats.json relu = écrit");
-        for (String k : new String[] {"server", "tps", "players", "newPlayers", "retention", "history", "activity",
-                "newByDay", "sessionsByDay", "leaderboards", "playerList", "worlds", "log"}) {
+        for (String k : new String[] {"server", "tps", "players", "newPlayers", "retention", "activity",
+                "newByDay", "sessionsByDay", "leaderboards", "records", "game", "worlds", "log"}) {
             check(Json.map(parsed).containsKey(k), "clé " + k);
         }
         String low = json.toLowerCase();
@@ -181,9 +200,22 @@ public final class SampleGen {
         System.out.println("Joueurs connus : " + d.players.size() + ", en ligne : " + pl.get("online") + ", record : " + d.recordCount);
         System.out.println("Rétention : " + ret);
         System.out.println("Taille stats.json : " + json.getBytes(StandardCharsets.UTF_8).length + " octets");
+        String playersJson = Json.write(Snapshot.players(d, now, false));
+        String historyJson = Json.write(Snapshot.history(d, now));
+        check(Json.map(Json.parse(playersJson)).containsKey("players") && Json.list(Json.map(Json.parse(playersJson)).get("players")).size() == d.players.size(), "players.json : une fiche par joueur");
+        check(Json.list(Json.map(Json.parse(historyJson)).get("points")).size() == StatsData.HISTORY_MAX, "history.json : 14 jours de points");
+        check(!playersJson.toLowerCase().contains("\"ip\"") && !historyJson.contains("."  + "0.0.1"), "players.json et history.json sans IP");
+        // vérifications des nouveaux champs
+        Map<String, Object> game = Json.map(Json.map(parsed).get("game"));
+        check(!Json.list(game.get("deathCauses")).isEmpty() && !Json.list(game.get("mobsKilled")).isEmpty() && !Json.list(game.get("commands")).isEmpty(), "morts, monstres et commandes comptés");
+        check(Json.num(Json.map(Json.map(Json.map(parsed).get("records")).get("longestSession")).get("ms"), 0) > 0, "plus longue session");
+        check(Json.map(Json.map(parsed).get("server")).containsKey("lagSpikes") && Json.map(Json.map(Json.map(parsed).get("server")).get("tps24h")).get("min") != null, "TPS du jour et pics de lag");
         if (args.length > 0) {
-            Files.writeString(Path.of(args[0]), json, StandardCharsets.UTF_8);
-            System.out.println("Écrit : " + args[0]);
+            Path out = Path.of(args[0]);
+            Files.writeString(out, json, StandardCharsets.UTF_8);
+            Files.writeString(out.resolveSibling("players.sample.json"), playersJson, StandardCharsets.UTF_8);
+            Files.writeString(out.resolveSibling("history.sample.json"), historyJson, StandardCharsets.UTF_8);
+            System.out.println("Écrit : " + args[0] + " (+ players et history) ; players " + playersJson.length() + " o, history " + historyJson.length() + " o");
         }
         System.out.println("TOUS LES TESTS OK");
     }

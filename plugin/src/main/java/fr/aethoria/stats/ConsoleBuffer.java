@@ -28,6 +28,7 @@ public final class ConsoleBuffer {
     }
 
     private final ArrayDeque<Line> lines = new ArrayDeque<>();
+    private volatile java.util.function.Consumer<String> listener;
     private long seq;
 
     /** Nettoie une ligne : couleurs ANSI et §, adresses IP, mots de passe de /astats setpass. */
@@ -41,7 +42,24 @@ public final class ConsoleBuffer {
         return s;
     }
 
-    public synchronized void add(long ts, String level, String text) {
+    /** Appelé (sur le thread du journal) avec chaque ligne brute : doit rester très rapide. */
+    public void setListener(java.util.function.Consumer<String> l) {
+        this.listener = l;
+    }
+
+    public void add(long ts, String level, String text) {
+        java.util.function.Consumer<String> l = listener;
+        if (l != null && text != null) {
+            try {
+                l.accept(text);
+            } catch (RuntimeException ignored) {
+                // un écouteur ne doit jamais casser le journal
+            }
+        }
+        append(ts, level, text);
+    }
+
+    private synchronized void append(long ts, String level, String text) {
         lines.addLast(new Line(++seq, ts, level, clean(text)));
         while (lines.size() > CAPACITY) lines.pollFirst();
         notifyAll();

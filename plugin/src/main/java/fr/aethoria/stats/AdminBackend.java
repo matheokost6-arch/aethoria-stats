@@ -37,19 +37,23 @@ public final class AdminBackend implements HttpApi.Backend {
     private final Supplier<String> stats;
     private final Supplier<String> playersJ;
     private final Supplier<String> historyJ;
+    private final Supplier<String> factionsJ;
+    private final Supplier<String> adminFactionsJ;
     private final Moderation moderation;
     private final AuditLog audit;
     private final Consumer<Moderation> saveModeration;
     private final java.util.function.Predicate<UUID> counted;
 
     public AdminBackend(Plugin plugin, Supplier<StatsData> data, Supplier<String> stats, Supplier<String> playersJ, Supplier<String> historyJ,
-                        Moderation moderation, AuditLog audit,
+                        Supplier<String> factionsJ, Supplier<String> adminFactionsJ, Moderation moderation, AuditLog audit,
                         Consumer<Moderation> saveModeration, java.util.function.Predicate<UUID> counted) {
         this.plugin = plugin;
         this.data = data;
         this.stats = stats;
         this.playersJ = playersJ;
         this.historyJ = historyJ;
+        this.factionsJ = factionsJ;
+        this.adminFactionsJ = adminFactionsJ;
         this.moderation = moderation;
         this.audit = audit;
         this.saveModeration = saveModeration;
@@ -64,6 +68,16 @@ public final class AdminBackend implements HttpApi.Backend {
     @Override
     public String playersJson() {
         return playersJ.get();
+    }
+
+    @Override
+    public String factionsJson() {
+        return factionsJ.get();
+    }
+
+    @Override
+    public String adminFactionsJson() {
+        return adminFactionsJ.get();
     }
 
     @Override

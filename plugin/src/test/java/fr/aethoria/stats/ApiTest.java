@@ -40,6 +40,10 @@ public final class ApiTest {
 
         public String historyJson() { return "{\"points\":[]}"; }
 
+        public String factionsJson() { return "{\"available\":true,\"factions\":[{\"name\":\"Valmont\"}]}"; }
+
+        public String adminFactionsJson() { return "{\"ok\":true,\"factions\":[{\"treasury\":500}]}"; }
+
         public Map<String, Object> action(Auth.Session who, Map<String, Object> req) {
             done.add(who.name + ":" + req.get("action") + ":" + req.get("target"));
             Map<String, Object> m = new LinkedHashMap<>();
@@ -187,6 +191,10 @@ public final class ApiTest {
         check(r.statusCode() == 200 && "https://matheokost6-arch.github.io".equals(r.headers().firstValue("Access-Control-Allow-Origin").orElse("")), "GET /api/stats public + CORS pour l'origine autorisée");
         r = call("GET", "/api/players", null, null, null, null);
         check(r.statusCode() == 200 && r.body().contains("Aldric"), "GET /api/players public");
+        r = call("GET", "/api/factions", null, null, null, null);
+        check(r.statusCode() == 200 && r.body().contains("Valmont"), "GET /api/factions public");
+        r = call("GET", "/api/admin/factions", null, null, null, null);
+        check(r.statusCode() == 401, "/api/admin/factions sans jeton : 401");
         r = call("GET", "/api/history", null, null, null, null);
         check(r.statusCode() == 200 && r.body().contains("points"), "GET /api/history public");
         r = call("GET", "/api/stats", null, null, "https://evil.example", null);
@@ -213,6 +221,9 @@ public final class ApiTest {
         check(r.statusCode() == 200 && r.body().contains("\"role\":\"admin\""), "/api/admin/me");
         r = call("POST", "/api/login", "{\"name\":\"chef\",\"password\":\"mot-de-passe-solide\"}", null, "https://evil.example", null);
         check(r.statusCode() == 403, "connexion refusée depuis une origine inconnue");
+
+        r = call("GET", "/api/admin/factions", null, tModo, null, null);
+        check(r.statusCode() == 200 && r.body().contains("treasury"), "/api/admin/factions avec jeton");
 
         // --- infos admin ---
         r = call("GET", "/api/admin/players", null, tAdmin, null, null);

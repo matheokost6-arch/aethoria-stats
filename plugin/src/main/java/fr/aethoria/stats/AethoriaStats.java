@@ -79,6 +79,11 @@ public final class AethoriaStats extends JavaPlugin implements Listener, Command
     private final Moderation moderation = new Moderation();
     private final java.util.concurrent.atomic.AtomicLong chatPending = new java.util.concurrent.atomic.AtomicLong();
     private final java.util.concurrent.ConcurrentLinkedQueue<long[]> clearPending = new java.util.concurrent.ConcurrentLinkedQueue<>();
+    private volatile AethoriaExport export;
+    private long exportMod;
+    private String exportWarn = "";
+    private volatile String latestFactions = "{\"available\":false,\"factions\":[]}";
+    private volatile String latestAdminFactions = "{\"ok\":true,\"available\":false,\"factions\":[]}";
     private volatile String latestPlayers = "{\"players\":[]}";
     private volatile String latestHistory = "{\"points\":[]}";
     private volatile String latestStats = "{\"version\":1,\"starting\":true}";
@@ -123,6 +128,7 @@ public final class AethoriaStats extends JavaPlugin implements Listener, Command
         Bukkit.getScheduler().runTaskTimer(this, this::sendCycle, 20L * 20, period);
 
         hookConsoleForClearLag();
+        Bukkit.getScheduler().runTaskTimerAsynchronously(this, this::pollExport, 100L, 60L * 20L);
         Bukkit.getScheduler().runTaskTimer(this, () -> latestStats = buildJson(), 60L,
                 Math.max(5, getConfig().getInt("api.stats-refresh-seconds", 20)) * 20L);
         Bukkit.getScheduler().runTaskTimer(this, this::refreshHeavyJson, 100L, 60L * 20L);
@@ -147,6 +153,41 @@ public final class AethoriaStats extends JavaPlugin implements Listener, Command
         uploader.shutdown();
     }
 
+    // ---- export du mod Aethoria (noms RP, factions) ----
+
+    /** Relit aethoria-export.json s'il a changé (au plus une fois par minute, hors thread principal). */
+    private void pollExport() {
+        String p = getConfig().getString("aethoria-export", "");
+        if (p == null || p.isBlank()) {
+            if (export != null) Bukkit.getScheduler().runTask(this, () -> {
+                export = null;
+                refreshHeavyJson();
+            });
+            return;
+        }
+        File f = new File(p.trim());
+        if (!f.isAbsolute()) f = new File(Bukkit.getWorldContainer(), p.trim());
+        if (!f.isFile()) return; // pas (encore) d'export : on ne fait rien
+        long mod = f.lastModified();
+        if (mod == exportMod || f.length() > 16L * 1024 * 1024) return;
+        try {
+            final AethoriaExport ex = AethoriaExport.parse(Files.readString(f.toPath(), StandardCharsets.UTF_8));
+            exportMod = mod;
+            exportWarn = "";
+            Bukkit.getScheduler().runTask(this, () -> {
+                export = ex;
+                data.observeFactions(ex.factionByUuid(), System.currentTimeMillis());
+                refreshHeavyJson();
+            });
+        } catch (Exception e) {
+            String msg = String.valueOf(e.getMessage());
+            if (!msg.equals(exportWarn)) { // un seul avertissement par type d'erreur
+                exportWarn = msg;
+                getLogger().warning("aethoria-export illisible pour l'instant (" + msg + ") : on garde les dernières données.");
+            }
+        }
+    }
+
     // ---- API HTTP ----
 
     private void startApi() {
@@ -157,7 +198,7 @@ public final class AethoriaStats extends JavaPlugin implements Listener, Command
         try {
             var origins = new java.util.HashSet<>(getConfig().getStringList("api.allowed-origins"));
             var audit = new AuditLog(new File(getDataFolder(), "audit.log").toPath());
-            var backend = new AdminBackend(this, () -> data, () -> latestStats, () -> latestPlayers, () -> latestHistory, moderation, audit, this::saveModeration,
+            var backend = new AdminBackend(this, () -> data, () -> latestStats, () -> latestPlayers, () -> latestHistory, () -> latestFactions, () -> latestAdminFactions, moderation, audit, this::saveModeration,
                     u -> online.containsKey(u));
             api = new HttpApi(backend, auth, console, origins, m -> getLogger().warning(m));
             String bind = getConfig().getString("api.bind", "127.0.0.1");
@@ -705,7 +746,15 @@ public final class AethoriaStats extends JavaPlugin implements Listener, Command
         long now = System.currentTimeMillis();
         drainPending();
         data.checkpointAll(now);
-        latestPlayers = Json.write(Snapshot.players(data, now, hideNames));
+        AethoriaExport ex = export;
+        latestPlayers = Json.write(Snapshot.players(data, now, hideNames, ex));
+        if (ex != null) {
+            latestFactions = Json.write(Snapshot.factions(data, ex, now, hideNames));
+            latestAdminFactions = Json.write(Snapshot.adminFactions(ex, now));
+        } else {
+            latestFactions = "{\"available\":false,\"factions\":[]}";
+            latestAdminFactions = "{\"ok\":true,\"available\":false,\"factions\":[]}";
+        }
         latestHistory = Json.write(Snapshot.history(data, now));
     }
 
@@ -713,7 +762,7 @@ public final class AethoriaStats extends JavaPlugin implements Listener, Command
         long now = System.currentTimeMillis();
         drainPending();
         data.checkpointAll(now);
-        return Json.write(Snapshot.build(data, live(), now, hideNames));
+        return Json.write(Snapshot.build(data, live(), now, hideNames, export));
     }
 
     private void sendCycle() {

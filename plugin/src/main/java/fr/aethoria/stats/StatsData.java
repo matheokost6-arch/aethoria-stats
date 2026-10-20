@@ -81,6 +81,9 @@ public final class StatsData {
     public String longestName = "";
     public long longestAt;
     public long bootMs;
+    /** uuid -> {id de faction, depuis quand (ms, 0 = inconnu)}. */
+    public final Map<String, String[]> factionOf = new LinkedHashMap<>();
+    public boolean factionsBaselined;
     public final Map<String, Integer> deathCauses = new LinkedHashMap<>();
     public final Map<String, Integer> killers = new LinkedHashMap<>();
     public final Map<String, Integer> mobsKilled = new LinkedHashMap<>();
@@ -251,6 +254,20 @@ public final class StatsData {
         }
     }
 
+    /**
+     * Met à jour l'appartenance aux factions d'après l'export du mod. À la toute première lecture,
+     * les membres existants ont une date inconnue (0) : seuls les arrivées suivantes comptent comme nouvelles.
+     */
+    public void observeFactions(Map<String, String> current, long now) {
+        long since = factionsBaselined ? now : 0;
+        for (Map.Entry<String, String> e : current.entrySet()) {
+            String[] old = factionOf.get(e.getKey());
+            if (old == null || !old[0].equals(e.getValue())) factionOf.put(e.getKey(), new String[] {e.getValue(), String.valueOf(since)});
+        }
+        factionOf.keySet().removeIf(u -> !current.containsKey(u));
+        factionsBaselined = true;
+    }
+
     public void addAdvancement(long now, String player, String key) {
         advancements.add(new String[] {String.valueOf(now), player, key});
         while (advancements.size() > 30) advancements.remove(0);
@@ -318,6 +335,10 @@ public final class StatsData {
         lg2.put("at", longestAt);
         root.put("longest", lg2);
         root.put("bootMs", bootMs);
+        root.put("factionsBaselined", factionsBaselined);
+        Map<String, Object> fo = new LinkedHashMap<>();
+        for (Map.Entry<String, String[]> e : factionOf.entrySet()) fo.put(e.getKey(), List.of(e.getValue()[0], e.getValue()[1]));
+        root.put("factionOf", fo);
         root.put("deathCauses", deathCauses);
         root.put("killers", killers);
         root.put("mobsKilled", mobsKilled);
@@ -398,6 +419,11 @@ public final class StatsData {
         d.longestName = Json.str(lg2.get("name"), "");
         d.longestAt = Json.num(lg2.get("at"), 0);
         d.bootMs = Json.num(root.get("bootMs"), 0);
+        d.factionsBaselined = Boolean.TRUE.equals(root.get("factionsBaselined"));
+        for (Map.Entry<String, Object> e : Json.map(root.get("factionOf")).entrySet()) {
+            List<Object> q = Json.list(e.getValue());
+            if (q.size() >= 2) d.factionOf.put(e.getKey(), new String[] {String.valueOf(q.get(0)), String.valueOf(q.get(1))});
+        }
         for (String k : new String[] {"deathCauses", "killers", "mobsKilled", "commands"}) {
             Map<String, Integer> target = k.equals("deathCauses") ? d.deathCauses : k.equals("killers") ? d.killers : k.equals("mobsKilled") ? d.mobsKilled : d.commands;
             for (Map.Entry<String, Object> e : Json.map(root.get(k)).entrySet()) target.put(e.getKey(), (int) Json.num(e.getValue(), 0));

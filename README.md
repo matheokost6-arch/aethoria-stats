@@ -50,6 +50,15 @@ Mets `encode zstd gzip` dans le bloc Caddy : l'historique pèse moins de 40 Ko c
 
 Les redémarrages programmés (UltimateAutoRestart) ne sont pas affichés : ce plugin n'expose rien de lisible.
 
+## Noms RP et factions (mod Aethoria)
+
+`config.yml` > `aethoria-export` : chemin du fichier `aethoria-export.json` écrit par le mod (relatif à la racine du serveur, vide = désactivé, `aethoria-export.json` par défaut). Le plugin le relit au plus une fois par minute, en arrière-plan, seulement s'il a changé. S'il manque ou s'il est cassé, il ne fait rien (un seul avertissement dans le journal) et garde les dernières données.
+
+- `/api/stats` et `/api/players` ajoutent `rp`, `faction`, `role`, `job` aux joueurs ; `/api/stats` contient `export.available`.
+- `GET /api/factions` (public) : factions, membres avec noms RP, diplomatie, couronne, et des statistiques calculées par le plugin (temps de jeu cumulé, actifs sur 7 jours, en ligne, nouveaux membres sur 7 jours). Ni la partie `admin`, ni aucun UUID.
+- `GET /api/admin/factions` (connecté) : trésor, claims et cités avec coordonnées.
+- Sans export, le menu « Royaumes » et tout ce qui s'y rapporte restent cachés.
+
 ## La page
 
 Barre de menu fixe (Serveur, Joueurs, Activité, Journal, Admin) avec menus déroulants au clavier (flèches, Échap) et bouton « Menu » sur téléphone. Chaque vue a son adresse : `#/serveur`, `#/serveur/performance`, `#/joueurs/classements`, `#/joueur/<pseudo>` (fiche), `#/admin`. Chaque carte a un « ? » qui explique ses chiffres simplement, et une phrase sous chaque graphique.

@@ -32,3 +32,7 @@ gist-id: ""
 github-token: ""
 gist-file: "stats.json"
 send-interval-seconds: 120
+
+# Export du mod Aethoria (noms RP, factions, couronne). Chemin relatif à la racine du serveur.
+# Vide = désactivé. Le fichier est relu au plus une fois par minute, seulement s'il a changé.
+aethoria-export: "aethoria-export.json"

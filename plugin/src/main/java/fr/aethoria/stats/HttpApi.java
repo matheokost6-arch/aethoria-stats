@@ -33,6 +33,12 @@ public final class HttpApi {
         /** JSON public de l'historique (courbes). */
         String historyJson();
 
+        /** JSON public des royaumes (sans la partie admin). */
+        String factionsJson();
+
+        /** Trésor, claims et cités des factions : réservé aux comptes connectés. */
+        String adminFactionsJson();
+
         /** Exécute une action. Renvoie {ok:boolean, message|error:String}. */
         Map<String, Object> action(Auth.Session who, Map<String, Object> req);
 
@@ -226,6 +232,8 @@ public final class HttpApi {
                 send(ex, 200, backend.statsJson());
             } else if (path.equals("/api/players") && method.equals("GET")) {
                 send(ex, 200, backend.playersJson());
+            } else if (path.equals("/api/factions") && method.equals("GET")) {
+                send(ex, 200, backend.factionsJson());
             } else if (path.equals("/api/history") && method.equals("GET")) {
                 send(ex, 200, backend.historyJson());
             } else if (path.equals("/api/ping") && method.equals("GET")) {
@@ -325,6 +333,7 @@ public final class HttpApi {
                 send(ex, 200, Map.of("ok", true, "entries", backend.audit(lim)));
             }
             case "/api/admin/console" -> consoleRoute(ex, s);
+            case "/api/admin/factions" -> send(ex, 200, backend.adminFactionsJson());
             case "/api/admin/action" -> {
                 if (!method.equals("POST")) {
                     send(ex, 405, err("POST attendu."));

@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -32,6 +33,106 @@ public final class SampleGen {
     private static final String[] KILLERS = {"ZOMBIE", "SKELETON", "CREEPER", "SPIDER", "ENDERMAN", "PLAYER", "WITCH", "DROWNED", "PILLAGER", "WOLF"};
     private static final String[] MOBS = {"ZOMBIE", "SKELETON", "CREEPER", "SPIDER", "COW", "PIG", "SHEEP", "CHICKEN", "ENDERMAN", "SLIME", "BAT", "ZOMBIFIED_PIGLIN", "WITCH", "DROWNED", "PHANTOM"};
     private static final String[] ADV = {"story/mine_stone", "story/upgrade_tools", "story/smelt_iron", "story/obtain_armor", "story/enter_the_nether", "story/follow_ender_eye", "nether/find_fortress", "nether/obtain_crying_obsidian", "end/kill_dragon", "adventure/kill_a_mob", "adventure/trade", "adventure/sleep_in_bed", "husbandry/breed_an_animal", "husbandry/plant_seed", "husbandry/tame_an_animal"};
+
+    private static final String[] FACTIONS = {"Maison de Valmont", "Ordre d'Ombrelune", "Clan du Cormoran", "Hautefort", "Brumevert", "Les Sans-Terre"};
+    private static final String[] COLORS = {"#b3402a", "#5a4a8a", "#1f6b2c", "#8a5a00", "#2a7a8a", "#6a6a6a"};
+    private static final String[] TAGS = {"VAL", "OMB", "COR", "HAU", "BRU", "SAN"};
+    private static final String[] DESCR = {"Vieille maison de chevaliers, gardienne de la grande route du sud.", "Moines-soldats qui veillent sur les étoiles et sur les secrets.", "Marins et pêcheurs de la côte, redoutés pour leurs navires.", "Bâtisseurs de la forteresse du nord, fiers de leurs remparts.", "Gens des forêts, éleveurs et herboristes, amis des loups.", "Exilés et aventuriers sans bannière, unis par la débrouille."};
+    private static final String[] FIRST = {"Aldric", "Berenger", "Cedric", "Isaure", "Eudes", "Gauvain", "Hildegarde", "Jehanne", "Kaelen", "Lancelin", "Mathilde", "Nimue", "Odilon", "Perceval", "Rosalinde", "Tristan", "Ulrich", "Vivienne", "Wulfric", "Yvain"};
+    private static final String[] PLACE = {"Valmont", "Ombrelune", "Cormoran", "Hautefort", "Brumevert", "la Combe", "Roc-Haut", "Fontclaire", "Pierrefeu", "Belair"};
+    private static final String[] JOBS = {"Mineur", "Forgeron", "Fermier", "Marchand", "Bûcheron", "Pêcheur", "Alchimiste"};
+
+    /** Fabrique un export fictif conforme au schéma du mod, avec les mêmes joueurs que la simulation. */
+    static String fakeExport(StatsData d, long now, Random rnd) {
+        Map<String, Object> root = new LinkedHashMap<>();
+        root.put("version", 1);
+        root.put("generatedAt", now - 20_000);
+        List<String> uuids = new ArrayList<>(d.players.keySet());
+        Map<String, Object> players = new LinkedHashMap<>();
+        List<List<String>> members = new ArrayList<>();
+        for (int f = 0; f < FACTIONS.length; f++) members.add(new ArrayList<>());
+        for (int i = 0; i < uuids.size(); i++) {
+            String u = uuids.get(i);
+            int f = i < 60 ? i % FACTIONS.length : -1; // les 8 derniers n'ont pas de faction
+            Map<String, Object> p = new LinkedHashMap<>();
+            String pseudo = d.players.get(u).name;
+            String fn = FIRST[i % FIRST.length];
+            String ln = "de " + PLACE[(i * 7 + 3) % PLACE.length];
+            p.put("name", pseudo);
+            p.put("firstName", fn);
+            p.put("lastName", ln);
+            p.put("rpName", i % 11 == 10 ? null : fn + " " + ln);
+            p.put("faction", f < 0 ? null : (Object) (long) (f + 1));
+            int rank = f < 0 ? 0 : members.get(f).size();
+            p.put("role", f < 0 ? null : rank == 0 ? "chef" : rank < 3 ? "officier" : "membre");
+            boolean job = rnd.nextDouble() < 0.7;
+            p.put("job", job ? JOBS[rnd.nextInt(JOBS.length)] : null);
+            p.put("jobLevel", job ? (Object) (long) (1 + rnd.nextInt(40)) : null);
+            players.put(u, p);
+            if (f >= 0) members.get(f).add(u);
+        }
+        root.put("players", players);
+        List<Object> factions = new ArrayList<>();
+        List<Object> adminF = new ArrayList<>();
+        for (int f = 0; f < FACTIONS.length; f++) {
+            Map<String, Object> m = new LinkedHashMap<>();
+            m.put("id", (long) (f + 1));
+            m.put("name", FACTIONS[f]);
+            m.put("color", COLORS[f]);
+            m.put("tag", TAGS[f]);
+            m.put("description", DESCR[f]);
+            String leader = members.get(f).get(0);
+            m.put("leader", leader);
+            m.put("leaderRpName", ((Map<?, ?>) players.get(leader)).get("rpName"));
+            m.put("members", members.get(f).size());
+            m.put("memberUuids", members.get(f));
+            m.put("founded", now - (long) (8 + rnd.nextInt(25)) * 86_400_000L);
+            int cities = 1 + rnd.nextInt(5);
+            m.put("cities", cities);
+            m.put("skillsUnlocked", 5 + rnd.nextInt(25));
+            m.put("skillsTotal", 40);
+            m.put("era", f == 0 ? "Moyen Âge" : f < 3 ? "Âge du fer" : "Antiquité");
+            m.put("isKing", f == 0);
+            m.put("suzerain", f == 3 || f == 4 ? (Object) 1L : null);
+            m.put("vassals", f == 0 ? List.of(4L, 5L) : List.of());
+            m.put("allies", f == 1 ? List.of(3L) : f == 2 ? List.of(2L) : List.of());
+            m.put("wars", f == 5 ? List.of(1L) : f == 0 ? List.of(6L) : List.of());
+            m.put("banner", null);
+            factions.add(m);
+            Map<String, Object> a = new LinkedHashMap<>();
+            a.put("id", (long) (f + 1));
+            a.put("treasury", 400 + rnd.nextInt(9000));
+            a.put("claims", 12 + rnd.nextInt(150));
+            List<Object> cl = new ArrayList<>();
+            String[] cn = {"Haute-Tour", "Port-Brume", "Val-Clair", "Rocamont", "Aubépine"};
+            for (int c = 0; c < cities; c++) {
+                Map<String, Object> city = new LinkedHashMap<>();
+                city.put("name", cn[c % cn.length] + (c >= cn.length ? " II" : ""));
+                city.put("level", 1 + rnd.nextInt(5));
+                city.put("x", rnd.nextInt(4000) - 2000);
+                city.put("z", rnd.nextInt(4000) - 2000);
+                city.put("dimension", "minecraft:overworld");
+                cl.add(city);
+            }
+            a.put("cities", cl);
+            adminF.add(a);
+        }
+        root.put("factions", factions);
+        Map<String, Object> crown = new LinkedHashMap<>();
+        String king = members.get(0).get(0);
+        crown.put("kingUuid", king);
+        crown.put("kingRpName", ((Map<?, ?>) players.get(king)).get("rpName"));
+        crown.put("factionId", 1L);
+        crown.put("termEnd", now + 12L * 86_400_000L);
+        crown.put("phase", "règne");
+        crown.put("royalTreeUnlocked", true);
+        crown.put("era", "Moyen Âge");
+        root.put("crown", crown);
+        Map<String, Object> admin = new LinkedHashMap<>();
+        admin.put("factions", adminF);
+        root.put("admin", admin);
+        return Json.write(root);
+    }
 
     private static final class Sim {
         String uuid, name;
@@ -137,6 +238,15 @@ public final class SampleGen {
         }
 
         d.bootMs = 41_300;
+        String exportJson = fakeExport(d, now, rnd);
+        AethoriaExport ex = AethoriaExport.parse(exportJson);
+        // deux membres arrivent après la première lecture : ils comptent comme « nouveaux membres »
+        Map<String, String> baseline = ex.factionByUuid();
+        List<String> later = new ArrayList<>(baseline.keySet()).subList(3, 5);
+        Map<String, String> early = new LinkedHashMap<>(baseline);
+        later.forEach(early::remove);
+        d.observeFactions(early, now - 8 * 86_400_000L);
+        d.observeFactions(baseline, now - 2 * 86_400_000L);
         // persistance : aller-retour sans perte
         String persisted = Json.write(d.toMap());
         StatsData back = StatsData.fromMap(Json.map(Json.parse(persisted)), zone);
@@ -179,7 +289,7 @@ public final class SampleGen {
             live.worlds.add(wi);
         }
 
-        Map<String, Object> snap = Snapshot.build(d, live, now, false);
+        Map<String, Object> snap = Snapshot.build(d, live, now, false, ex);
         String json = Json.write(snap);
         Object parsed = Json.parse(json);
         check(parsed instanceof Map, "stats.json est un objet JSON");
@@ -200,7 +310,28 @@ public final class SampleGen {
         System.out.println("Joueurs connus : " + d.players.size() + ", en ligne : " + pl.get("online") + ", record : " + d.recordCount);
         System.out.println("Rétention : " + ret);
         System.out.println("Taille stats.json : " + json.getBytes(StandardCharsets.UTF_8).length + " octets");
-        String playersJson = Json.write(Snapshot.players(d, now, false));
+        String playersJson = Json.write(Snapshot.players(d, now, false, ex));
+        String factionsJson = Json.write(Snapshot.factions(d, ex, now, false));
+        String adminJson = Json.write(Snapshot.adminFactions(ex, now));
+        Map<String, Object> fm = Json.map(Json.parse(factionsJson));
+        check(Json.list(fm.get("factions")).size() == 6 && fm.get("crown") != null, "royaumes : 6 factions et la couronne");
+        check(!factionsJson.contains("treasury") && !factionsJson.contains("claims") && !factionsJson.contains("\"x\":") && !factionsJson.contains("memberUuids") && !factionsJson.contains("kingUuid"), "royaumes publics : pas de partie admin, pas d'UUID");
+        check(!factionsJson.matches("(?s).*[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}.*") && !playersJson.matches("(?s).*[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}.*"), "aucun UUID dans les JSON publics");
+        check(adminJson.contains("treasury") && adminJson.contains("Haute-Tour"), "partie admin : trésor et cités");
+        long new7 = 0;
+        for (Object o : Json.list(fm.get("factions"))) new7 += Json.num(Json.map(Json.map(o).get("stats")).get("new7d"), 0);
+        check(new7 == 2, "nouveaux membres sur 7 jours : " + new7);
+        check(playersJson.contains("\"rp\":\"Aldric de Valmont\"") || playersJson.contains("\"rp\":"), "noms RP dans players.json");
+        check(json.contains("\"rp\":") && json.contains("\"export\":{\"available\":true"), "noms RP et export dans stats.json");
+        String noExport = Json.write(Snapshot.build(d, live, now, false));
+        check(!noExport.contains("\"rp\":") && noExport.contains("\"available\":false"), "sans export : aucun champ RP, tout reste valide");
+        try {
+            AethoriaExport.parse("{pas du json");
+            check(false, "export cassé refusé");
+        } catch (RuntimeException e) {
+            check(true, "export cassé refusé proprement");
+        }
+        check(AethoriaExport.parse("{\"version\":1}").factions.isEmpty(), "export vide accepté");
         String historyJson = Json.write(Snapshot.history(d, now));
         check(Json.map(Json.parse(playersJson)).containsKey("players") && Json.list(Json.map(Json.parse(playersJson)).get("players")).size() == d.players.size(), "players.json : une fiche par joueur");
         check(Json.list(Json.map(Json.parse(historyJson)).get("points")).size() == StatsData.HISTORY_MAX, "history.json : 14 jours de points");
@@ -215,6 +346,9 @@ public final class SampleGen {
             Files.writeString(out, json, StandardCharsets.UTF_8);
             Files.writeString(out.resolveSibling("players.sample.json"), playersJson, StandardCharsets.UTF_8);
             Files.writeString(out.resolveSibling("history.sample.json"), historyJson, StandardCharsets.UTF_8);
+            Files.writeString(out.resolveSibling("factions.sample.json"), factionsJson, StandardCharsets.UTF_8);
+            Files.writeString(out.resolveSibling("factions-admin.sample.json"), adminJson, StandardCharsets.UTF_8);
+            Files.writeString(out.resolveSibling("aethoria-export.sample.json"), exportJson, StandardCharsets.UTF_8);
             System.out.println("Écrit : " + args[0] + " (+ players et history) ; players " + playersJson.length() + " o, history " + historyJson.length() + " o");
         }
         System.out.println("TOUS LES TESTS OK");

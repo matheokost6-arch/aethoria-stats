@@ -384,6 +384,21 @@ ul.results li button:hover { background: #523420; }
 @media print { .topbar, .adminbar { display: none; } }
 
 .chip button.namelink { color: var(--gold-soft); text-decoration-color: var(--gold-soft); }
+/* royaumes */
+#crown .kpi .n { font-size: 1.25rem; overflow-wrap: anywhere; }
+[hidden] { display: none !important; }
+.vgrid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; }
+.swatch { display: inline-block; width: 14px; height: 14px; border-radius: 4px; border: 1px solid rgba(0,0,0,.4); margin-right: 8px; vertical-align: -2px; }
+.fgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; }
+a.fcard { display: block; text-decoration: none; color: var(--ink); background: rgba(255,255,255,.4); border: 2px solid var(--line); border-top: 6px solid #888; border-radius: 10px; padding: 10px 14px 12px; }
+a.fcard:hover, a.fcard:focus-visible { background: rgba(255,255,255,.7); }
+.fhead { display: flex; align-items: center; gap: 8px; font-family: "Cinzel", Georgia, serif; font-size: 1.08rem; color: #3b2208; }
+.ftag { color: var(--ink-soft); font-size: .8em; font-family: "Segoe UI", system-ui, sans-serif; }
+.fmeta { font-size: .9rem; color: var(--ink-soft); margin: 2px 0; }
+a.flink { color: #4a2c0c; font-weight: 700; text-decoration: underline dotted; text-underline-offset: 3px; }
+a.flink:hover { color: #8a5a00; }
+#dlg-faction { max-width: min(760px, 96vw); }
+#dlg-faction h2 { display: flex; align-items: center; flex-wrap: wrap; }
 </style>
 </head>
 <body>
@@ -413,6 +428,14 @@ ul.results li button:hover { background: #523420; }
             <li><a href="#/joueurs/nouveaux">Nouveaux joueurs</a></li>
             <li><a href="#/joueurs/fidelite">Fidélité</a></li>
             <li><a href="#/joueurs/classements">Classements</a></li>
+          </ul>
+        </li>
+        <li class="has-sub" id="nav-royaumes" hidden>
+          <button type="button" class="top-btn" aria-expanded="false" aria-haspopup="true" aria-controls="m-royaumes" data-view="royaumes">Royaumes</button>
+          <ul class="sub" id="m-royaumes" hidden>
+            <li><a href="#/royaumes/couronne">La couronne</a></li>
+            <li><a href="#/royaumes/liste">Les factions</a></li>
+            <li><a href="#/royaumes/classement">Classement des factions</a></li>
           </ul>
         </li>
         <li class="has-sub">
@@ -479,6 +502,7 @@ ul.results li button:hover { background: #523420; }
         <div class="tiles">
           <a class="tile" href="#/serveur"><strong>Serveur</strong><span>Est-ce que ça lague ? Mémoire, mondes, machine.</span><small>État, performance, machine, chunks, mondes</small></a>
           <a class="tile" href="#/joueurs"><strong>Joueurs</strong><span>Qui est là, qui vient d'arriver, qui est le meilleur.</span><small>En ligne, recherche, nouveaux, fidélité, classements</small></a>
+          <a class="tile" href="#/royaumes" id="tile-royaumes" hidden><strong>Royaumes</strong><span>Les factions, leurs chefs et la couronne.</span><small>Couronne, factions, classement</small></a>
           <a class="tile" href="#/activite"><strong>Activité</strong><span>À quelle heure il y a le plus de monde.</span><small>Courbes, heures animées, visites, discussions</small></a>
           <a class="tile" href="#/journal"><strong>Journal</strong><span>Ce qui se passe : connexions, morts, succès.</span><small>Événements, succès, morts, monstres, commandes</small></a>
           <a class="tile" href="#/admin"><strong>Admin</strong><span>Réservé à l'équipe : console et modération.</span><small>Connexion nécessaire</small></a>
@@ -542,7 +566,7 @@ ul.results li button:hover { background: #523420; }
         <h2 id="h-search" data-help="recherche"><span class="t">Chercher un joueur</span></h2>
         <form class="searchrow" id="search-form" role="search">
           <label class="sr-only" for="search-q">Pseudo du joueur</label>
-          <input type="search" id="search-q" placeholder="Tape un pseudo..." autocomplete="off" spellcheck="false">
+          <input type="search" id="search-q" placeholder="Tape un pseudo ou un nom RP..." autocomplete="off" spellcheck="false">
           <button type="submit" class="btn">Chercher</button>
         </form>
         <ul class="results" id="search-res" aria-live="polite"></ul>
@@ -580,6 +604,31 @@ ul.results li button:hover { background: #523420; }
         <div id="board" role="tabpanel" tabindex="0"></div>
         <p class="caption" id="cap-board"></p>
       </section>
+    </div>
+
+    <!-- ===================== ROYAUMES ===================== -->
+    <div class="view" id="v-royaumes" data-view="royaumes" hidden>
+      <section class="card" id="roy-none" hidden aria-labelledby="h-roynone">
+        <h2 id="h-roynone"><span class="t">Royaumes</span></h2>
+        <p class="empty">Les royaumes ne sont pas encore ouverts sur ce serveur. Cette page se remplira toute seule quand le mod Aethoria sera là.</p>
+      </section>
+      <div class="vgrid" id="roy-body">
+        <section class="card" id="s-couronne" aria-labelledby="h-crown">
+          <h2 id="h-crown" data-help="couronne"><span class="t">La couronne</span></h2>
+          <div id="crown"></div>
+          <p class="caption" id="cap-crown"></p>
+        </section>
+        <section class="card" id="s-liste" aria-labelledby="h-flist">
+          <h2 id="h-flist" data-help="factions"><span class="t">Les factions</span></h2>
+          <div class="fgrid" id="flist"></div>
+        </section>
+        <section class="card" id="s-classement" aria-labelledby="h-frank">
+          <h2 id="h-frank" data-help="classroy"><span class="t">Classement des factions</span></h2>
+          <div class="toolbar"><div class="seg small" role="group" aria-label="Classer par" id="fsort"></div></div>
+          <div id="frank"></div>
+          <p class="caption" id="cap-frank"></p>
+        </section>
+      </div>
     </div>
 
     <!-- ===================== ACTIVITE ===================== -->
@@ -740,6 +789,11 @@ ul.results li button:hover { background: #523420; }
         </form>
       </div>
 
+      <div id="ap-factions" role="tabpanel" aria-labelledby="atab-factions" hidden>
+        <div class="toolbar"><button type="button" class="btn small" id="af-refresh">Actualiser</button><span class="hint">Trésor, territoires et cités de chaque faction. Visible seulement ici.</span></div>
+        <div id="af-body"></div>
+      </div>
+
       <div id="ap-audit" role="tabpanel" aria-labelledby="atab-audit" hidden>
         <div class="toolbar"><button type="button" class="btn small" id="au-refresh">Actualiser</button><span class="hint">Qui a fait quoi, et quand. Les 100 dernières actions.</span></div>
         <div class="tablewrap"><table class="data" id="au-table"></table></div>
@@ -757,6 +811,7 @@ ul.results li button:hover { background: #523420; }
 </div>
 
 <dialog id="dlg-player" aria-labelledby="pl-name"></dialog>
+<dialog id="dlg-faction" aria-labelledby="fa-name"></dialog>
 <dialog id="dlg-login" aria-labelledby="login-h">
   <form id="login-form" autocomplete="off">
     <h2 id="login-h">Connexion au panneau</h2>
@@ -787,8 +842,8 @@ const params = new URLSearchParams(location.search);
 const DEMO = params.get("demo") === "1";
 const API_BASE_USED = (params.get("api") || API_BASE).replace(/\/+$/, "");
 const URLS = DEMO
-  ? { stats: "stats.sample.json", players: "players.sample.json", history: "history.sample.json" }
-  : { stats: API_BASE_USED + "/api/stats", players: API_BASE_USED + "/api/players", history: API_BASE_USED + "/api/history" };
+  ? { stats: "stats.sample.json", players: "players.sample.json", history: "history.sample.json", factions: "factions.sample.json" }
+  : { stats: API_BASE_USED + "/api/stats", players: API_BASE_USED + "/api/players", history: API_BASE_USED + "/api/history", factions: API_BASE_USED + "/api/factions" };
 
 const $ = (id) => document.getElementById(id);
 const nf = new Intl.NumberFormat("fr-FR");
@@ -798,6 +853,8 @@ const DAYS_SHORT = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
 let data = null;       // stats.json (léger)
 let pdata = null;      // players.json (fiches)
 let hdata = null;      // history.json (courbes)
+let fdata = null;      // factions.json (royaumes), seulement si le mod Aethoria est là
+let fTime = 0;
 let pTime = 0, hTime = 0;
 let fetchError = "";
 let curView = null;
@@ -831,6 +888,9 @@ const HELP = {
   succes: "Les succès (ou avancements) que les joueurs ont débloqués récemment : ce sont les petites récompenses du jeu.",
   morts: "Les causes de mort des joueurs, et les créatures qui les ont tués. Un bon moyen de voir ce qui est dangereux.",
   monstres: "Les créatures que les joueurs ont tuées le plus souvent depuis le début du suivi.",
+  couronne: "Le roi dirige tout le royaume pour un temps limité. Ici : qui porte la couronne, de quelle faction, quand son mandat se termine et où en est l'élection.",
+  factions: "Une faction est un groupe de joueurs avec un chef, des cités et un arbre de compétences. Clique sur une faction pour voir ses membres, ses alliés et ses guerres.",
+  classroy: "Les factions classées les unes contre les autres : plus de membres, plus de temps de jeu, plus de joueurs actifs, ou un arbre de compétences plus avancé.",
   commandes: "Les commandes que les joueurs tapent le plus (comme /home ou /spawn). On ne garde que le nom, jamais le reste."
 };
 
@@ -896,8 +956,9 @@ function stateOf() {
   if (ageMin <= STALE_MIN) return { cls: "warn", text: "Données anciennes", sub: "Mis à jour " + ago(data.generatedAt), age: ageMin };
   return { cls: "bad", text: "Hors ligne", sub: "Dernier signe de vie " + ago(data.generatedAt), age: ageMin };
 }
-function nameButton(name) {
-  const b = h("button", { type: "button", class: "namelink", "aria-label": "Voir la fiche de " + name }, name);
+function nameButton(name, rp) {
+  const label = rp ? rp + " (" + name + ")" : name;
+  const b = h("button", { type: "button", class: "namelink", "aria-label": "Voir la fiche de " + label }, label);
   b.addEventListener("click", () => { location.hash = "#/joueur/" + encodeURIComponent(name); });
   return b;
 }
@@ -1076,7 +1137,7 @@ function renderRecords() {
   clear($("records")).append(
     kpi(ls && ls.ms ? dur(ls.ms) : "-", "Plus longue session", ls && ls.ms ? ls.name + ", " + fmtDate(ls.at) : "pas encore de record"),
     kpi(num(pk.count), "Plus de monde en même temps", pk.at ? fmtDate(pk.at) : "pas encore de record"),
-    kpi(wt && wt.name ? wt.name : "-", "Joueur de la semaine", wt && wt.ms ? dur(wt.ms) + " de jeu en 7 jours" : "pas encore de données"));
+    kpi(wt && wt.name ? (wt.rp || wt.name) : "-", "Joueur de la semaine", wt && wt.ms ? dur(wt.ms) + " de jeu en 7 jours" : "pas encore de données"));
 }
 
 /* ---------- vue Serveur ---------- */
@@ -1175,7 +1236,7 @@ function renderOnline() {
   if (!l.length) { box.append(h("p", { class: "empty" }, "Personne en ligne pour l'instant. Le royaume dort.")); return; }
   const ul = h("ul", { class: "plain chips" });
   l.slice().sort((a, b) => a.since - b.since).forEach((p) => {
-    const b = nameButton(p.name);
+    const b = nameButton(p.name, p.rp);
     b.classList.add("chipname");
     ul.append(h("li", { class: "chip" }, b, " ", h("small", null, "joue depuis " + dur(Date.now() - p.since) + (p.ping !== null && p.ping !== undefined ? ", " + p.ping + " ms" : ""))));
   });
@@ -1195,10 +1256,10 @@ function renderNew() {
   $("ch-new").setAttribute("aria-label", "Nouveaux joueurs par jour. " + cap);
   const ul = clear($("recent")), r = data.newPlayers.recent;
   if (!r.length) ul.append(h("li", { class: "empty" }, "Personne pour l'instant."));
-  r.forEach((p) => ul.append(h("li", null, nameButton(p.name), h("span", { class: "when" }, ago(p.first)))));
+  r.forEach((p) => ul.append(h("li", null, nameButton(p.name, p.rp), h("span", { class: "when" }, ago(p.first)))));
   const bl = clear($("birthdays")), b = data.newPlayers.anniversaries || [];
   if (!b.length) bl.append(h("li", { class: "empty" }, "Aucun anniversaire aujourd'hui."));
-  b.forEach((p) => bl.append(h("li", null, nameButton(p.name), h("span", { class: "when" }, "inscrit il y a " + p.text))));
+  b.forEach((p) => bl.append(h("li", null, nameButton(p.name, p.rp), h("span", { class: "when" }, "inscrit il y a " + p.text))));
 }
 function renderRetention() {
   const box = clear($("ret"));
@@ -1274,7 +1335,7 @@ function renderBoard() {
   rows.forEach((r, i) => {
     const bar = h("div", { class: "bar", "aria-hidden": "true", style: "min-width:60px" }, h("i"));
     bar.firstChild.style.width = Math.max(2, 100 * r.value / max) + "%";
-    tb.append(h("tr", null, h("td", { class: "rank" }, String(i + 1)), h("td", null, nameButton(r.name)), h("td", { class: "num" }, def[2](r.value)), h("td", { style: "width:35%" }, bar)));
+    tb.append(h("tr", null, h("td", { class: "rank" }, String(i + 1)), h("td", null, nameButton(r.name, r.rp)), h("td", { class: "num" }, def[2](r.value)), h("td", { style: "width:35%" }, bar)));
   });
   t.append(tb);
   box.append(h("div", { class: "tablewrap" }, t));
@@ -1306,10 +1367,11 @@ function runSearch() {
   if (!pdata) { $("search-hint").textContent = "Chargement de la liste des joueurs..."; return; }
   $("search-hint").textContent = num(pdata.total) + " joueurs connus.";
   if (!q) { return; }
-  const found = pdata.players.filter((p) => p.name.toLowerCase().includes(q)).sort((a, b) => (a.name.toLowerCase().startsWith(q) ? 0 : 1) - (b.name.toLowerCase().startsWith(q) ? 0 : 1) || b.playMs - a.playMs).slice(0, 12);
+  const starts = (p) => (p.name.toLowerCase().startsWith(q) || (p.rp || "").toLowerCase().startsWith(q)) ? 0 : 1;
+  const found = pdata.players.filter((p) => p.name.toLowerCase().includes(q) || (p.rp || "").toLowerCase().includes(q)).sort((a, b) => starts(a) - starts(b) || b.playMs - a.playMs).slice(0, 12);
   if (!found.length) { res.append(h("li", { class: "empty" }, "Aucun joueur ne ressemble à « " + $("search-q").value.trim() + " ».")); return; }
   found.forEach((p) => {
-    const b = h("button", { type: "button" }, p.name);
+    const b = h("button", { type: "button" }, p.rp ? p.rp + " (" + p.name + ")" : p.name);
     b.addEventListener("click", () => { location.hash = "#/joueur/" + encodeURIComponent(p.name); });
     res.append(h("li", null, b));
   });
@@ -1324,7 +1386,12 @@ async function openPlayerModal(name) {
   clear(dlg).append(h("p", null, "Chargement de la fiche..."));
   if (!dlg.open) dlg.showModal();
   let p = null;
-  try { await ensurePlayers(); p = pdata.players.find((x) => x.name.toLowerCase() === name.toLowerCase()); }
+  try {
+    await whenData();
+    await ensurePlayers();
+    if (hasExport()) { try { await ensureFactions(); } catch (e) { /* la fiche marche sans */ } }
+    p = pdata.players.find((x) => x.name.toLowerCase() === name.toLowerCase());
+  }
   catch (e) { clear(dlg).append(h("p", { class: "formerr" }, "Impossible de charger la liste des joueurs (" + e.message + ")."), closeRow(dlg)); return; }
   clear(dlg);
   if (!p) { dlg.append(h("h2", { id: "pl-name" }, "Joueur introuvable"), h("p", null, "Aucune fiche pour « " + name + " ». Seuls les 500 joueurs les plus actifs ont une fiche."), closeRow(dlg)); return; }
@@ -1339,8 +1406,9 @@ async function openPlayerModal(name) {
   strip.setAttribute("aria-label", "Heures préférées. " + favTxt);
   const stat = (v, l) => h("div", null, h("b", null, v), h("span", null, l));
   const rk = p.ranks;
-  dlg.append(
-    h("div", { class: "pcard-head" }, img, h("div", null, h("h2", { id: "pl-name" }, p.name), h("p", null, st + ". Inscrit le " + fmtDate(p.first) + " (" + ago(p.first).replace("il y a ", "il y a ") + ")."))),
+  put(dlg,
+    h("div", { class: "pcard-head" }, img, h("div", null, h("h2", { id: "pl-name" }, p.rp || p.name), h("p", null, (p.rp ? "Pseudo : " + p.name + ". " : "") + st + ". Inscrit le " + fmtDate(p.first) + " (" + ago(p.first) + ")."))),
+    playerFactionBlock(p),
     h("h3", { class: "panel-h3" }, "Présence"),
     h("div", { class: "statgrid" }, stat(dur(p.playMs), "Temps de jeu total"), stat(num(p.sessions), "Visites"), stat(p.sessions ? dur(p.avgSessionMs) : "-", "Visite moyenne"), stat(p.maxSessionMs ? dur(p.maxSessionMs) : "-", "Plus longue visite"), stat(p.streak + (p.streak > 1 ? " jours" : " jour"), "Jours d'affilée"), stat(num(p.days30) + " / 30", "Jours joués ce mois"), stat(dur(p.weekMs), "Cette semaine")),
     h("h3", { class: "panel-h3" }, "Heures préférées"), strip,
@@ -1460,9 +1528,196 @@ function renderJournal() {
   $("cap-mobs").textContent = g.mobsKilled.length ? "Le plus tué : " + mobName(g.mobsKilled[0].type).toLowerCase() + " (" + num(g.mobsKilled[0].n) + " fois)." : "";
 }
 
+function whenData() {
+  return new Promise((res) => {
+    if (data) { res(); return; }
+    const t = setInterval(() => { if (data) { clearInterval(t); res(); } }, 100);
+    setTimeout(() => { clearInterval(t); res(); }, 8000);
+  });
+}
+function put(parent, ...kids) { kids.forEach((k) => { if (k) parent.append(k); }); }
+/* ---------- Royaumes (export du mod Aethoria) ---------- */
+const hasExport = () => !!(data && data.export && data.export.available);
+function shiftFactions(d) {
+  const delta = shiftBy(d);
+  d.generatedAt += delta;
+  const s = (o, k) => { if (o && typeof o[k] === "number" && o[k] > 0) o[k] += delta; };
+  d.factions.forEach((f) => { s(f, "founded"); f.memberList.forEach((m) => s(m, "last")); });
+  if (d.crown) s(d.crown, "termEnd");
+  return d;
+}
+async function ensureFactions(force) {
+  if (fdata && !force && Date.now() - fTime < 55000) return fdata;
+  try { fdata = await getJson(URLS.factions, shiftFactions); fTime = Date.now(); }
+  catch (e) { if (!fdata) throw e; }
+  return fdata;
+}
+function factionById(id) { return fdata ? fdata.factions.find((f) => String(f.id) === String(id)) : null; }
+function whoLabel(name, rp) { return rp ? rp + " (" + name + ")" : name; }
+function crownIcon(size) {
+  const ns = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(ns, "svg");
+  svg.setAttribute("viewBox", "0 0 24 24"); svg.setAttribute("width", size || 18); svg.setAttribute("height", size || 18);
+  svg.setAttribute("role", "img"); svg.setAttribute("aria-label", "Couronne : faction du roi");
+  svg.style.cssText = "vertical-align:-3px;color:#8a5a00;flex:none";
+  const p = document.createElementNS(ns, "path");
+  p.setAttribute("d", "M3 19h18v2H3zM2.5 7l4.6 4.2L12 3.5l4.9 7.7L21.5 7 19.6 17H4.4z");
+  p.setAttribute("fill", "currentColor");
+  svg.append(p);
+  return svg;
+}
+function swatch(color) { const s = h("span", { class: "swatch", "aria-hidden": "true" }); s.style.background = color || "#888"; return s; }
+function factionLink(f) {
+  const a = h("a", { class: "flink", href: "#/royaume/" + encodeURIComponent(f.id) }, swatch(f.color), f.name);
+  return a;
+}
+function factionLinks(ids) {
+  const box = h("span");
+  (ids || []).forEach((id, i) => {
+    const f = factionById(id);
+    if (i) box.append(", ");
+    box.append(f ? factionLink(f) : String(id));
+  });
+  return box;
+}
+const ROLE_FR = { chef: "Chef", officier: "Officier", membre: "Membre" };
+const PHASE_FR = { regne: "Règne", "règne": "Règne", election: "Élection", "élection": "Élection", candidature: "Candidatures", vote: "Vote" };
+function phaseName(p) { if (!p) return "-"; const k = String(p).toLowerCase(); return PHASE_FR[k] || (k.charAt(0).toUpperCase() + k.slice(1).replace(/_/g, " ")); }
+function treeBar(f) {
+  const tot = f.skillsTotal || 0, un = f.skillsUnlocked || 0;
+  const bar = h("div", { class: "bar", role: "img", "aria-label": "Arbre de compétences : " + un + " sur " + tot }, h("i"));
+  bar.firstChild.style.width = (tot ? Math.min(100, 100 * un / tot) : 0) + "%";
+  return bar;
+}
+
+function renderCrown() {
+  const c = fdata.crown, box = clear($("crown"));
+  if (!c) { box.append(h("p", { class: "empty" }, "Il n'y a pas de roi pour l'instant.")); $("cap-crown").textContent = ""; return; }
+  const f = factionById(c.factionId);
+  const left = c.termEnd ? Math.round((c.termEnd - Date.now()) / 86400000) : null;
+  const kingTxt = c.kingRpName || c.kingName || "-";
+  const grid = h("div", { class: "kpis" },
+    kpi(kingTxt, "Le roi", c.kingRpName && c.kingName ? "pseudo : " + c.kingName : null),
+    kpi(f ? f.name : "-", "Sa faction", f ? num(f.members) + " membres" : null),
+    kpi(c.termEnd ? fmtDate(c.termEnd) : "-", "Fin du mandat", left === null ? null : left > 0 ? "dans " + left + (left > 1 ? " jours" : " jour") : "terminé"),
+    kpi(phaseName(c.phase), "Phase en cours"),
+    kpi(c.era || "-", "Ère du royaume"),
+    kpi(c.royalTreeUnlocked ? "Débloqué" : "Fermé", "Arbre royal"));
+  box.append(grid);
+  $("cap-crown").textContent = (c.kingRpName ? "Le roi actuel est " + c.kingRpName : "Le trône est tenu") + (f ? ", de la faction " + f.name : "") + "." + (left !== null && left > 0 ? " Son mandat se termine dans " + left + (left > 1 ? " jours." : " jour.") : "");
+}
+function renderFactionList() {
+  const box = clear($("flist"));
+  if (!fdata.factions.length) { box.append(h("p", { class: "empty" }, "Aucune faction pour l'instant.")); return; }
+  fdata.factions.slice().sort((a, b) => (b.isKing ? 1 : 0) - (a.isKing ? 1 : 0) || (b.members || 0) - (a.members || 0)).forEach((f) => {
+    const head = h("div", { class: "fhead" }, h("strong", null, f.name), f.isKing ? crownIcon(18) : null, f.tag ? h("span", { class: "ftag" }, "[" + f.tag + "]") : null);
+    const a = h("a", { class: "fcard", href: "#/royaume/" + encodeURIComponent(f.id), "aria-label": "Fiche de la faction " + f.name }, head,
+      h("div", { class: "fmeta" }, "Chef : " + (f.leaderRpName || f.leaderName || "-")),
+      h("div", { class: "fmeta" }, num(f.members) + " membres, " + num(f.cities) + (f.cities > 1 ? " cités" : " cité") + (f.era ? ", " + f.era : "")),
+      treeBar(f), h("div", { class: "fmeta" }, "Arbre : " + num(f.skillsUnlocked) + " / " + num(f.skillsTotal)));
+    a.style.borderTopColor = f.color || "#888";
+    box.append(a);
+  });
+}
+const FSORT = [["members", "Membres", (f) => f.members || 0, (v) => num(v)], ["playMs", "Temps de jeu", (f) => (f.stats || {}).playMs || 0, (v) => dur(v)], ["active7d", "Actifs sur 7 jours", (f) => (f.stats || {}).active7d || 0, (v) => num(v)], ["online", "En ligne", (f) => (f.stats || {}).online || 0, (v) => num(v)], ["cities", "Cités", (f) => f.cities || 0, (v) => num(v)], ["tree", "Arbre", (f) => f.skillsUnlocked || 0, (v) => num(v)]];
+let fsort = "members";
+function renderFactionRank() {
+  const seg = clear($("fsort"));
+  FSORT.forEach(([k, name]) => {
+    const b = h("button", { type: "button", "aria-pressed": String(k === fsort) }, name);
+    b.addEventListener("click", () => { fsort = k; renderFactionRank(); });
+    seg.append(b);
+  });
+  const def = FSORT.find((x) => x[0] === fsort);
+  const rows = fdata.factions.slice().sort((a, b) => def[2](b) - def[2](a));
+  const t = h("table", { class: "data" }, h("thead", null, h("tr", null, h("th", { scope: "col" }, "#"), h("th", { scope: "col" }, "Faction"), h("th", { scope: "col", class: "num" }, def[1]))));
+  const tb = h("tbody");
+  rows.forEach((f, i) => tb.append(h("tr", null, h("td", { class: "rank" }, String(i + 1)), h("td", null, factionLink(f), f.isKing ? crownIcon(15) : null), h("td", { class: "num" }, def[3](def[2](f))))));
+  t.append(tb);
+  clear($("frank")).append(h("div", { class: "tablewrap" }, t));
+  $("cap-frank").textContent = rows.length ? "En tête pour « " + def[1] + " » : " + rows[0].name + " avec " + def[3](def[2](rows[0])) + "." : "";
+}
+function renderRoyaumes() {
+  const ok = hasExport();
+  $("roy-none").hidden = ok;
+  $("roy-body").hidden = !ok;
+  if (!ok) return;
+  if (fdata) { renderCrown(); renderFactionList(); renderFactionRank(); return; }
+  $("cap-crown").textContent = "Chargement des royaumes...";
+  ensureFactions().then(() => { if (curView === "royaumes") { renderCrown(); renderFactionList(); renderFactionRank(); } })
+    .catch((e) => { $("cap-crown").textContent = "Royaumes indisponibles (" + e.message + ")."; });
+}
+
+async function openFactionModal(id) {
+  const dlg = $("dlg-faction");
+  clear(dlg).append(h("p", null, "Chargement de la faction..."));
+  if (!dlg.open) dlg.showModal();
+  try { await ensureFactions(); } catch (e) { clear(dlg).append(h("p", { class: "formerr" }, "Impossible de charger les royaumes (" + e.message + ")."), closeRow(dlg)); return; }
+  const f = factionById(id);
+  clear(dlg);
+  if (!f) { dlg.append(h("h2", { id: "fa-name" }, "Faction introuvable"), h("p", null, "Aucune faction ne porte l'identifiant « " + id + " »."), closeRow(dlg)); return; }
+  const st = f.stats || {}, stat = (v, l) => h("div", null, h("b", null, v), h("span", null, l));
+  const title = h("h2", { id: "fa-name" }, swatch(f.color), f.name, " ", f.isKing ? crownIcon(22) : null, f.tag ? h("span", { class: "ftag" }, " [" + f.tag + "]") : null);
+  const mt = h("table", { class: "data stack" }, h("thead", null, h("tr", null, ...["Membre", "Rôle", "Métier", "Activité"].map((x) => h("th", { scope: "col" }, x)))));
+  const tb = h("tbody");
+  const order = { chef: 0, officier: 1, membre: 2 };
+  f.memberList.slice().sort((a, b) => (order[a.role] ?? 3) - (order[b.role] ?? 3) || (b.playMs || 0) - (a.playMs || 0)).forEach((m) => {
+    tb.append(h("tr", null, h("td", { "data-l": "Membre" }, nameButton(m.name, m.rp)), h("td", { "data-l": "Rôle" }, m.role ? h("span", { class: "badge " + (m.role === "chef" ? "b-record" : m.role === "officier" ? "b-first" : "b-quit") }, ROLE_FR[m.role] || m.role) : "-"),
+      h("td", { "data-l": "Métier" }, m.job || "-"), h("td", { "data-l": "Activité" }, m.online ? "En ligne" : (m.last ? "Vu " + ago(m.last) : "Jamais vu"))));
+  });
+  mt.append(tb);
+  const rel = (label, ids) => (ids && ids.length ? h("p", null, h("strong", null, label + " : "), factionLinks(ids)) : null);
+  const sz = f.suzerain === null || f.suzerain === undefined ? null : h("p", null, h("strong", null, "Suzerain : "), factionLinks([f.suzerain]));
+  put(dlg, title,
+    f.description ? h("p", { class: "caption", style: "margin-top:4px" }, f.description) : null,
+    h("div", { class: "statgrid" }, stat(num(f.members), "Membres"), stat(num(f.cities), f.cities > 1 ? "Cités" : "Cité"), stat(num(f.skillsUnlocked) + " / " + num(f.skillsTotal), "Arbre de compétences"), stat(f.era || "-", "Ère"), stat(f.founded ? fmtDate(f.founded) : "-", "Fondée le")),
+    treeBar(f),
+    h("h3", { class: "panel-h3" }, "Activité"),
+    h("div", { class: "statgrid" }, stat(dur(st.playMs || 0), "Temps de jeu cumulé"), stat(num(st.active7d), "Actifs sur 7 jours"), stat(num(st.online), "En ligne maintenant"), stat("+" + num(st.new7d), "Nouveaux membres (7 j)")),
+    h("h3", { class: "panel-h3" }, "Membres"), h("div", { class: "tablewrap" }, mt),
+    h("h3", { class: "panel-h3" }, "Diplomatie"),
+    sz, rel("Vassaux", f.vassals), rel("Alliés", f.allies), rel("En guerre contre", f.wars),
+    (!sz && !(f.vassals || []).length && !(f.allies || []).length && !(f.wars || []).length) ? h("p", { class: "empty" }, "Aucune alliance ni guerre pour l'instant.") : null,
+    closeRow(dlg));
+  dlg.scrollTo(0, 0);
+}
+$("dlg-faction").addEventListener("close", () => { if (location.hash.startsWith("#/royaume/")) location.hash = "#/royaumes"; });
+
+/* bloc faction / métier dans la fiche joueur */
+function playerFactionBlock(p) {
+  if (!hasExport() || (p.faction === null || p.faction === undefined) && !p.job) return null;
+  const f = p.faction === null || p.faction === undefined ? null : factionById(p.faction);
+  const box = h("p", { class: "caption", style: "margin-top:0" });
+  if (f) { box.append(h("strong", null, "Faction : "), factionLink(f), p.role ? " (" + (ROLE_FR[p.role] || p.role).toLowerCase() + ")" : ""); }
+  if (p.job) { if (f) box.append(" - "); box.append(h("strong", null, "Métier : "), p.job + (p.jobLevel ? ", niveau " + p.jobLevel : "")); }
+  return box;
+}
+
+/* onglet admin : trésor, claims et cités */
+async function refreshAdminFactions() {
+  if (!admin) return;
+  const box = clear($("af-body"));
+  try {
+    const j = await adm("/api/admin/factions");
+    if (!j.available || !j.factions.length) { box.append(h("p", { class: "empty" }, "Pas d'export du mod pour l'instant.")); return; }
+    const t = h("table", { class: "data" }, h("thead", null, h("tr", null, ...["Faction", "Trésor", "Claims", "Cités (niveau, position, dimension)"].map((x, i) => h("th", { scope: "col", class: i === 1 || i === 2 ? "num" : null }, x)))));
+    const tb = h("tbody");
+    j.factions.forEach((f) => {
+      const cities = h("ul", { class: "plain", style: "margin:0" });
+      (f.cities || []).forEach((c) => cities.append(h("li", null, h("strong", null, c.name), " : niveau " + c.level + ", x " + c.x + ", z " + c.z + ", " + String(c.dimension || "").replace("minecraft:", ""))));
+      if (!(f.cities || []).length) cities.append(h("li", { class: "empty" }, "Aucune cité"));
+      tb.append(h("tr", null, h("td", null, h("strong", null, f.factionName)), h("td", { class: "num" }, num(f.treasury)), h("td", { class: "num" }, num(f.claims)), h("td", null, cities)));
+    });
+    t.append(tb);
+    box.append(h("div", { class: "tablewrap" }, t));
+  } catch (e) { box.append(h("p", { class: "formerr" }, e.message)); }
+}
+
 /* ---------- vues, routage, rendu ---------- */
-const VIEWS = ["accueil", "serveur", "joueurs", "activite", "journal", "admin"];
+const VIEWS = ["accueil", "serveur", "joueurs", "royaumes", "activite", "journal", "admin"];
 function applyVisibility() {
+  const ex = hasExport();
+  ["nav-royaumes", "tile-royaumes"].forEach((id) => { if ($(id)) $(id).hidden = !ex; });
   document.querySelectorAll(".view").forEach((el) => { el.hidden = el.dataset.view !== curView || (!data && curView !== "admin"); });
 }
 function renderView(refresh) {
@@ -1477,6 +1732,7 @@ function renderView(refresh) {
       renderBoard();
       if (pdata) runSearch(); else ensurePlayers().then(() => { if (curView === "joueurs") runSearch(); }).catch(() => { $("search-hint").textContent = "Liste des joueurs indisponible."; });
       break;
+    case "royaumes": renderRoyaumes(); break;
     case "activite": renderActivity(); break;
     case "journal": renderJournal(); break;
     case "admin": onAdminView(); break;
@@ -1517,12 +1773,20 @@ function switchView(v, sub) {
 }
 function route() {
   const { view, sub } = parseHash();
+  if (view === "royaume" && sub) {
+    if (!curView) switchView("royaumes");
+    if ($("dlg-player").open) $("dlg-player").close();
+    openFactionModal(sub);
+    return;
+  }
   if (view === "joueur" && sub) {
     if (!curView) switchView("joueurs");
+    if ($("dlg-faction").open) $("dlg-faction").close();
     openPlayerModal(sub);
     return;
   }
   if ($("dlg-player").open) $("dlg-player").close();
+  if ($("dlg-faction").open) $("dlg-faction").close();
   switchView(VIEWS.includes(view) ? view : "accueil", VIEWS.includes(view) ? sub : "");
 }
 
@@ -1605,7 +1869,7 @@ function initRanges() {
    PANNEAU D'ADMINISTRATION
    ========================================================== */
 const ADMIN_KEY = "aethoria_admin";
-const ADMIN_TABS = [["console", "Console"], ["players", "Joueurs"], ["server", "Serveur"], ["sanctions", "Sanctions"], ["audit", "Journal d'audit"]];
+const ADMIN_TABS = [["console", "Console"], ["players", "Joueurs"], ["server", "Serveur"], ["sanctions", "Sanctions"], ["factions", "Royaumes"], ["audit", "Journal d'audit"]];
 const DURATIONS = [["", "Définitif"], ["30m", "30 minutes"], ["1h", "1 heure"], ["1d", "1 jour"], ["7d", "7 jours"]];
 let admin = null;            // { token, name, role, expiresAt }
 let adminTab = "console";
@@ -1716,6 +1980,7 @@ function adminLogout(callApi, msg) {
 function renderAdminTabs() {
   const box = clear($("atabs"));
   ADMIN_TABS.forEach(([k, name]) => {
+    if (k === "factions" && !hasExport()) return;
     const b = h("button", { type: "button", role: "tab", id: "atab-" + k, "aria-selected": String(k === adminTab), "aria-controls": "ap-" + k, tabindex: k === adminTab ? "0" : "-1" }, name);
     b.addEventListener("click", () => selectTab(k));
     b.addEventListener("keydown", (ev) => {
@@ -1740,6 +2005,7 @@ function selectTab(k) {
   if (k === "players") { refreshPlayers(); plTimer = setInterval(refreshPlayers, 10000); }
   if (k === "sanctions") refreshSanctions();
   if (k === "audit") refreshAudit();
+  if (k === "factions") refreshAdminFactions();
 }
 
 /* ---------- console ---------- */
@@ -1940,6 +2206,7 @@ async function refreshAudit() {
   } catch (e) { toast(e.message, true); }
 }
 $("au-refresh").addEventListener("click", refreshAudit);
+$("af-refresh").addEventListener("click", refreshAdminFactions);
 
 /* ---------- formulaire de commande console ---------- */
 $("con-form").addEventListener("submit", async (ev) => {
@@ -2023,6 +2290,7 @@ function demoApi(path, opts) {
   if (p === "/api/admin/players") return Promise.resolve({ ok: true, players: JSON.parse(JSON.stringify(demo.players)) });
   if (p === "/api/admin/sanctions") return Promise.resolve({ ok: true, bans: demo.bans, mutes: demo.mutes, frozen: demo.players.filter((x) => x.frozen).map((x) => x.name) });
   if (p === "/api/admin/audit") return Promise.resolve({ ok: true, entries: demo.audit.slice(0, 100) });
+  if (p === "/api/admin/factions") return getJson("factions-admin.sample.json");
   if (p === "/api/admin/console") {
     const since = +url.searchParams.get("since");
     const fresh = () => (since < 0 ? demo.lines.slice(-200) : demo.lines.filter((l) => l[0] > since));

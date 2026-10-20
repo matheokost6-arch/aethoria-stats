@@ -81,11 +81,27 @@ public final class Snapshot {
     }
 
     public static Map<String, Object> build(StatsData d, Live live, long now, boolean hideNames) {
+        return build(d, live, now, hideNames, null);
+    }
+
+    /** Ajoute le nom RP (et la faction) d'un joueur dans une entrée JSON, si l'export du mod est présent. */
+    private static void rp(Map<String, Object> m, AethoriaExport ex, String uuid) {
+        if (ex == null) return;
+        String r = ex.rpName(uuid);
+        if (r != null) m.put("rp", r);
+    }
+
+    public static Map<String, Object> build(StatsData d, Live live, long now, boolean hideNames, AethoriaExport ex) {
         Map<String, Object> out = new LinkedHashMap<>();
         long today = d.dayOf(now);
         out.put("version", 2);
         out.put("generatedAt", now);
         out.put("timezone", d.zone.getId());
+        Map<String, Object> exInfo = new LinkedHashMap<>();
+        exInfo.put("available", ex != null);
+        exInfo.put("generatedAt", ex == null ? 0 : ex.generatedAt);
+        exInfo.put("factions", ex == null ? 0 : ex.factions.size());
+        out.put("export", exInfo);
 
         Map<String, Object> srv = new LinkedHashMap<>();
         srv.put("version", live.serverVersion);
@@ -147,6 +163,7 @@ public final class Snapshot {
         for (OnlinePlayer o : live.online) {
             Map<String, Object> m = new LinkedHashMap<>();
             m.put("name", name(o.uuid, o.name, hideNames));
+            rp(m, ex, o.uuid);
             Long s = d.since.get(o.uuid);
             m.put("since", s != null ? s : now);
             m.put("ping", o.ping >= 0 ? (Object) o.ping : null);
@@ -192,6 +209,7 @@ public final class Snapshot {
             if (months >= 1 && fdate.plusMonths(months).equals(td) && birthdays.size() < 8 && (months < 12 || months % 12 == 0)) {
                 Map<String, Object> m = new LinkedHashMap<>();
                 m.put("name", name(r.uuid, r.name, hideNames));
+                rp(m, ex, r.uuid);
                 m.put("text", months < 12 ? months + " mois" : (months / 12) + (months / 12 > 1 ? " ans" : " an"));
                 birthdays.add(m);
             }
@@ -203,6 +221,7 @@ public final class Snapshot {
             StatsData.PlayerRec r = byFirst.get(i);
             Map<String, Object> m = new LinkedHashMap<>();
             m.put("name", name(r.uuid, r.name, hideNames));
+            rp(m, ex, r.uuid);
             m.put("first", r.first);
             recent.add(m);
         }
@@ -277,10 +296,10 @@ public final class Snapshot {
 
         // classements (top 15)
         Map<String, Object> lb = new LinkedHashMap<>();
-        for (String b : BOARDS) lb.put(b, top(all, hideNames, metric(d, b, now)));
-        lb.put("playtimeDay", top(all, hideNames, r -> playOver(d, r, now, today, 1)));
-        lb.put("playtimeWeek", top(all, hideNames, r -> playOver(d, r, now, today, 7)));
-        lb.put("playtimeMonth", top(all, hideNames, r -> playOver(d, r, now, today, 30)));
+        for (String b : BOARDS) lb.put(b, top(all, hideNames, metric(d, b, now), ex));
+        lb.put("playtimeDay", top(all, hideNames, r -> playOver(d, r, now, today, 1), ex));
+        lb.put("playtimeWeek", top(all, hideNames, r -> playOver(d, r, now, today, 7), ex));
+        lb.put("playtimeMonth", top(all, hideNames, r -> playOver(d, r, now, today, 30), ex));
         out.put("leaderboards", lb);
 
         // records
@@ -302,6 +321,7 @@ public final class Snapshot {
         }
         Map<String, Object> wt = new LinkedHashMap<>();
         wt.put("name", wk == null ? null : name(wk.uuid, wk.name, hideNames));
+        if (wk != null) rp(wt, ex, wk.uuid);
         wt.put("ms", wkMs);
         rc.put("weekTop", wt);
         out.put("records", rc);
@@ -371,6 +391,10 @@ public final class Snapshot {
 
     /** Fiches joueurs (les 500 premiers au temps de jeu), avec leur rang dans chaque classement. */
     public static Map<String, Object> players(StatsData d, long now, boolean hideNames) {
+        return players(d, now, hideNames, null);
+    }
+
+    public static Map<String, Object> players(StatsData d, long now, boolean hideNames, AethoriaExport ex) {
         long today = d.dayOf(now);
         List<StatsData.PlayerRec> all = new ArrayList<>(d.players.values());
         Map<String, Map<String, Integer>> ranks = new LinkedHashMap<>();
@@ -390,6 +414,14 @@ public final class Snapshot {
             long pm = d.playMsNow(r, now);
             Map<String, Object> m = new LinkedHashMap<>();
             m.put("name", name(r.uuid, r.name, hideNames));
+            if (ex != null && ex.players.containsKey(r.uuid)) {
+                Map<String, Object> ep = ex.players.get(r.uuid);
+                rp(m, ex, r.uuid);
+                m.put("faction", ex.factionId(r.uuid));
+                m.put("role", ex.role(r.uuid));
+                m.put("job", Json.str(ep.get("job"), null));
+                m.put("jobLevel", ep.get("jobLevel") instanceof Number n ? (Object) n.longValue() : null);
+            }
             m.put("avatar", !hideNames);
             m.put("first", r.first);
             m.put("last", d.lastNow(r, now));
@@ -463,7 +495,7 @@ public final class Snapshot {
         return m;
     }
 
-    private static List<Object> top(List<StatsData.PlayerRec> all, boolean hide, ToLongFunction<StatsData.PlayerRec> f) {
+    private static List<Object> top(List<StatsData.PlayerRec> all, boolean hide, ToLongFunction<StatsData.PlayerRec> f, AethoriaExport ex) {
         List<StatsData.PlayerRec> l = new ArrayList<>(all);
         l.sort(Comparator.comparingLong(f).reversed());
         List<Object> out = new ArrayList<>();
@@ -472,6 +504,7 @@ public final class Snapshot {
             if (v <= 0 || out.size() >= 15) break;
             Map<String, Object> m = new LinkedHashMap<>();
             m.put("name", name(r.uuid, r.name, hide));
+            rp(m, ex, r.uuid);
             m.put("value", v);
             out.add(m);
         }
@@ -513,6 +546,108 @@ public final class Snapshot {
     private static double round(double v, int dec) {
         double p = Math.pow(10, dec);
         return Math.round(v * p) / p;
+    }
+
+    /**
+     * Royaumes publics : factions, membres (noms RP), diplomatie, couronne et statistiques calculées ici.
+     * Ne contient jamais la partie « admin » de l'export, ni d'UUID.
+     */
+    public static Map<String, Object> factions(StatsData d, AethoriaExport ex, long now, boolean hide) {
+        Map<String, Object> out = new LinkedHashMap<>();
+        out.put("version", 2);
+        out.put("generatedAt", now);
+        out.put("exportAt", ex.generatedAt);
+        Map<String, String> factionName = new LinkedHashMap<>();
+        for (Map<String, Object> f : ex.factions) factionName.put(ExportIds.id(f), Json.str(f.get("name"), "?"));
+        List<Object> list = new ArrayList<>();
+        for (Map<String, Object> f : ex.factions) {
+            String id = ExportIds.id(f);
+            Map<String, Object> o = new LinkedHashMap<>();
+            for (String k : new String[] {"id", "name", "color", "tag", "description", "leaderRpName", "members", "founded", "cities",
+                "skillsUnlocked", "skillsTotal", "era", "isKing", "suzerain", "vassals", "allies", "wars", "banner"}) {
+                if (f.containsKey(k)) o.put(k, f.get(k));
+            }
+            // uuid -> membres (jamais d'UUID dans la sortie)
+            List<String> uuids = new ArrayList<>();
+            for (Object u : Json.list(f.get("memberUuids"))) uuids.add(String.valueOf(u));
+            if (uuids.isEmpty()) {
+                for (Map.Entry<String, String> e : ex.factionByUuid().entrySet()) if (id.equals(e.getValue())) uuids.add(e.getKey());
+            }
+            String leader = ExportIds.str(f.get("leader"));
+            StatsData.PlayerRec lr = leader == null ? null : d.players.get(leader);
+            Map<String, Object> lp = leader == null ? null : ex.players.get(leader);
+            o.put("leaderName", lr != null ? name(lr.uuid, lr.name, hide) : (lp != null && !hide ? Json.str(lp.get("name"), null) : null));
+            long playMs = 0;
+            int active7 = 0, onlineNow = 0, new7 = 0;
+            List<Object> ml = new ArrayList<>();
+            for (String u : uuids) {
+                StatsData.PlayerRec r = d.players.get(u);
+                Map<String, Object> ep = ex.players.get(u);
+                Map<String, Object> m = new LinkedHashMap<>();
+                String pseudo = r != null ? name(u, r.name, hide) : (ep != null && !hide ? Json.str(ep.get("name"), "?") : pseudo(u));
+                m.put("name", pseudo);
+                m.put("rp", ex.rpName(u));
+                m.put("role", ex.role(u));
+                m.put("job", ep == null ? null : Json.str(ep.get("job"), null));
+                boolean on = d.active.containsKey(u);
+                m.put("online", on);
+                if (r != null) {
+                    long pm = d.playMsNow(r, now);
+                    long last = d.lastNow(r, now);
+                    playMs += pm;
+                    if (last >= now - 7 * 86_400_000L) active7++;
+                    m.put("last", last);
+                    m.put("playMs", pm);
+                }
+                if (on) onlineNow++;
+                String[] fo = d.factionOf.get(u);
+                if (fo != null && Long.parseLong(fo[1]) > 0 && Long.parseLong(fo[1]) >= now - 7 * 86_400_000L) new7++;
+                ml.add(m);
+            }
+            o.put("memberList", ml);
+            if (!o.containsKey("members")) o.put("members", uuids.size());
+            Map<String, Object> st = new LinkedHashMap<>();
+            st.put("playMs", playMs);
+            st.put("active7d", active7);
+            st.put("online", onlineNow);
+            st.put("new7d", new7);
+            o.put("stats", st);
+            list.add(o);
+        }
+        out.put("factions", list);
+        Map<String, Object> crown = new LinkedHashMap<>();
+        for (String k : new String[] {"kingRpName", "factionId", "termEnd", "phase", "royalTreeUnlocked", "era"}) {
+            if (ex.crown.containsKey(k)) crown.put(k, ex.crown.get(k));
+        }
+        String king = ExportIds.str(ex.crown.get("kingUuid"));
+        if (king != null) {
+            StatsData.PlayerRec kr = d.players.get(king);
+            Map<String, Object> kp = ex.players.get(king);
+            crown.put("kingName", kr != null ? name(kr.uuid, kr.name, hide) : (kp != null && !hide ? Json.str(kp.get("name"), null) : null));
+            if (!crown.containsKey("kingRpName") || crown.get("kingRpName") == null) crown.put("kingRpName", ex.rpName(king));
+        }
+        out.put("crown", ex.crown.isEmpty() ? null : crown);
+        return out;
+    }
+
+    /** Partie réservée aux admins : trésor, claims, cités avec coordonnées. */
+    public static Map<String, Object> adminFactions(AethoriaExport ex, long now) {
+        Map<String, Object> out = new LinkedHashMap<>();
+        out.put("ok", true);
+        out.put("available", ex != null);
+        out.put("generatedAt", now);
+        List<Object> l = new ArrayList<>();
+        if (ex != null) {
+            Map<String, String> names = new LinkedHashMap<>();
+            for (Map<String, Object> f : ex.factions) names.put(ExportIds.id(f), Json.str(f.get("name"), "?"));
+            for (Map<String, Object> a : ex.adminFactions) {
+                Map<String, Object> m = new LinkedHashMap<>(a);
+                m.put("factionName", names.getOrDefault(ExportIds.id(a), "?"));
+                l.add(m);
+            }
+        }
+        out.put("factions", l);
+        return out;
     }
 
     /** Pour les tests : formate un instant. */

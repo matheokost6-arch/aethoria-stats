@@ -134,6 +134,30 @@ public final class SampleGen {
         return Json.write(root);
     }
 
+    /** Le vrai exemple écrit par le mod (copie dans src/test/resources), ou null s'il manque. */
+    static String loadRealExport() {
+        try {
+            Path p = Path.of("src/test/resources/aethoria-export.real.sample.json");
+            return Files.exists(p) ? Files.readString(p, StandardCharsets.UTF_8) : null;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /** Décale les dates de l'exemple pour qu'il paraisse écrit à l'instant. */
+    static String shiftExport(String json, long now) {
+        Map<String, Object> root = Json.map(Json.parse(json));
+        long delta = now - 20_000 - Json.num(root.get("generatedAt"), now);
+        root.put("generatedAt", Json.num(root.get("generatedAt"), now) + delta);
+        Map<String, Object> crown = Json.map(root.get("crown"));
+        if (crown.get("termEnd") instanceof Number n) crown.put("termEnd", n.longValue() + delta);
+        for (Object o : Json.list(root.get("factions"))) {
+            Map<String, Object> f = Json.map(o);
+            if (f.get("founded") instanceof Number n) f.put("founded", n.longValue() + delta);
+        }
+        return Json.write(root);
+    }
+
     private static final class Sim {
         String uuid, name;
         long joinAt;
@@ -165,6 +189,17 @@ public final class SampleGen {
             s.shift = rnd.nextInt(5) - 2;
             s.sessionSteps = 6 + rnd.nextDouble() * 30;
             sims.add(s);
+        }
+        // avec le vrai exemple du mod, les premiers joueurs simulés prennent les UUID et pseudos de l'export
+        String realExport = loadRealExport();
+        if (realExport != null) {
+            int k = 0;
+            for (Map.Entry<String, Object> e : Json.map(Json.map(Json.parse(realExport)).get("players")).entrySet()) {
+                if (k >= sims.size()) break;
+                Sim s = sims.get(k++);
+                s.uuid = e.getKey();
+                s.name = Json.str(Json.map(e.getValue()).get("name"), s.name);
+            }
         }
         // les 4 premiers joueurs sont d'anciens habitués
         for (int i = 0; i < 4; i++) {
@@ -238,7 +273,7 @@ public final class SampleGen {
         }
 
         d.bootMs = 41_300;
-        String exportJson = fakeExport(d, now, rnd);
+        String exportJson = realExport != null ? shiftExport(realExport, now) : fakeExport(d, now, rnd);
         AethoriaExport ex = AethoriaExport.parse(exportJson);
         // deux membres arrivent après la première lecture : ils comptent comme « nouveaux membres »
         Map<String, String> baseline = ex.factionByUuid();
@@ -314,10 +349,20 @@ public final class SampleGen {
         String factionsJson = Json.write(Snapshot.factions(d, ex, now, false));
         String adminJson = Json.write(Snapshot.adminFactions(ex, now));
         Map<String, Object> fm = Json.map(Json.parse(factionsJson));
-        check(Json.list(fm.get("factions")).size() == 6 && fm.get("crown") != null, "royaumes : 6 factions et la couronne");
+        int expectedFactions = ex.factions.size();
+        check(Json.list(fm.get("factions")).size() == expectedFactions && expectedFactions >= 5 && fm.get("crown") != null, "royaumes : " + expectedFactions + " factions et la couronne");
         check(!factionsJson.contains("treasury") && !factionsJson.contains("claims") && !factionsJson.contains("\"x\":") && !factionsJson.contains("memberUuids") && !factionsJson.contains("kingUuid"), "royaumes publics : pas de partie admin, pas d'UUID");
         check(!factionsJson.matches("(?s).*[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}.*") && !playersJson.matches("(?s).*[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}.*"), "aucun UUID dans les JSON publics");
-        check(adminJson.contains("treasury") && adminJson.contains("Haute-Tour"), "partie admin : trésor et cités");
+        check(adminJson.contains("treasury") && adminJson.contains("\"cities\""), "partie admin : trésor et cités");
+        if (realExport != null) {
+            AethoriaExport real = AethoriaExport.parse(realExport);
+            check(real.players.size() == 25 && real.factionId("9f8136c5-5d9e-5f73-a168-84e80e87f723").equals("valmont") && "chef".equals(real.role("9f8136c5-5d9e-5f73-a168-84e80e87f723")), "vrai export : 25 joueurs, identifiants texte, rôles");
+            check(real.rpName("9f8136c5-5d9e-5f73-a168-84e80e87f723").equals("Aldric Valmont"), "vrai export : nom RP lu");
+            Map<String, Object> noJob = null;
+            for (Map<String, Object> p : real.players.values()) if (p.get("job") == null) noJob = p;
+            check(noJob != null && !playersJson.isEmpty(), "vrai export : champs null acceptés (job = null)");
+            check(real.crown.get("royalTreeUnlocked") instanceof Number && "aucune".equals(real.crown.get("phase")), "vrai export : couronne (arbre royal numérique, phase aucune)");
+        }
         long new7 = 0;
         for (Object o : Json.list(fm.get("factions"))) new7 += Json.num(Json.map(Json.map(o).get("stats")).get("new7d"), 0);
         check(new7 == 2, "nouveaux membres sur 7 jours : " + new7);

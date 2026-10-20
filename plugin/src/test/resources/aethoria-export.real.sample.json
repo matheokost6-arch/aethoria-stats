@@ -1,0 +1,525 @@
+{
+  "version": 1,
+  "generatedAt": 1760900000000,
+  "players": {
+    "9f8136c5-5d9e-5f73-a168-84e80e87f723": {
+      "name": "aldric_10",
+      "firstName": "Aldric",
+      "lastName": "Valmont",
+      "rpName": "Aldric Valmont",
+      "faction": "valmont",
+      "role": "chef",
+      "job": "Mineur",
+      "jobLevel": 4
+    },
+    "e5791fdd-3f1e-5fe5-b8b3-6a513f8fe858": {
+      "name": "berenger_11",
+      "firstName": "Berenger",
+      "lastName": "Montclair",
+      "rpName": "Berenger Montclair",
+      "faction": "valmont",
+      "role": "officier",
+      "job": "Forgeron",
+      "jobLevel": 6
+    },
+    "f465b53b-ff95-55d9-9a6f-795130220e34": {
+      "name": "clothilde_12",
+      "firstName": "Clothilde",
+      "lastName": "Valmont",
+      "rpName": "Clothilde Valmont",
+      "faction": "valmont",
+      "role": "membre",
+      "job": "Fermier",
+      "jobLevel": 8
+    },
+    "dd9c9be6-1b5e-5571-82e7-f28286247bf3": {
+      "name": "dorian_13",
+      "firstName": "Dorian",
+      "lastName": "Rochefort",
+      "rpName": "Dorian Rochefort",
+      "faction": "valmont",
+      "role": "membre",
+      "job": "Pêcheur",
+      "jobLevel": 10
+    },
+    "e0b9035f-dfbe-54ae-8402-11ec939c1d86": {
+      "name": "edwige_14",
+      "firstName": "Edwige",
+      "lastName": "Valmont",
+      "rpName": "Edwige Valmont",
+      "faction": "valmont",
+      "role": "membre",
+      "job": null,
+      "jobLevel": null
+    },
+    "d03da20a-02fe-5289-a8c8-198ccc37186b": {
+      "name": "fulbert_15",
+      "firstName": "Fulbert",
+      "lastName": "Noir",
+      "rpName": "Fulbert Noir",
+      "faction": "corbeaux",
+      "role": "chef",
+      "job": "Médecin",
+      "jobLevel": 14
+    },
+    "71f1d316-6e6d-5a55-87e4-a5f73102ad0e": {
+      "name": "gisele_16",
+      "firstName": "Gisele",
+      "lastName": "Corbin",
+      "rpName": "Gisele Corbin",
+      "faction": "corbeaux",
+      "role": "officier",
+      "job": "Mineur",
+      "jobLevel": 16
+    },
+    "7841255c-e7e1-5a26-93a3-177377581b41": {
+      "name": "hugues_17",
+      "firstName": "Hugues",
+      "lastName": "Noir",
+      "rpName": "Hugues Noir",
+      "faction": "corbeaux",
+      "role": "membre",
+      "job": "Forgeron",
+      "jobLevel": 18
+    },
+    "fad68ffa-b7ed-559f-b63d-eb790948017a": {
+      "name": "isaure_18",
+      "firstName": "Isaure",
+      "lastName": "Vautour",
+      "rpName": "Isaure Vautour",
+      "faction": "corbeaux",
+      "role": "membre",
+      "job": "Fermier",
+      "jobLevel": 20
+    },
+    "a46f3a4f-a7e7-5188-94c0-f767648595ff": {
+      "name": "jehan_19",
+      "firstName": "Jehan",
+      "lastName": "Noir",
+      "rpName": "Jehan Noir",
+      "faction": "corbeaux",
+      "role": "membre",
+      "job": null,
+      "jobLevel": null
+    },
+    "2af5ccd6-a3e7-54f9-9f38-e91e62aa0b2d": {
+      "name": "kilian_20",
+      "firstName": "Kilian",
+      "lastName": "Marin",
+      "rpName": "Kilian Marin",
+      "faction": "havre",
+      "role": "chef",
+      "job": "Chasseur",
+      "jobLevel": 24
+    },
+    "6cd0d7ab-f753-57d8-9fe8-722862132996": {
+      "name": "lucette_21",
+      "firstName": "Lucette",
+      "lastName": "Havre",
+      "rpName": "Lucette Havre",
+      "faction": "havre",
+      "role": "officier",
+      "job": "Médecin",
+      "jobLevel": 26
+    },
+    "ebd28b95-d345-5b9e-8db4-2a320c9bf378": {
+      "name": "mathis_22",
+      "firstName": "Mathis",
+      "lastName": "Salin",
+      "rpName": "Mathis Salin",
+      "faction": "havre",
+      "role": "membre",
+      "job": "Mineur",
+      "jobLevel": 28
+    },
+    "93a66c2b-adb7-54af-8896-3fad3c104daa": {
+      "name": "nolwenn_23",
+      "firstName": "Nolwenn",
+      "lastName": "Marin",
+      "rpName": "Nolwenn Marin",
+      "faction": "havre",
+      "role": "membre",
+      "job": "Forgeron",
+      "jobLevel": 2
+    },
+    "c9d754c4-5546-5cdc-a27b-e2b1434d254b": {
+      "name": "osmond_24",
+      "firstName": "Osmond",
+      "lastName": "Havre",
+      "rpName": "Osmond Havre",
+      "faction": "havre",
+      "role": "membre",
+      "job": null,
+      "jobLevel": null
+    },
+    "c155795f-589d-5598-ab08-eb4279af69d0": {
+      "name": "perrine_25",
+      "firstName": "Perrine",
+      "lastName": "Sylvain",
+      "rpName": "Perrine Sylvain",
+      "faction": "sylve",
+      "role": "chef",
+      "job": "Pêcheur",
+      "jobLevel": 6
+    },
+    "f5926164-6811-5c65-bbd0-f7b052f21c8c": {
+      "name": "quentin_26",
+      "firstName": "Quentin",
+      "lastName": "Boisclair",
+      "rpName": "Quentin Boisclair",
+      "faction": "sylve",
+      "role": "officier",
+      "job": "Chasseur",
+      "jobLevel": 8
+    },
+    "e6679399-dff5-5c3d-8521-6856e56b9341": {
+      "name": "raoul_27",
+      "firstName": "Raoul",
+      "lastName": "Sylvain",
+      "rpName": "Raoul Sylvain",
+      "faction": "sylve",
+      "role": "membre",
+      "job": "Médecin",
+      "jobLevel": 10
+    },
+    "85187fb1-e151-5404-9551-f44286ccaf72": {
+      "name": "sibylle_28",
+      "firstName": "Sibylle",
+      "lastName": "Ronce",
+      "rpName": "Sibylle Ronce",
+      "faction": "sylve",
+      "role": "membre",
+      "job": "Mineur",
+      "jobLevel": 12
+    },
+    "4d5e0318-30ed-5a38-9965-898071f709c1": {
+      "name": "thibault_29",
+      "firstName": "Thibault",
+      "lastName": "Boisclair",
+      "rpName": "Thibault Boisclair",
+      "faction": "sylve",
+      "role": "membre",
+      "job": null,
+      "jobLevel": null
+    },
+    "27f53ab0-3d99-58ec-9b4a-8a3ddcdc5779": {
+      "name": "ulrich_30",
+      "firstName": "Ulrich",
+      "lastName": "Aubry",
+      "rpName": "Ulrich Aubry",
+      "faction": "ordre",
+      "role": "chef",
+      "job": "Fermier",
+      "jobLevel": 16
+    },
+    "0e700314-e549-5b3f-85c5-ede39a8d8e76": {
+      "name": "valentine_31",
+      "firstName": "Valentine",
+      "lastName": "Clairval",
+      "rpName": "Valentine Clairval",
+      "faction": "ordre",
+      "role": "officier",
+      "job": "Pêcheur",
+      "jobLevel": 18
+    },
+    "c25bcdd1-73c5-5560-9ade-551156aac6be": {
+      "name": "wandrille_32",
+      "firstName": "Wandrille",
+      "lastName": "Aubry",
+      "rpName": "Wandrille Aubry",
+      "faction": "ordre",
+      "role": "membre",
+      "job": "Chasseur",
+      "jobLevel": 20
+    },
+    "39c1f218-bc2c-5f87-adaf-eb53f9783a25": {
+      "name": "yseult_33",
+      "firstName": "Yseult",
+      "lastName": "Matines",
+      "rpName": "Yseult Matines",
+      "faction": "ordre",
+      "role": "membre",
+      "job": "Médecin",
+      "jobLevel": 22
+    },
+    "2871307c-6b5e-5f1a-8c1b-696e9fb4dcdc": {
+      "name": "zacharie_34",
+      "firstName": "Zacharie",
+      "lastName": "Aubry",
+      "rpName": "Zacharie Aubry",
+      "faction": "ordre",
+      "role": "membre",
+      "job": null,
+      "jobLevel": null
+    }
+  },
+  "factions": [
+    {
+      "id": "valmont",
+      "name": "Royaume de Valmont",
+      "color": "#ffaa00",
+      "tag": null,
+      "description": "Vaillants et fiers, nous tenons le col du Nord.",
+      "leader": "9f8136c5-5d9e-5f73-a168-84e80e87f723",
+      "leaderRpName": "Aldric Valmont",
+      "members": 5,
+      "memberUuids": [
+        "9f8136c5-5d9e-5f73-a168-84e80e87f723",
+        "e5791fdd-3f1e-5fe5-b8b3-6a513f8fe858",
+        "f465b53b-ff95-55d9-9a6f-795130220e34",
+        "dd9c9be6-1b5e-5571-82e7-f28286247bf3",
+        "e0b9035f-dfbe-54ae-8402-11ec939c1d86"
+      ],
+      "founded": 1757444000000,
+      "cities": 1,
+      "skillsUnlocked": 12,
+      "skillsTotal": 140,
+      "era": 1,
+      "isKing": true,
+      "suzerain": null,
+      "vassals": [
+        "sylve"
+      ],
+      "allies": [
+        "havre"
+      ],
+      "wars": [
+        "corbeaux"
+      ],
+      "banner": null
+    },
+    {
+      "id": "corbeaux",
+      "name": "Compagnie des Corbeaux",
+      "color": "#555555",
+      "tag": null,
+      "description": "Mercenaires sans drapeau, fidèles à la solde.",
+      "leader": "d03da20a-02fe-5289-a8c8-198ccc37186b",
+      "leaderRpName": "Fulbert Noir",
+      "members": 5,
+      "memberUuids": [
+        "d03da20a-02fe-5289-a8c8-198ccc37186b",
+        "71f1d316-6e6d-5a55-87e4-a5f73102ad0e",
+        "7841255c-e7e1-5a26-93a3-177377581b41",
+        "fad68ffa-b7ed-559f-b63d-eb790948017a",
+        "a46f3a4f-a7e7-5188-94c0-f767648595ff"
+      ],
+      "founded": 1757962400000,
+      "cities": 2,
+      "skillsUnlocked": 21,
+      "skillsTotal": 140,
+      "era": 1,
+      "isKing": false,
+      "suzerain": null,
+      "vassals": [],
+      "allies": [],
+      "wars": [
+        "ordre",
+        "valmont"
+      ],
+      "banner": null
+    },
+    {
+      "id": "havre",
+      "name": "Cité libre du Havre",
+      "color": "#55ffff",
+      "tag": null,
+      "description": "Port ouvert à tous les marchands.",
+      "leader": "2af5ccd6-a3e7-54f9-9f38-e91e62aa0b2d",
+      "leaderRpName": "Kilian Marin",
+      "members": 5,
+      "memberUuids": [
+        "2af5ccd6-a3e7-54f9-9f38-e91e62aa0b2d",
+        "6cd0d7ab-f753-57d8-9fe8-722862132996",
+        "ebd28b95-d345-5b9e-8db4-2a320c9bf378",
+        "93a66c2b-adb7-54af-8896-3fad3c104daa",
+        "c9d754c4-5546-5cdc-a27b-e2b1434d254b"
+      ],
+      "founded": 1758480800000,
+      "cities": 3,
+      "skillsUnlocked": 30,
+      "skillsTotal": 140,
+      "era": 2,
+      "isKing": false,
+      "suzerain": null,
+      "vassals": [],
+      "allies": [
+        "valmont",
+        "ordre"
+      ],
+      "wars": [],
+      "banner": null
+    },
+    {
+      "id": "sylve",
+      "name": "Clan de la Sylve",
+      "color": "#55ff55",
+      "tag": null,
+      "description": "Gardiens des vieilles forêts.",
+      "leader": "c155795f-589d-5598-ab08-eb4279af69d0",
+      "leaderRpName": "Perrine Sylvain",
+      "members": 5,
+      "memberUuids": [
+        "c155795f-589d-5598-ab08-eb4279af69d0",
+        "f5926164-6811-5c65-bbd0-f7b052f21c8c",
+        "e6679399-dff5-5c3d-8521-6856e56b9341",
+        "85187fb1-e151-5404-9551-f44286ccaf72",
+        "4d5e0318-30ed-5a38-9965-898071f709c1"
+      ],
+      "founded": 1758999200000,
+      "cities": 1,
+      "skillsUnlocked": 39,
+      "skillsTotal": 140,
+      "era": 2,
+      "isKing": false,
+      "suzerain": "valmont",
+      "vassals": [],
+      "allies": [],
+      "wars": [],
+      "banner": null
+    },
+    {
+      "id": "ordre",
+      "name": "Ordre de l'Aube",
+      "color": "#ff5555",
+      "tag": null,
+      "description": "Moines-soldats au service de la foi.",
+      "leader": "27f53ab0-3d99-58ec-9b4a-8a3ddcdc5779",
+      "leaderRpName": "Ulrich Aubry",
+      "members": 5,
+      "memberUuids": [
+        "27f53ab0-3d99-58ec-9b4a-8a3ddcdc5779",
+        "0e700314-e549-5b3f-85c5-ede39a8d8e76",
+        "c25bcdd1-73c5-5560-9ade-551156aac6be",
+        "39c1f218-bc2c-5f87-adaf-eb53f9783a25",
+        "2871307c-6b5e-5f1a-8c1b-696e9fb4dcdc"
+      ],
+      "founded": 1759517600000,
+      "cities": 2,
+      "skillsUnlocked": 48,
+      "skillsTotal": 140,
+      "era": 2,
+      "isKing": false,
+      "suzerain": null,
+      "vassals": [],
+      "allies": [
+        "havre"
+      ],
+      "wars": [
+        "corbeaux"
+      ],
+      "banner": null
+    }
+  ],
+  "crown": {
+    "kingUuid": "9f8136c5-5d9e-5f73-a168-84e80e87f723",
+    "kingRpName": "Aldric Valmont",
+    "factionId": "valmont",
+    "termEnd": 1761677600000,
+    "phase": "aucune",
+    "royalTreeUnlocked": 4,
+    "era": 2
+  },
+  "admin": {
+    "factions": [
+      {
+        "id": "valmont",
+        "treasury": 1840,
+        "claims": 14,
+        "cities": [
+          {
+            "name": "Montclair",
+            "level": "Bourg",
+            "x": 120,
+            "z": -340,
+            "dimension": "minecraft:overworld"
+          }
+        ]
+      },
+      {
+        "id": "corbeaux",
+        "treasury": 420,
+        "claims": 6,
+        "cities": [
+          {
+            "name": "Fort-Noir",
+            "level": "Hameau",
+            "x": -880,
+            "z": 410,
+            "dimension": "minecraft:overworld"
+          },
+          {
+            "name": "Hameau de Corbeaux",
+            "level": "Hameau",
+            "x": -700,
+            "z": 315,
+            "dimension": "minecraft:overworld"
+          }
+        ]
+      },
+      {
+        "id": "havre",
+        "treasury": 5230,
+        "claims": 22,
+        "cities": [
+          {
+            "name": "Havre-Haut",
+            "level": "Ville",
+            "x": 1500,
+            "z": 900,
+            "dimension": "minecraft:overworld"
+          },
+          {
+            "name": "Hameau de Havre",
+            "level": "Hameau",
+            "x": 1680,
+            "z": 805,
+            "dimension": "minecraft:overworld"
+          },
+          {
+            "name": "Avant-poste Havre",
+            "level": "Hameau",
+            "x": 1280,
+            "z": 1060,
+            "dimension": "minecraft:overworld"
+          }
+        ]
+      },
+      {
+        "id": "sylve",
+        "treasury": 610,
+        "claims": 9,
+        "cities": [
+          {
+            "name": "Ronceval",
+            "level": "Hameau",
+            "x": -300,
+            "z": -1200,
+            "dimension": "minecraft:overworld"
+          }
+        ]
+      },
+      {
+        "id": "ordre",
+        "treasury": 2275,
+        "claims": 17,
+        "cities": [
+          {
+            "name": "Saint-Aube",
+            "level": "Bourg",
+            "x": 640,
+            "z": -90,
+            "dimension": "minecraft:overworld"
+          },
+          {
+            "name": "Hameau de l'Aube",
+            "level": "Hameau",
+            "x": 820,
+            "z": -185,
+            "dimension": "minecraft:overworld"
+          }
+        ]
+      }
+    ]
+  }
+}

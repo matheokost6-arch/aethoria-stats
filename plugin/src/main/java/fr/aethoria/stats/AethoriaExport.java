@@ -43,7 +43,10 @@ public final class AethoriaExport {
 
     public String rpName(String uuid) {
         Map<String, Object> p = players.get(uuid);
-        return p == null ? null : Json.str(p.get("rpName"), null);
+        if (p == null) return null;
+        String rp = Json.str(p.get("rpName"), null);
+        // le mod met le pseudo comme nom RP quand le joueur n'a pas de prénom : rien à ajouter
+        return rp == null || rp.equalsIgnoreCase(Json.str(p.get("name"), "")) ? null : rp;
     }
 
     public String factionId(String uuid) {

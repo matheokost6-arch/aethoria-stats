@@ -31,7 +31,11 @@ import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -60,13 +64,26 @@ public final class AethoriaStats extends JavaPlugin implements Listener, Command
     private int skipCycles;
     private Path dataFile;
 
+    private final ConsoleBuffer console = new ConsoleBuffer();
+    private Log4jTap tap;
+    private Auth auth;
+    private HttpApi api;
+    private final Moderation moderation = new Moderation();
+    private volatile String latestStats = "{\"version\":1,\"starting\":true}";
+
     @Override
     public void onEnable() {
+        try {
+            tap = Log4jTap.attach(console);
+        } catch (Throwable t) {
+            tap = null;
+        }
         saveDefaultConfig();
         dataFile = new File(getDataFolder(), "data.json").toPath();
         startedAt = ManagementFactory.getRuntimeMXBean().getStartTime();
         readConfig();
         loadData();
+        loadModeration();
 
         List<Material> blocks = new ArrayList<>();
         for (Material m : Material.values()) {
@@ -91,14 +108,16 @@ public final class AethoriaStats extends JavaPlugin implements Listener, Command
         long period = Math.max(30, sendIntervalSec) * 20L;
         Bukkit.getScheduler().runTaskTimer(this, this::sendCycle, 20L * 20, period);
 
-        if (!uploader.isConfigured()) {
-            getLogger().warning("gist-id ou github-token vide dans config.yml : collecte active, envoi désactivé.");
-        }
+        Bukkit.getScheduler().runTaskTimer(this, () -> latestStats = buildJson(), 60L,
+                Math.max(5, getConfig().getInt("api.stats-refresh-seconds", 20)) * 20L);
+        startApi();
         getLogger().info("AethoriaStats actif" + (authMe ? " (sessions comptées après connexion AuthMe)." : "."));
     }
 
     @Override
     public void onDisable() {
+        if (api != null) api.stop();
+        if (tap != null) tap.detach();
         long now = System.currentTimeMillis();
         for (String u : new ArrayList<>(data.active.keySet())) data.endSession(u, now);
         online.clear();
@@ -107,8 +126,158 @@ public final class AethoriaStats extends JavaPlugin implements Listener, Command
         } catch (Exception e) {
             getLogger().warning("Sauvegarde finale impossible : " + e.getMessage());
         }
+        saveModeration(moderation);
         io.shutdown();
         uploader.shutdown();
+    }
+
+    // ---- API HTTP ----
+
+    private void startApi() {
+        if (!getConfig().getBoolean("api.enabled", true)) return;
+        if (!auth.hasAccounts()) {
+            getLogger().warning("Aucun compte admin : depuis la console, tape /astats setpass <nom> <mot de passe> (10 caractères minimum).");
+        }
+        try {
+            var origins = new java.util.HashSet<>(getConfig().getStringList("api.allowed-origins"));
+            var audit = new AuditLog(new File(getDataFolder(), "audit.log").toPath());
+            var backend = new AdminBackend(this, () -> data, () -> latestStats, moderation, audit, this::saveModeration,
+                    u -> online.containsKey(u));
+            api = new HttpApi(backend, auth, console, origins, m -> getLogger().warning(m));
+            String bind = getConfig().getString("api.bind", "127.0.0.1");
+            int port = getConfig().getInt("api.port", 8765);
+            api.start(bind, port);
+            getLogger().info("API sur http://" + bind + ":" + port + " (stats publiques : /api/stats).");
+        } catch (Exception e) {
+            getLogger().warning("API HTTP non démarrée : " + e);
+            api = null;
+        }
+    }
+
+    private void loadModeration() {
+        Path f = new File(getDataFolder(), "moderation.json").toPath();
+        if (!Files.exists(f)) return;
+        try {
+            moderation.load(Json.map(Json.parse(Files.readString(f, StandardCharsets.UTF_8))));
+        } catch (Exception e) {
+            getLogger().warning("moderation.json illisible : " + e.getMessage());
+        }
+    }
+
+    private void saveModeration(Moderation m) {
+        final String text = Json.write(m.toMap());
+        Runnable job = () -> {
+            try {
+                Path f = new File(getDataFolder(), "moderation.json").toPath();
+                Files.createDirectories(f.getParent());
+                Path tmp = f.resolveSibling("moderation.json.tmp");
+                Files.writeString(tmp, text, StandardCharsets.UTF_8);
+                Files.move(tmp, f, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+            } catch (Exception e) {
+                getLogger().warning("Sauvegarde de moderation.json impossible : " + e.getMessage());
+            }
+        };
+        if (io.isShutdown()) job.run();
+        else io.execute(job);
+    }
+
+    private void loadAccounts() {
+        Map<String, Auth.Account> accs = new HashMap<>();
+        for (Map<?, ?> m : getConfig().getMapList("admins")) {
+            String name = String.valueOf(m.get("name"));
+            Object h = m.get("hash");
+            Object r = m.get("role");
+            String role = r == null ? "admin" : String.valueOf(r);
+            if (h == null || !Auth.validRole(role)) {
+                getLogger().warning("Compte admin ignoré (hash ou rôle manquant) : " + name);
+                continue;
+            }
+            accs.put(name.toLowerCase(), new Auth.Account(name, String.valueOf(h), role));
+        }
+        auth.setAccounts(accs);
+    }
+
+    private void setPass(CommandSender s, String[] a) {
+        if (!(s instanceof ConsoleCommandSender)) {
+            s.sendMessage("Cette commande se tape uniquement dans la console du serveur.");
+            return;
+        }
+        if (a.length < 3 || a.length > 4) {
+            s.sendMessage("Usage : /astats setpass <nom> <mot de passe> [admin|modo]");
+            return;
+        }
+        String name = a[1], pass = a[2];
+        if (!name.matches("[A-Za-z0-9_.-]{2,32}")) {
+            s.sendMessage("Nom invalide (lettres, chiffres, _ . - ; 2 à 32 caractères).");
+            return;
+        }
+        if (pass.length() < 10) {
+            s.sendMessage("Mot de passe trop court : 10 caractères minimum.");
+            return;
+        }
+        String role = a.length == 4 ? a[3].toLowerCase() : null;
+        if (role != null && !Auth.validRole(role)) {
+            s.sendMessage("Rôle inconnu : admin ou modo.");
+            return;
+        }
+        List<Map<String, Object>> list = new ArrayList<>();
+        boolean found = false;
+        for (Map<?, ?> m : getConfig().getMapList("admins")) {
+            Map<String, Object> e = new java.util.LinkedHashMap<>();
+            for (Map.Entry<?, ?> en : m.entrySet()) e.put(String.valueOf(en.getKey()), en.getValue());
+            if (name.equalsIgnoreCase(String.valueOf(e.get("name")))) {
+                e.put("hash", Auth.hash(pass));
+                if (role != null) e.put("role", role);
+                found = true;
+            }
+            list.add(e);
+        }
+        if (!found) {
+            Map<String, Object> e = new java.util.LinkedHashMap<>();
+            e.put("name", name);
+            e.put("hash", Auth.hash(pass));
+            e.put("role", role == null ? "admin" : role);
+            list.add(e);
+        }
+        getConfig().set("admins", list);
+        saveConfig();
+        loadAccounts();
+        s.sendMessage((found ? "Mot de passe mis à jour pour " : "Compte créé : ") + name + ".");
+    }
+
+    // ---- modération : muets et joueurs immobilisés ----
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onChat(AsyncPlayerChatEvent e) {
+        Moderation.Mute m = moderation.muteOf(e.getPlayer().getUniqueId().toString(), System.currentTimeMillis());
+        if (m == null) return;
+        e.setCancelled(true);
+        e.getPlayer().sendMessage("§cTu es muet" + (m.until == 0 ? "." : " pendant encore " + Math.max(1, (m.until - System.currentTimeMillis()) / 60_000) + " min.")
+                + (m.reason.isEmpty() ? "" : " Raison : " + m.reason));
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onCommandMute(PlayerCommandPreprocessEvent e) {
+        if (moderation.muteOf(e.getPlayer().getUniqueId().toString(), System.currentTimeMillis()) == null) return;
+        String c = e.getMessage().toLowerCase().split("\\s+")[0];
+        if (c.matches("/(msg|tell|w|whisper|r|reply|me|say|mail|t|m)") || c.matches("/[a-z0-9_]+:(msg|tell|w|me|say)")) {
+            e.setCancelled(true);
+            e.getPlayer().sendMessage("§cTu es muet : cette commande est bloquée.");
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onFrozenMove(PlayerMoveEvent e) {
+        if (!moderation.isFrozen(e.getPlayer().getUniqueId().toString())) return;
+        var f = e.getFrom();
+        var t = e.getTo();
+        if (t == null) return;
+        if (f.getX() != t.getX() || f.getY() != t.getY() || f.getZ() != t.getZ()) {
+            t.setX(f.getX());
+            t.setY(f.getY());
+            t.setZ(f.getZ());
+            e.setTo(t);
+        }
     }
 
     private void readConfig() {
@@ -116,6 +285,8 @@ public final class AethoriaStats extends JavaPlugin implements Listener, Command
         var c = getConfig();
         hideNames = c.getBoolean("hide-player-names", false);
         sendIntervalSec = c.getInt("send-interval-seconds", 120);
+        auth = auth == null ? new Auth(Math.max(1, c.getInt("api.session-hours", 12)) * 3_600_000L) : auth;
+        loadAccounts();
         uploader.configure(c.getString("gist-id", ""), c.getString("github-token", ""), c.getString("gist-file", "stats.json"));
     }
 
@@ -422,6 +593,10 @@ public final class AethoriaStats extends JavaPlugin implements Listener, Command
             s.sendMessage("Tu n'as pas la permission.");
             return true;
         }
+        if (args.length > 0 && args[0].equalsIgnoreCase("setpass")) {
+            setPass(s, args);
+            return true;
+        }
         if (args.length > 0 && args[0].equalsIgnoreCase("reload")) {
             readConfig();
             s.sendMessage("Configuration relue.");
@@ -452,7 +627,8 @@ public final class AethoriaStats extends JavaPlugin implements Listener, Command
         if (!uploader.lastError.isEmpty()) {
             s.sendMessage("Dernière erreur : " + uploader.lastError + " (échecs de suite : " + uploader.failures + ")");
         }
-        s.sendMessage("Commandes : /astats send (forcer un envoi), /astats reload (relire config.yml).");
+        s.sendMessage(api != null ? "API active sur le port " + api.port() + "." : "API arrêtée (voir config.yml, section api).");
+        s.sendMessage("Commandes : /astats setpass <nom> <mdp> [admin|modo] (console), /astats send, /astats reload.");
         return true;
     }
 }

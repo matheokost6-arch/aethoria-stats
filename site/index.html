@@ -184,6 +184,86 @@ dl.mach { display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; margin:
 dl.mach dt { color: var(--ink-soft); }
 dl.mach dd { margin: 0; font-weight: 600; overflow-wrap: anywhere; }
 
+/* ---- admin ---- */
+@media (max-width: 640px) {
+  table.stack thead { display: none; }
+  table.stack, table.stack tbody, table.stack tr, table.stack td { display: block; width: 100%; }
+  table.stack tr { border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; margin-bottom: 10px; background: rgba(255,255,255,.3); }
+  table.stack td { border: 0; padding: 3px 0; display: flex; justify-content: space-between; align-items: center; gap: 10px; text-align: right; }
+  table.stack td::before { content: attr(data-l); font-weight: 600; color: var(--ink-soft); text-align: left; }
+  table.stack td.empty { display: block; }
+}
+.adminbar { margin-left: auto; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.adminbar .who { font-size: .9rem; color: var(--gold-soft); }
+.btn {
+  font: inherit; font-size: .92rem; cursor: pointer; min-height: 40px; padding: 7px 14px;
+  border: 2px solid #6a4a22; border-radius: 8px; background: #e0c88f; color: var(--ink);
+}
+.btn:hover:not(:disabled) { background: #f0dca5; }
+.btn:disabled { opacity: .55; cursor: not-allowed; }
+.btn.primary { background: #3a2514; color: var(--gold-soft); border-color: #3a2514; }
+.btn.primary:hover:not(:disabled) { background: #523420; }
+.btn.danger { border-color: #8f2416; color: #7a1d11; background: #f3d4c4; }
+.btn.danger:hover:not(:disabled) { background: #f8e0d3; }
+.btn.armed { background: #a12a1a; color: #fff; border-color: #6f1a0e; font-weight: 600; }
+.btn.small { min-height: 34px; padding: 4px 10px; font-size: .85rem; }
+.top .btn { background: #3a2514; color: var(--gold-soft); border-color: var(--gold); }
+.top .btn:hover { background: #523420; }
+.row-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+
+input[type="text"], input[type="password"], input[type="search"], select, textarea {
+  font: inherit; font-size: .95rem; min-height: 40px; padding: 6px 10px; border-radius: 8px;
+  border: 2px solid #6a4a22; background: #fbf3de; color: var(--ink); max-width: 100%;
+}
+label.fld { display: block; font-size: .85rem; color: var(--ink-soft); margin-bottom: 2px; }
+.field { margin-bottom: 10px; }
+.field input, .field select { width: 100%; }
+.inline { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.inline input[type="text"] { flex: 1 1 200px; min-width: 0; }
+.toolbar label { font-size: .9rem; display: inline-flex; align-items: center; gap: 6px; }
+
+.console {
+  background: #17100a; color: #efe3c8; border: 2px solid #5a3d22; border-radius: 8px;
+  font: .84rem/1.45 Consolas, "Cascadia Mono", Menlo, monospace;
+  height: 380px; overflow: auto; padding: 8px 10px; margin-bottom: 8px;
+}
+.console .ln { white-space: pre-wrap; overflow-wrap: anywhere; }
+.console .tm { color: #b9a98a; margin-right: 8px; }
+.console .lv-WARN { color: #f0c05a; }
+.console .lv-ERROR, .console .lv-FATAL { color: #f59a8b; }
+.console .lv-DEBUG, .console .lv-TRACE { color: #b9a98a; }
+.console .you { color: #9fd6ff; }
+.prompt { font-family: Consolas, monospace; font-weight: 700; }
+@media (max-width: 520px) { .console { height: 300px; font-size: .78rem; } }
+
+.pill { display: inline-block; font-size: .72rem; font-weight: 700; padding: 1px 8px; border-radius: 999px; border: 1px solid; margin-right: 4px; white-space: nowrap; }
+.pill.mute { color: #6b4400; border-color: #6b4400; background: rgba(217,164,65,.3); }
+.pill.freeze { color: #124a73; border-color: #124a73; background: rgba(40,120,190,.12); }
+.pill.auth { color: #8f2416; border-color: #8f2416; background: rgba(161,42,26,.1); }
+.hp { display: inline-block; width: 64px; height: 8px; border-radius: 4px; background: rgba(43,27,14,.18); vertical-align: middle; margin-right: 6px; overflow: hidden; }
+.hp > i { display: block; height: 100%; background: #a12a1a; }
+.hp.food > i { background: #8a5a00; }
+
+dialog {
+  color: var(--ink); border: 2px solid #8a6a3a; border-radius: var(--radius); padding: 18px 20px; max-width: min(520px, 94vw); width: 100%;
+  background: linear-gradient(180deg, var(--parch), var(--parch-2)); box-shadow: 0 10px 40px rgba(0,0,0,.6);
+}
+dialog::backdrop { background: rgba(10, 6, 3, .7); }
+dialog h2 { margin: 0 0 10px; font-size: 1.15rem; color: #4a2c0c; border-bottom: 2px solid var(--gold); padding-bottom: 6px; }
+dialog .grp { border-top: 1px dashed var(--line); padding-top: 10px; margin-top: 10px; }
+dialog .grp h3 { margin: 0 0 6px; font-size: .95rem; color: #4a2c0c; }
+dialog .foot { display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px; }
+.formerr { color: var(--bad); font-weight: 600; min-height: 1.4em; margin: 6px 0 0; }
+.panel-h3 { font-size: 1rem; margin: 16px 0 6px; color: #4a2c0c; font-family: "Cinzel", Georgia, serif; }
+.panel-h3:first-child { margin-top: 0; }
+.btnrow { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 6px; }
+#toast {
+  position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); z-index: 20; max-width: min(92vw, 560px);
+  background: #1f3d24; color: #e8f6e6; border: 2px solid #8fd18a; border-radius: 8px; padding: 10px 16px; box-shadow: 0 6px 20px rgba(0,0,0,.5);
+}
+#toast.bad { background: #4a1b12; color: #ffe2d8; border-color: #f59a8b; }
+#toast[hidden] { display: none; }
+
 footer { margin-top: 26px; text-align: center; color: #cdbb97; font-size: .85rem; }
 
 @media (max-width: 520px) {
@@ -202,6 +282,10 @@ footer { margin-top: 26px; text-align: center; color: #cdbb97; font-size: .85rem
     <div class="brand">
       <h1>Aethoria</h1>
       <p>Registre du royaume : les chiffres du serveur en direct</p>
+      <div class="adminbar">
+        <button type="button" class="btn" id="btn-admin">Admin</button>
+        <button type="button" class="btn" id="btn-logout" hidden>Se déconnecter</button>
+      </div>
     </div>
     <div class="status" id="status" role="status" aria-live="polite">
       <div><span class="lbl">Serveur</span><span class="val" id="st-state">Chargement...</span><span class="sub" id="st-age">&nbsp;</span></div>
@@ -213,6 +297,94 @@ footer { margin-top: 26px; text-align: center; color: #cdbb97; font-size: .85rem
   </header>
 
   <main id="contenu">
+    <section class="card" id="admin" aria-labelledby="h-admin" hidden>
+      <h2 id="h-admin">Panneau d'administration</h2>
+      <p class="hint" id="admin-who" style="margin:0 0 10px"></p>
+      <div class="tabs" role="tablist" id="atabs" aria-label="Sections du panneau"></div>
+
+      <div id="ap-console" role="tabpanel" aria-labelledby="atab-console">
+        <div class="toolbar">
+          <label class="sr-only" for="con-filter">Filtrer les lignes</label>
+          <input type="search" id="con-filter" placeholder="Filtrer les lignes...">
+          <label><input type="checkbox" id="con-auto" checked> Défilement automatique</label>
+          <label><input type="checkbox" id="con-warn"> Seulement avertissements et erreurs</label>
+          <button type="button" class="btn small" id="con-clear">Vider l'écran</button>
+          <span class="hint" id="con-state" role="status"></span>
+        </div>
+        <div id="con" class="console" role="log" aria-label="Console du serveur" tabindex="0"></div>
+        <form id="con-form" class="inline" autocomplete="off">
+          <label class="sr-only" for="con-cmd">Commande à envoyer</label>
+          <span class="prompt" aria-hidden="true">&gt;</span>
+          <input type="text" id="con-cmd" autocomplete="off" spellcheck="false" placeholder="Commande sans /  (flèches haut et bas : historique)">
+          <button type="submit" class="btn primary" id="con-send">Envoyer</button>
+        </form>
+        <p class="hint" id="con-note"></p>
+      </div>
+
+      <div id="ap-players" role="tabpanel" aria-labelledby="atab-players" hidden>
+        <div class="toolbar">
+          <button type="button" class="btn small" id="pl-refresh">Actualiser</button>
+          <span class="hint" id="pl-state" role="status"></span>
+        </div>
+        <div class="tablewrap"><table class="data stack" id="pl-table"></table></div>
+      </div>
+
+      <div id="ap-server" role="tabpanel" aria-labelledby="atab-server" hidden>
+        <h3 class="panel-h3">Annonce à tous les joueurs</h3>
+        <form id="bc-form" class="inline">
+          <label class="sr-only" for="bc-msg">Message de l'annonce</label>
+          <input type="text" id="bc-msg" maxlength="200" placeholder="Ex. Redémarrage dans 10 minutes">
+          <button type="submit" class="btn primary">Envoyer l'annonce</button>
+        </form>
+        <h3 class="panel-h3">Le monde</h3>
+        <div class="btnrow">
+          <button type="button" class="btn" data-srv='{"action":"save-all"}'>Sauvegarder le monde</button>
+          <button type="button" class="btn" data-srv='{"action":"clearlag"}'>Nettoyer les entités (ClearLag)</button>
+        </div>
+        <div class="btnrow" role="group" aria-label="Météo">
+          <button type="button" class="btn" data-srv='{"action":"weather","value":"clear"}'>Beau temps</button>
+          <button type="button" class="btn" data-srv='{"action":"weather","value":"rain"}'>Pluie</button>
+          <button type="button" class="btn" data-srv='{"action":"weather","value":"thunder"}'>Orage</button>
+        </div>
+        <div class="btnrow" role="group" aria-label="Heure du jeu">
+          <button type="button" class="btn" data-srv='{"action":"time","value":"day"}'>Matin</button>
+          <button type="button" class="btn" data-srv='{"action":"time","value":"noon"}'>Midi</button>
+          <button type="button" class="btn" data-srv='{"action":"time","value":"night"}'>Nuit</button>
+          <button type="button" class="btn" data-srv='{"action":"time","value":"midnight"}'>Minuit</button>
+        </div>
+        <p class="hint">La météo et l'heure changent dans le monde principal. Pour une commande libre, utilise l'onglet Console (admins seulement).</p>
+      </div>
+
+      <div id="ap-sanctions" role="tabpanel" aria-labelledby="atab-sanctions" hidden>
+        <div class="toolbar"><button type="button" class="btn small" id="sa-refresh">Actualiser</button></div>
+        <h3 class="panel-h3">Joueurs bannis</h3>
+        <div class="tablewrap"><table class="data" id="sa-bans"></table></div>
+        <h3 class="panel-h3">Joueurs muets</h3>
+        <div class="tablewrap"><table class="data" id="sa-mutes"></table></div>
+        <h3 class="panel-h3">Joueurs immobilisés</h3>
+        <p id="sa-frozen" class="hint"></p>
+        <h3 class="panel-h3">Sanctionner un pseudo</h3>
+        <form id="sa-form">
+          <div class="inline">
+            <div class="field"><label class="fld" for="sa-name">Pseudo</label><input type="text" id="sa-name" maxlength="16" autocomplete="off"></div>
+            <div class="field"><label class="fld" for="sa-dur">Durée</label><select id="sa-dur"></select></div>
+          </div>
+          <div class="field"><label class="fld" for="sa-reason">Raison (les autres joueurs la voient)</label><input type="text" id="sa-reason" maxlength="200"></div>
+          <div class="btnrow">
+            <button type="button" class="btn danger" id="sa-ban">Bannir</button>
+            <button type="button" class="btn" id="sa-unban">Débannir</button>
+            <button type="button" class="btn" id="sa-mute">Rendre muet</button>
+            <button type="button" class="btn" id="sa-unmute">Rendre la parole</button>
+          </div>
+        </form>
+      </div>
+
+      <div id="ap-audit" role="tabpanel" aria-labelledby="atab-audit" hidden>
+        <div class="toolbar"><button type="button" class="btn small" id="au-refresh">Actualiser</button><span class="hint">Qui a fait quoi, et quand. Les 100 dernières actions.</span></div>
+        <div class="tablewrap"><table class="data" id="au-table"></table></div>
+      </div>
+    </section>
+
     <section class="card" aria-labelledby="h-kpi">
       <h2 id="h-kpi">En un coup d'oeil</h2>
       <div class="kpis" id="kpis"></div>
@@ -297,29 +469,40 @@ footer { margin-top: 26px; text-align: center; color: #cdbb97; font-size: .85rem
   </main>
 
   <footer>
-    <p>Aethoria - données envoyées par le serveur toutes les 2 minutes. Aucune adresse IP n'est publiée.</p>
+    <p>Aethoria - chiffres mis à jour par le serveur toutes les 20 secondes. Aucune adresse IP n'est publiée.</p>
     <p id="foot-gen"></p>
   </footer>
 </div>
+<dialog id="dlg-login" aria-labelledby="login-h">
+  <form id="login-form" autocomplete="off">
+    <h2 id="login-h">Connexion au panneau</h2>
+    <div class="field"><label class="fld" for="login-name">Nom du compte</label><input type="text" id="login-name" autocomplete="username" required></div>
+    <div class="field"><label class="fld" for="login-pass">Mot de passe</label><input type="password" id="login-pass" autocomplete="current-password" required></div>
+    <p class="formerr" id="login-err" role="alert"></p>
+    <div class="foot"><button type="button" class="btn" id="login-cancel">Annuler</button><button type="submit" class="btn primary" id="login-go">Se connecter</button></div>
+  </form>
+</dialog>
+<dialog id="dlg-act" aria-label="Actions sur un joueur"></dialog>
+<div id="toast" role="status" aria-live="polite" hidden></div>
 <noscript><p class="notice">Cette page a besoin de JavaScript pour afficher les statistiques.</p></noscript>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" integrity="sha384-bs/nf9FbdNouRbMiFcrcZfLXYPKiPaGVGplVbv7dLGECccEXDW+S3zjqSKR5ZEaD" crossorigin="anonymous"></script>
 <script>
 "use strict";
 /* ==========================================================
-   RÉGLAGES : changer ici l'adresse du Gist.
-   Format : https://gist.githubusercontent.com/<pseudo-github>/<gist-id>/raw/stats.json
-   (Sans numéro de version dans l'adresse, GitHub renvoie toujours la dernière.)
+   RÉGLAGES : changer ici l'adresse de l'API du serveur (sans / à la fin).
+   La page lit API_BASE + "/api/stats". Pour un essai local : ?api=http://127.0.0.1:8765
    ========================================================== */
-const GIST_URL = "https://gist.githubusercontent.com/VOTRE_PSEUDO/VOTRE_GIST_ID/raw/stats.json";
-const REFRESH_MS = 60000;      // relecture du fichier
-const FRESH_MIN = 8;           // données plus récentes que ça : "En ligne"
-const STALE_MIN = 20;          // au-delà : "Hors ligne"
+const API_BASE = "https://141-11-103-141.sslip.io";
+const REFRESH_MS = 30000;      // relecture des stats
+const FRESH_MIN = 3;           // données plus récentes que ça : "En ligne"
+const STALE_MIN = 10;          // au-delà : "Hors ligne"
 const DEMO_URL = "stats.sample.json";
 
 const params = new URLSearchParams(location.search);
 const DEMO = params.get("demo") === "1";
-const SOURCE = DEMO ? DEMO_URL : (params.get("src") || GIST_URL);
+const API_BASE_USED = (params.get("api") || API_BASE).replace(/\/+$/, "");
+const SOURCE = DEMO ? DEMO_URL : API_BASE_USED + "/api/stats";
 
 const $ = (id) => document.getElementById(id);
 const nf = new Intl.NumberFormat("fr-FR");
@@ -397,11 +580,6 @@ function shiftTimes(d) {
   return d;
 }
 async function load() {
-  if (/VOTRE_/.test(SOURCE)) {
-    fetchError = "L'adresse du Gist n'est pas encore réglée dans la page (voir GIST_URL en haut du script). Essaie ?demo=1 pour voir un exemple.";
-    renderStatus();
-    return;
-  }
   try {
     const sep = SOURCE.includes("?") ? "&" : "?";
     const r = await fetch(SOURCE + sep + "t=" + Date.now(), { cache: "no-store" });
@@ -706,6 +884,467 @@ function renderAll() {
   renderOnline(); renderRecent(); renderLog(); renderTabs(); renderBoard(); renderWorlds(); renderMachine();
 }
 
+/* ==========================================================
+   PANNEAU D'ADMINISTRATION
+   ========================================================== */
+const ADMIN_KEY = "aethoria_admin";
+const ADMIN_TABS = [["console", "Console"], ["players", "Joueurs"], ["server", "Serveur"], ["sanctions", "Sanctions"], ["audit", "Journal d'audit"]];
+const DURATIONS = [["", "Définitif"], ["30m", "30 minutes"], ["1h", "1 heure"], ["1d", "1 jour"], ["7d", "7 jours"]];
+let admin = null;            // { token, name, role, expiresAt }
+let adminTab = "console";
+let conSince = -1, conLoop = 0, conCtl = null;
+const conLines = [];
+const cmdHistory = [];
+let cmdPos = -1;
+let adminPlayers = [];
+let plTimer = null;
+let toastTimer = null;
+
+function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
+function isModo() { return admin && admin.role === "modo"; }
+function toast(msg, bad) {
+  const t = $("toast");
+  t.textContent = msg;
+  t.className = bad ? "bad" : "";
+  t.hidden = false;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { t.hidden = true; }, 6000);
+}
+function untilText(ts) { return !ts ? "Définitif" : "jusqu'au " + fmtShort(ts, true); }
+function durOptions(sel) {
+  clear(sel);
+  DURATIONS.forEach(([v, l]) => { if (!(isModo() && v === "")) sel.append(h("option", { value: v, selected: v === "1h" }, l)); });
+}
+
+/* ---------- appels ---------- */
+async function adm(path, opts) {
+  opts = opts || {};
+  if (DEMO) return demoApi(path, opts);
+  const headers = { "Authorization": "Bearer " + (admin ? admin.token : "") };
+  if (opts.body) headers["Content-Type"] = "application/json";
+  let r;
+  try { r = await fetch(API_BASE_USED + path, { method: opts.method || "GET", headers, body: opts.body, signal: opts.signal, cache: "no-store" }); }
+  catch (e) { if (e.name === "AbortError") throw e; throw new Error("Le serveur ne répond pas."); }
+  let j = null;
+  try { j = await r.json(); } catch (e) { /* corps vide */ }
+  if (r.status === 401) { adminLogout(false, "Session expirée : reconnecte-toi."); throw new Error("Session expirée."); }
+  if (!r.ok) { const e = new Error((j && j.error) || "Erreur " + r.status); e.status = r.status; throw e; }
+  return j;
+}
+async function act(body, quiet) {
+  try {
+    const j = await adm("/api/admin/action", { method: "POST", body: JSON.stringify(body) });
+    if (!quiet) toast(j.message || "Fait.");
+    return j;
+  } catch (e) {
+    toast(e.message, true);
+    return null;
+  }
+}
+function armConfirm(btn, armedText, run) {
+  const orig = btn.textContent;
+  const reset = () => { btn.dataset.armed = ""; btn.textContent = orig; btn.classList.remove("armed"); };
+  btn.addEventListener("click", () => {
+    if (btn.dataset.armed === "1") { clearTimeout(btn._t); reset(); run(); return; }
+    btn.dataset.armed = "1";
+    btn.textContent = armedText;
+    btn.classList.add("armed");
+    btn._t = setTimeout(reset, 5000);
+  });
+}
+
+/* ---------- connexion ---------- */
+function saveAdmin() { try { sessionStorage.setItem(ADMIN_KEY, JSON.stringify(admin)); } catch (e) { /* stockage indisponible */ } }
+function loadAdmin() { try { const s = sessionStorage.getItem(ADMIN_KEY); return s ? JSON.parse(s) : null; } catch (e) { return null; } }
+async function doLogin(name, password) {
+  if (DEMO) {
+    return { token: "demo", name: name || "demo", role: name === "modo" ? "modo" : "admin", expiresAt: Date.now() + 12 * 3600000 };
+  }
+  let r;
+  try { r = await fetch(API_BASE_USED + "/api/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, password }) }); }
+  catch (e) { throw new Error("Impossible de joindre le serveur."); }
+  let j = null;
+  try { j = await r.json(); } catch (e) { /* vide */ }
+  if (!r.ok) throw new Error((j && j.error) || "Connexion refusée (" + r.status + ").");
+  return j;
+}
+function showAdmin() {
+  $("admin").hidden = !admin;
+  $("btn-admin").textContent = admin ? "Panneau admin" : "Admin";
+  $("btn-logout").hidden = !admin;
+  const who = $("admin-who");
+  if (!admin) { who.textContent = ""; return; }
+  who.textContent = "Connecté : " + admin.name + " (" + (admin.role === "admin" ? "administrateur" : "modérateur") + "). La session se ferme toute seule après " + Math.round((admin.expiresAt - Date.now()) / 3600000) + " h ou à la fermeture de l'onglet.";
+  $("con-cmd").disabled = isModo();
+  $("con-send").disabled = isModo();
+  $("con-note").textContent = isModo() ? "La commande libre est réservée aux administrateurs." : "Les commandes sont exécutées par la console du serveur et notées dans le journal d'audit.";
+  durOptions($("sa-dur"));
+  renderAdminTabs();
+  selectTab(adminTab);
+}
+function adminLogout(callApi, msg) {
+  if (callApi && admin && !DEMO) { fetch(API_BASE_USED + "/api/logout", { method: "POST", headers: { "Authorization": "Bearer " + admin.token } }).catch(() => {}); }
+  admin = null;
+  try { sessionStorage.removeItem(ADMIN_KEY); } catch (e) { /* rien */ }
+  stopConsole();
+  clearInterval(plTimer);
+  conLines.length = 0; conSince = -1;
+  clear($("con"));
+  showAdmin();
+  if (msg) toast(msg, true);
+}
+
+/* ---------- onglets ---------- */
+function renderAdminTabs() {
+  const box = clear($("atabs"));
+  ADMIN_TABS.forEach(([k, name]) => {
+    const b = h("button", { type: "button", role: "tab", id: "atab-" + k, "aria-selected": String(k === adminTab), "aria-controls": "ap-" + k, tabindex: k === adminTab ? "0" : "-1" }, name);
+    b.addEventListener("click", () => selectTab(k));
+    b.addEventListener("keydown", (ev) => {
+      const i = ADMIN_TABS.findIndex((x) => x[0] === adminTab);
+      let n = null;
+      if (ev.key === "ArrowRight") n = (i + 1) % ADMIN_TABS.length;
+      else if (ev.key === "ArrowLeft") n = (i + ADMIN_TABS.length - 1) % ADMIN_TABS.length;
+      if (n !== null) { ev.preventDefault(); selectTab(ADMIN_TABS[n][0]); $("atab-" + adminTab).focus(); }
+    });
+    box.append(b);
+  });
+}
+function selectTab(k) {
+  adminTab = k;
+  ADMIN_TABS.forEach(([t]) => {
+    $("ap-" + t).hidden = t !== k;
+    const b = $("atab-" + t);
+    if (b) { b.setAttribute("aria-selected", String(t === k)); b.tabIndex = t === k ? 0 : -1; }
+  });
+  clearInterval(plTimer);
+  if (k === "console") startConsole(); else stopConsole();
+  if (k === "players") { refreshPlayers(); plTimer = setInterval(refreshPlayers, 10000); }
+  if (k === "sanctions") refreshSanctions();
+  if (k === "audit") refreshAudit();
+}
+
+/* ---------- console ---------- */
+function applyConFilter() {
+  const f = $("con-filter").value.trim().toLowerCase(), warn = $("con-warn").checked;
+  conLines.forEach((l) => {
+    const okText = !f || l.text.toLowerCase().includes(f);
+    const okLevel = !warn || l.level === "WARN" || l.level === "ERROR" || l.level === "FATAL" || l.you;
+    l.el.hidden = !(okText && okLevel);
+  });
+}
+function addConLine(n, ts, level, text, you) {
+  const el = h("div", { class: "ln lv-" + level + (you ? " you" : "") }, h("span", { class: "tm" }, fmtShort(ts, false).slice(0, 5) + ":" + String(new Date(ts).getSeconds()).padStart(2, "0")), text);
+  const box = $("con");
+  const stick = $("con-auto").checked;
+  box.append(el);
+  conLines.push({ el, text, level, you: !!you });
+  while (conLines.length > 1000) conLines.shift().el.remove();
+  const f = $("con-filter").value.trim().toLowerCase(), warn = $("con-warn").checked;
+  if ((f && !text.toLowerCase().includes(f)) || (warn && !you && !["WARN", "ERROR", "FATAL"].includes(level))) el.hidden = true;
+  if (stick) box.scrollTop = box.scrollHeight;
+}
+function startConsole() {
+  if (conCtl || !admin) return;
+  const my = ++conLoop;
+  conCtl = new AbortController();
+  const ctl = conCtl;
+  $("con-state").textContent = "Connexion à la console...";
+  (async () => {
+    while (my === conLoop && admin) {
+      try {
+        const j = await adm("/api/admin/console?since=" + conSince, { signal: ctl.signal });
+        if (my !== conLoop) return;
+        $("con-state").textContent = "En direct";
+        conSince = j.next;
+        j.lines.forEach((l) => addConLine(l[0], l[1], l[2], l[3]));
+      } catch (e) {
+        if (e.name === "AbortError" || my !== conLoop) return;
+        $("con-state").textContent = "Console interrompue : " + e.message + " Nouvel essai...";
+        await sleep(3000);
+      }
+    }
+  })();
+}
+function stopConsole() {
+  conLoop++;
+  if (conCtl) { conCtl.abort(); conCtl = null; }
+  const s = $("con-state");
+  if (s) s.textContent = "";
+}
+
+/* ---------- joueurs ---------- */
+async function refreshPlayers() {
+  if (!admin) return;
+  try {
+    const j = await adm("/api/admin/players");
+    adminPlayers = j.players;
+    renderPlayers();
+    $("pl-state").textContent = j.players.length + " joueur(s) connecté(s). Mis à jour à " + fmtClock(Date.now()) + ".";
+  } catch (e) { $("pl-state").textContent = e.message; }
+}
+function meter(v, max, cls) {
+  const i = h("i");
+  i.style.width = Math.max(0, Math.min(100, 100 * v / (max || 1))) + "%";
+  return h("span", { class: "hp " + (cls || ""), "aria-hidden": "true" }, i);
+}
+function renderPlayers() {
+  const t = clear($("pl-table"));
+  t.append(h("thead", null, h("tr", null, ...["Joueur", "Vie", "Faim", "Lieu", "Mode", "Ping", "État", "Actions"].map((x) => h("th", { scope: "col" }, x)))));
+  const tb = h("tbody");
+  if (!adminPlayers.length) tb.append(h("tr", null, h("td", { colspan: "8", class: "empty" }, "Personne n'est connecté.")));
+  adminPlayers.forEach((p) => {
+    const st = h("td", { "data-l": "État" });
+    if (p.muted) st.append(h("span", { class: "pill mute" }, "Muet"));
+    if (p.frozen) st.append(h("span", { class: "pill freeze" }, "Immobilisé"));
+    if (!p.loggedIn) st.append(h("span", { class: "pill auth" }, "Pas connecté (AuthMe)"));
+    const acts = h("div", { class: "row-actions" });
+    const b1 = h("button", { type: "button", class: "btn small" }, "Soigner");
+    b1.addEventListener("click", async () => { if (await act({ action: "heal", target: p.name })) refreshPlayers(); });
+    const b2 = h("button", { type: "button", class: "btn small" }, "Nourrir");
+    b2.addEventListener("click", async () => { if (await act({ action: "feed", target: p.name })) refreshPlayers(); });
+    const b3 = h("button", { type: "button", class: "btn small primary", "aria-label": "Plus d'actions pour " + p.name }, "Actions...");
+    b3.addEventListener("click", () => openActions(p));
+    acts.append(b1, b2, b3);
+    tb.append(h("tr", null,
+      h("td", { "data-l": "Joueur" }, h("strong", null, p.name), p.op ? h("span", { class: "hint", style: "margin:0 0 0 6px" }, "op") : null),
+      h("td", { "data-l": "Vie" }, h("span", null, meter(p.health, p.maxHealth), dec(p.health, 1) + " / " + p.maxHealth)),
+      h("td", { "data-l": "Faim" }, h("span", null, meter(p.food, 20, "food"), p.food + " / 20")),
+      h("td", { "data-l": "Lieu" }, h("span", null, p.world, h("div", { class: "hint", style: "margin:0" }, p.x + ", " + p.y + ", " + p.z))),
+      h("td", { "data-l": "Mode" }, p.gamemode),
+      h("td", { class: "num", "data-l": "Ping" }, p.ping >= 0 ? p.ping + " ms" : "-"),
+      st,
+      h("td", { "data-l": "Actions" }, acts)));
+  });
+  t.append(tb);
+}
+function openActions(p) {
+  const dlg = $("dlg-act");
+  clear(dlg);
+  const done = async (body, closeAfter) => { const j = await act(body); if (j) { refreshPlayers(); if (closeAfter) dlg.close(); } };
+  const sel = h("select", { id: "act-dur" }); durOptions(sel);
+  const reason = h("input", { type: "text", id: "act-reason", maxlength: "200", autocomplete: "off" });
+  const gm = h("select", { id: "act-gm" }, ...[["survival", "Survie"], ["creative", "Créatif"], ["adventure", "Aventure"], ["spectator", "Spectateur"]].map(([v, l]) => h("option", { value: v, selected: v === p.gamemode }, l)));
+  const msg = h("input", { type: "text", id: "act-msg", maxlength: "200", autocomplete: "off", placeholder: "Message privé du staff" });
+  const mk = (txt, cls, fn) => { const b = h("button", { type: "button", class: "btn small " + (cls || "") }, txt); if (fn) b.addEventListener("click", fn); return b; };
+  const quick = h("div", { class: "btnrow" },
+    mk("Soigner", "", () => done({ action: "heal", target: p.name })),
+    mk("Nourrir", "", () => done({ action: "feed", target: p.name })),
+    mk("Retirer les effets", "", () => done({ action: "clear-effects", target: p.name })),
+    mk("Ramener au spawn", "", () => done({ action: "tp-spawn", target: p.name })),
+    mk(p.frozen ? "Libérer (dégeler)" : "Immobiliser", "", () => done({ action: p.frozen ? "unfreeze" : "freeze", target: p.name })),
+    mk(p.muted ? "Rendre la parole" : "Rendre muet", "", () => done({ action: p.muted ? "unmute" : "mute", target: p.name, duration: sel.value, reason: reason.value })));
+  const kick = mk("Exclure", "danger"), ban = mk("Bannir", "danger");
+  armConfirm(kick, "Confirmer : exclure " + p.name, () => done({ action: "kick", target: p.name, reason: reason.value }, true));
+  armConfirm(ban, "Confirmer : bannir " + p.name, () => done({ action: "ban", target: p.name, duration: sel.value, reason: reason.value }, true));
+  const close = mk("Fermer", "primary", () => dlg.close());
+  dlg.append(
+    h("h2", null, "Actions pour " + p.name),
+    h("div", { class: "grp" }, h("h3", null, "Actions rapides"), quick),
+    h("div", { class: "grp" }, h("h3", null, "Sanction"),
+      h("div", { class: "field" }, h("label", { class: "fld", for: "act-dur" }, "Durée (bannissement et muet)"), sel),
+      h("div", { class: "field" }, h("label", { class: "fld", for: "act-reason" }, "Raison (le joueur la voit)"), reason),
+      h("div", { class: "btnrow" }, kick, ban),
+      isModo() ? h("p", { class: "hint" }, "Modérateur : le bannissement définitif n'est pas possible, choisis une durée.") : null),
+    h("div", { class: "grp" }, h("h3", null, "Mode de jeu"), h("div", { class: "inline" }, h("label", { class: "sr-only", for: "act-gm" }, "Mode de jeu"), gm, mk("Appliquer", "", () => done({ action: "gamemode", target: p.name, mode: gm.value })))),
+    h("div", { class: "grp" }, h("h3", null, "Message privé"), h("div", { class: "inline" }, h("label", { class: "sr-only", for: "act-msg" }, "Message privé"), msg, mk("Envoyer", "", () => { if (msg.value.trim()) done({ action: "message", target: p.name, message: msg.value }); }))),
+    h("div", { class: "foot" }, close));
+  dlg.showModal();
+}
+
+/* ---------- serveur ---------- */
+$("bc-form").addEventListener("submit", async (ev) => {
+  ev.preventDefault();
+  const v = $("bc-msg").value.trim();
+  if (!v) return;
+  if (await act({ action: "broadcast", message: v })) $("bc-msg").value = "";
+});
+document.querySelectorAll("[data-srv]").forEach((b) => b.addEventListener("click", () => act(JSON.parse(b.dataset.srv))));
+
+/* ---------- sanctions ---------- */
+async function refreshSanctions() {
+  if (!admin) return;
+  try {
+    const j = await adm("/api/admin/sanctions");
+    const tb = clear($("sa-bans")), tm = clear($("sa-mutes"));
+    tb.append(h("thead", null, h("tr", null, ...["Joueur", "Raison", "Durée", "Par", ""].map((x) => h("th", { scope: "col" }, x)))));
+    const b1 = h("tbody");
+    if (!j.bans.length) b1.append(h("tr", null, h("td", { colspan: "5", class: "empty" }, "Aucun joueur banni.")));
+    j.bans.forEach((b) => {
+      const bt = h("button", { type: "button", class: "btn small" }, "Débannir");
+      bt.addEventListener("click", async () => { if (await act({ action: "unban", target: b.name })) refreshSanctions(); });
+      b1.append(h("tr", null, h("td", null, h("strong", null, b.name)), h("td", null, b.reason || "-"), h("td", null, untilText(b.until)), h("td", null, b.by || "-"), h("td", null, bt)));
+    });
+    tb.append(b1);
+    tm.append(h("thead", null, h("tr", null, ...["Joueur", "Raison", "Durée", "Par", ""].map((x) => h("th", { scope: "col" }, x)))));
+    const b2 = h("tbody");
+    if (!j.mutes.length) b2.append(h("tr", null, h("td", { colspan: "5", class: "empty" }, "Aucun joueur muet.")));
+    j.mutes.forEach((m) => {
+      const bt = h("button", { type: "button", class: "btn small" }, "Rendre la parole");
+      bt.addEventListener("click", async () => { if (await act({ action: "unmute", target: m.name })) refreshSanctions(); });
+      b2.append(h("tr", null, h("td", null, h("strong", null, m.name)), h("td", null, m.reason || "-"), h("td", null, untilText(m.until)), h("td", null, m.by || "-"), h("td", null, bt)));
+    });
+    tm.append(b2);
+    $("sa-frozen").textContent = j.frozen.length ? j.frozen.join(", ") : "Personne n'est immobilisé.";
+  } catch (e) { toast(e.message, true); }
+}
+function saBody(action) { return { action, target: $("sa-name").value.trim(), duration: $("sa-dur").value, reason: $("sa-reason").value }; }
+function saCheck() {
+  if (!$("sa-name").value.trim()) { toast("Écris d'abord un pseudo.", true); $("sa-name").focus(); return false; }
+  return true;
+}
+(function () {
+  const run = async (a) => { if (saCheck() && await act(saBody(a))) refreshSanctions(); };
+  armConfirm($("sa-ban"), "Confirmer le bannissement", () => { if (saCheck()) run("ban"); });
+  $("sa-unban").addEventListener("click", () => run("unban"));
+  $("sa-mute").addEventListener("click", () => run("mute"));
+  $("sa-unmute").addEventListener("click", () => run("unmute"));
+  $("sa-form").addEventListener("submit", (ev) => ev.preventDefault());
+})();
+$("sa-refresh").addEventListener("click", refreshSanctions);
+$("pl-refresh").addEventListener("click", refreshPlayers);
+
+/* ---------- audit ---------- */
+const ACTION_NAMES = { heal: "Soigner", feed: "Nourrir", kick: "Exclure", ban: "Bannir", unban: "Débannir", mute: "Rendre muet", unmute: "Rendre la parole", "tp-spawn": "Retour au spawn", "clear-effects": "Retirer les effets", gamemode: "Mode de jeu", message: "Message privé", freeze: "Immobiliser", unfreeze: "Libérer", broadcast: "Annonce", "save-all": "Sauvegarde", weather: "Météo", time: "Heure", clearlag: "Nettoyage", console: "Commande console", login: "Connexion", "login-failed": "Connexion ratée" };
+async function refreshAudit() {
+  if (!admin) return;
+  try {
+    const j = await adm("/api/admin/audit?limit=100");
+    const t = clear($("au-table"));
+    t.append(h("thead", null, h("tr", null, ...["Quand", "Qui", "Action", "Cible", "Détail", "Résultat"].map((x) => h("th", { scope: "col" }, x)))));
+    const tb = h("tbody");
+    if (!j.entries.length) tb.append(h("tr", null, h("td", { colspan: "6", class: "empty" }, "Rien pour l'instant.")));
+    j.entries.forEach((e) => tb.append(h("tr", null,
+      h("td", null, fmtShort(e.ts, true)), h("td", null, e.who + (e.role && e.role !== "-" ? " (" + e.role + ")" : "")),
+      h("td", null, ACTION_NAMES[e.action] || e.action), h("td", null, e.target || "-"), h("td", null, e.detail || "-"),
+      h("td", null, h("span", { class: "badge " + (e.ok ? "b-join" : "b-death") }, e.ok ? "Fait" : "Refusé")))));
+    t.append(tb);
+  } catch (e) { toast(e.message, true); }
+}
+$("au-refresh").addEventListener("click", refreshAudit);
+
+/* ---------- formulaire de commande console ---------- */
+$("con-form").addEventListener("submit", async (ev) => {
+  ev.preventDefault();
+  const v = $("con-cmd").value.trim();
+  if (!v || isModo()) return;
+  cmdHistory.push(v);
+  if (cmdHistory.length > 100) cmdHistory.shift();
+  cmdPos = cmdHistory.length;
+  $("con-cmd").value = "";
+  addConLine(0, Date.now(), "INFO", "> " + v, true);
+  const j = await act({ action: "console", command: v }, true);
+  if (j && !j.ok) toast(j.error, true);
+});
+$("con-cmd").addEventListener("keydown", (ev) => {
+  if (ev.key === "ArrowUp" && cmdHistory.length) { ev.preventDefault(); cmdPos = Math.max(0, cmdPos - 1); $("con-cmd").value = cmdHistory[cmdPos]; }
+  else if (ev.key === "ArrowDown" && cmdHistory.length) { ev.preventDefault(); cmdPos = Math.min(cmdHistory.length, cmdPos + 1); $("con-cmd").value = cmdHistory[cmdPos] || ""; }
+});
+$("con-filter").addEventListener("input", applyConFilter);
+$("con-warn").addEventListener("change", applyConFilter);
+$("con-clear").addEventListener("click", () => { conLines.length = 0; clear($("con")); });
+
+/* ---------- boîte de connexion ---------- */
+$("btn-admin").addEventListener("click", () => {
+  if (admin) { $("admin").scrollIntoView({ behavior: "smooth" }); return; }
+  $("login-err").textContent = "";
+  $("dlg-login").showModal();
+  $("login-name").focus();
+});
+$("login-cancel").addEventListener("click", () => $("dlg-login").close());
+$("login-form").addEventListener("submit", async (ev) => {
+  ev.preventDefault();
+  const btn = $("login-go");
+  btn.disabled = true;
+  $("login-err").textContent = "";
+  try {
+    admin = await doLogin($("login-name").value.trim(), $("login-pass").value);
+    $("login-pass").value = "";
+    saveAdmin();
+    $("dlg-login").close();
+    showAdmin();
+    $("admin").scrollIntoView({ behavior: "smooth" });
+  } catch (e) { $("login-err").textContent = e.message; }
+  btn.disabled = false;
+});
+$("btn-logout").addEventListener("click", () => adminLogout(true));
+
+async function initAdmin() {
+  admin = loadAdmin();
+  if (!admin && DEMO && params.get("admin")) {
+    admin = await doLogin(params.get("admin") === "modo" ? "modo" : "demo", "");
+    saveAdmin();
+  }
+  if (admin && admin.expiresAt < Date.now()) admin = null;
+  if (admin && !DEMO) {
+    try { await adm("/api/admin/me"); } catch (e) { admin = null; }
+  }
+  if (params.get("tab") && DEMO) adminTab = params.get("tab");
+  showAdmin();
+  if (admin && DEMO && params.get("dlg")) { await refreshPlayers(); if (adminPlayers[0]) openActions(adminPlayers[0]); }
+}
+
+/* ---------- faux serveur du mode démonstration ---------- */
+const demo = { players: null, bans: [], mutes: [], audit: [], lines: [] , n: 0, timer: 0 };
+function demoInit() {
+  if (demo.players) return;
+  const names = (data && data.players.list.length ? data.players.list.map((p) => p.name) : ["Aldric", "Jehanne", "Kaelen", "Odilon", "Ysolde", "Perceval_44"]).slice(0, 7);
+  demo.players = names.map((n, i) => ({ name: n, uuid: "demo-" + i, health: [20, 14.5, 7, 20, 3.5, 18, 20][i % 7], maxHealth: 20, food: [20, 12, 6, 18, 20, 9, 15][i % 7], world: i === 4 ? "world_nether" : "world", x: 120 * (i + 1) - 300, y: 64 + i * 3, z: -80 * i + 40, gamemode: i === 3 ? "creative" : "survival", ping: 24 + i * 11, muted: i === 2, mutedUntil: 0, frozen: false, op: i === 0, loggedIn: i !== 5 }));
+  demo.bans = [{ name: "Griefer42", reason: "Destruction de la ville", until: 0, by: "Chef" }, { name: "Spambot7", reason: "Publicité", until: Date.now() + 5 * 86400000, by: "Modo1" }];
+  demo.mutes = [{ name: names[2] || "Kaelen", reason: "Spam dans le chat", until: Date.now() + 3600000, by: "Modo1" }];
+  const base = [["INFO", "Starting minecraft server version 1.20.1"], ["INFO", "Loading properties"], ["INFO", "Done (14.2s)! For help, type \"help\""], ["WARN", "Can't keep up! Is the server overloaded? Running 2103ms or 42 ticks behind"], ["INFO", names[0] + " joined the game"], ["INFO", "<" + names[0] + "> Bonjour tout le monde"], ["INFO", names[1] + " lost connection: Disconnected"], ["ERROR", "Could not pass event EntityDamageEvent to ExamplePlugin"], ["INFO", "[ClearLag] Removed 214 entities"]];
+  base.forEach((b, i) => demo.lines.push([++demo.n, Date.now() - (base.length - i) * 17000, b[0], b[1]]));
+}
+function demoLog(level, text) { demo.lines.push([++demo.n, Date.now(), level, text]); }
+function demoAudit(action, target, detail, ok) { demo.audit.unshift({ ts: Date.now(), who: admin.name, role: admin.role, action, target, detail, ok }); }
+function demoApi(path, opts) {
+  demoInit();
+  const url = new URL(path, "http://x");
+  const p = url.pathname;
+  if (p === "/api/admin/me") return Promise.resolve({ ok: true, name: admin.name, role: admin.role, expiresAt: admin.expiresAt });
+  if (p === "/api/admin/players") return Promise.resolve({ ok: true, players: JSON.parse(JSON.stringify(demo.players)) });
+  if (p === "/api/admin/sanctions") return Promise.resolve({ ok: true, bans: demo.bans, mutes: demo.mutes, frozen: demo.players.filter((x) => x.frozen).map((x) => x.name) });
+  if (p === "/api/admin/audit") return Promise.resolve({ ok: true, entries: demo.audit.slice(0, 100) });
+  if (p === "/api/admin/console") {
+    const since = +url.searchParams.get("since");
+    const fresh = () => (since < 0 ? demo.lines.slice(-200) : demo.lines.filter((l) => l[0] > since));
+    return new Promise((resolve, reject) => {
+      const first = fresh();
+      if (first.length) { resolve({ ok: true, next: first[first.length - 1][0], lines: first }); return; }
+      const t = setTimeout(() => { demoLog("INFO", "Sauvegarde automatique du monde..."); const f = fresh(); resolve({ ok: true, next: f.length ? f[f.length - 1][0] : since, lines: f }); }, 4000);
+      if (opts.signal) opts.signal.addEventListener("abort", () => { clearTimeout(t); reject(Object.assign(new Error("abort"), { name: "AbortError" })); });
+    });
+  }
+  if (p === "/api/admin/action") {
+    const b = JSON.parse(opts.body), pl = demo.players.find((x) => x.name.toLowerCase() === (b.target || "").toLowerCase());
+    const fail = (m) => Promise.reject(new Error(m));
+    if (isModo() && (b.action === "console" || (b.action === "ban" && !b.duration))) { demoAudit(b.action, b.target, "refusé", false); return fail(b.action === "console" ? "Réservé aux admins." : "Le bannissement définitif est réservé aux admins : choisis une durée."); }
+    const need = () => (pl ? null : fail((b.target || "Ce joueur") + " n'est pas connecté."));
+    let msg = "Fait.";
+    switch (b.action) {
+      case "heal": if (need()) return need(); pl.health = pl.maxHealth; msg = pl.name + " est soigné."; break;
+      case "feed": if (need()) return need(); pl.food = 20; msg = pl.name + " n'a plus faim."; break;
+      case "clear-effects": if (need()) return need(); msg = "Effets retirés à " + pl.name + "."; break;
+      case "tp-spawn": if (need()) return need(); pl.x = 0; pl.y = 70; pl.z = 0; pl.world = "world"; msg = pl.name + " est ramené au spawn."; break;
+      case "freeze": if (need()) return need(); pl.frozen = true; msg = pl.name + " est immobilisé."; break;
+      case "unfreeze": if (need()) return need(); pl.frozen = false; msg = pl.name + " peut de nouveau bouger."; break;
+      case "gamemode": if (need()) return need(); pl.gamemode = b.mode; msg = pl.name + " est en mode " + b.mode + "."; break;
+      case "message": if (need()) return need(); msg = "Message envoyé à " + pl.name + "."; break;
+      case "kick": if (need()) return need(); demo.players = demo.players.filter((x) => x !== pl); demoLog("INFO", pl.name + " lost connection: Exclu"); msg = pl.name + " est exclu."; break;
+      case "ban": if (pl) demo.players = demo.players.filter((x) => x !== pl); demo.bans.push({ name: b.target, reason: b.reason || "Banni par un modérateur", until: b.duration ? Date.now() + 86400000 : 0, by: admin.name }); msg = b.target + " est banni."; break;
+      case "unban": if (!demo.bans.some((x) => x.name.toLowerCase() === b.target.toLowerCase())) return fail(b.target + " n'est pas banni."); demo.bans = demo.bans.filter((x) => x.name.toLowerCase() !== b.target.toLowerCase()); msg = b.target + " est débanni."; break;
+      case "mute": if (pl) pl.muted = true; demo.mutes.push({ name: b.target, reason: b.reason, until: b.duration ? Date.now() + 3600000 : 0, by: admin.name }); msg = b.target + " est muet."; break;
+      case "unmute": if (pl) pl.muted = false; demo.mutes = demo.mutes.filter((x) => x.name.toLowerCase() !== b.target.toLowerCase()); msg = b.target + " peut de nouveau parler."; break;
+      case "broadcast": demoLog("INFO", "[Aethoria] " + b.message); msg = "Annonce envoyée."; break;
+      case "console": demoLog("INFO", "Commande exécutée : " + b.command); msg = "Commande envoyée."; break;
+      default: msg = "Fait (démonstration)."; demoLog("INFO", "Action : " + b.action);
+    }
+    demoAudit(b.action, b.target || "", b.reason || b.message || b.command || b.value || "", true);
+    return Promise.resolve({ ok: true, message: msg + " (démonstration)" });
+  }
+  return Promise.reject(new Error("Introuvable."));
+}
+
 /* ---------- démarrage ---------- */
 $("range").addEventListener("click", (ev) => {
   const b = ev.target.closest("button[data-h]");
@@ -716,6 +1355,7 @@ $("range").addEventListener("click", (ev) => {
 });
 renderStatus();
 load();
+initAdmin();
 setInterval(load, REFRESH_MS);
 setInterval(() => { if (data) { renderStatus(); renderOnline(); renderRecent(); } }, 20000);
 </script>

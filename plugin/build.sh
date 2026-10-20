@@ -5,7 +5,7 @@ set -euo pipefail
 cd "$(dirname "$0")"
 rm -rf build/classes
 mkdir -p build/classes
-javac --release 17 -encoding UTF-8 -cp lib/spigot-api.jar -d build/classes $(find src/main/java -name '*.java')
+javac -proc:none --release 17 -encoding UTF-8 -cp "lib/spigot-api.jar$(printf ";")lib/log4j-api-2.19.0.jar$(printf ";")lib/log4j-core-2.19.0.jar" -d build/classes $(find src/main/java -name '*.java')
 cp -r src/main/resources/. build/classes/
 (cd build/classes && jar --create --file ../AethoriaStats.jar .)
 echo "OK : build/AethoriaStats.jar"

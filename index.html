@@ -1,0 +1,723 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aethoria - Registre du royaume</title>
+<meta name="description" content="Statistiques en direct du serveur Minecraft Aethoria : joueurs en ligne, performances, classements et activité.">
+<meta name="theme-color" content="#1b120b">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --wood-0: #140d07;
+  --wood-1: #1f150d;
+  --wood-2: #2c1e13;
+  --wood-edge: #5a3d22;
+  --gold: #d9a441;
+  --gold-soft: #f0cf8a;
+  --parch: #f1e3c0;
+  --parch-2: #e6d2a4;
+  --ink: #2b1b0e;
+  --ink-soft: #5a4529;
+  --line: rgba(43, 27, 14, .22);
+  --ok: #1f6b2c;
+  --warn: #7d5200;
+  --bad: #a12a1a;
+  --ok-on-dark: #8fd18a;
+  --warn-on-dark: #f0c05a;
+  --bad-on-dark: #f59a8b;
+  --c-players: #8a5a00;
+  --c-players-fill: rgba(217, 164, 65, .38);
+  --c-tps: #1f6b2c;
+  --c-ram: #4b3a8a;
+  --c-sessions: #9a2f1a;
+  --radius: 10px;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  color: var(--parch);
+  font: 16px/1.5 "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+  background-color: var(--wood-1);
+  background-image:
+    repeating-linear-gradient(90deg, rgba(0,0,0,.28) 0 2px, transparent 2px 120px),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.025) 0 1px, transparent 1px 60px),
+    linear-gradient(180deg, var(--wood-2), var(--wood-0));
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+h1, h2, h3, .cinzel { font-family: "Cinzel", Georgia, "Times New Roman", serif; font-weight: 700; letter-spacing: .02em; }
+a { color: var(--gold-soft); }
+:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.skip { position: absolute; left: 8px; top: -60px; background: var(--gold); color: var(--ink); padding: 8px 14px; border-radius: 6px; z-index: 10; }
+.skip:focus { top: 8px; }
+
+.wrap { max-width: 1200px; margin: 0 auto; padding: 0 16px 40px; }
+
+/* ---- bandeau ---- */
+header.top { padding: 22px 0 8px; }
+.brand { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 14px; }
+.brand h1 { margin: 0; font-size: clamp(1.6rem, 5vw, 2.4rem); color: var(--gold); text-shadow: 0 2px 0 #000; }
+.brand p { margin: 0; color: var(--gold-soft); font-size: .95rem; }
+.status {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1px;
+  background: var(--wood-edge);
+  border: 2px solid var(--wood-edge);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.status > div { background: linear-gradient(180deg, #33231a, #261910); padding: 10px 14px; min-width: 0; }
+.status .lbl { display: block; font-size: .78rem; text-transform: uppercase; letter-spacing: .08em; color: var(--gold-soft); }
+.status .val { display: block; font-size: 1.25rem; font-weight: 600; overflow-wrap: anywhere; }
+.status .sub { display: block; font-size: .8rem; color: #d6c6a4; }
+.dot { display: inline-block; width: .7em; height: .7em; border-radius: 50%; margin-right: .4em; background: currentColor; box-shadow: 0 0 0 3px rgba(255,255,255,.12); }
+.t-ok { color: var(--ok-on-dark); } .t-warn { color: var(--warn-on-dark); } .t-bad { color: var(--bad-on-dark); }
+.notice {
+  margin: 12px 0 0; padding: 10px 14px; border-radius: var(--radius);
+  background: #3b1f14; border: 1px solid #8a4a2a; color: #ffe2cc;
+}
+.notice[hidden] { display: none; }
+
+/* ---- cartes ---- */
+main { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; margin-top: 16px; }
+.grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; }
+.cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.span-2 { grid-column: span 2; }
+@media (max-width: 900px) { .cols-2, .cols-3 { grid-template-columns: minmax(0, 1fr); } .span-2 { grid-column: auto; } }
+
+section.card {
+  color: var(--ink);
+  background:
+    radial-gradient(ellipse at 20% 0%, rgba(255,255,255,.35), transparent 60%),
+    linear-gradient(180deg, var(--parch), var(--parch-2));
+  border: 2px solid #8a6a3a;
+  border-radius: var(--radius);
+  box-shadow: 0 6px 18px rgba(0,0,0,.45), inset 0 0 0 3px rgba(255,255,255,.18);
+  padding: 16px 18px 18px;
+  min-width: 0;
+}
+section.card h2 {
+  margin: 0 0 12px; font-size: 1.2rem; color: #4a2c0c;
+  padding-bottom: 6px; border-bottom: 2px solid var(--gold);
+}
+.hint { margin: 8px 0 0; font-size: .85rem; color: var(--ink-soft); }
+.empty { color: var(--ink-soft); font-style: italic; margin: 6px 0; }
+
+/* KPI */
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.kpi { background: rgba(255,255,255,.35); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
+.kpi .n { font-family: "Cinzel", Georgia, serif; font-weight: 700; font-size: clamp(1.3rem, 5vw, 1.8rem); line-height: 1.1; color: #3b2208; }
+.kpi .l { font-size: .85rem; color: var(--ink-soft); }
+.kpi .s { font-size: .8rem; color: var(--ink-soft); }
+
+/* graphiques */
+.chart { position: relative; height: 300px; }
+.chart.small { height: 220px; }
+.toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; align-items: center; }
+.seg { display: inline-flex; border: 2px solid #6a4a22; border-radius: 8px; overflow: hidden; }
+.seg button, .tabs button {
+  font: inherit; font-size: .92rem; cursor: pointer; border: 0; padding: 7px 14px; min-height: 40px;
+  background: #e0c88f; color: var(--ink);
+}
+.seg button + button { border-left: 1px solid #6a4a22; }
+.seg button[aria-pressed="true"], .tabs button[aria-selected="true"] { background: #3a2514; color: var(--gold-soft); font-weight: 600; }
+.seg button:hover:not([aria-pressed="true"]), .tabs button:hover:not([aria-selected="true"]) { background: #f0dca5; }
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.tabs button { border: 2px solid #6a4a22; border-radius: 8px; }
+
+/* heatmap */
+.heat-scroll { overflow-x: auto; }
+table.heat { border-collapse: separate; border-spacing: 2px; width: 100%; min-width: 440px; table-layout: fixed; font-size: .75rem; }
+table.heat th { font-weight: 600; color: var(--ink-soft); padding: 0 2px; text-align: center; }
+table.heat th.row { text-align: right; padding-right: 6px; width: 2.8em; }
+table.heat th:not(.row) { overflow: visible; white-space: nowrap; }
+table.heat td { height: 26px; border-radius: 3px; padding: 0; background: rgba(43,27,14,.08); }
+.legend { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: .8rem; color: var(--ink-soft); }
+.legend .ramp { width: 120px; height: 10px; border-radius: 5px; border: 1px solid var(--line); background: linear-gradient(90deg, rgba(138,90,0,.08), rgba(138,90,0,1)); }
+
+/* rétention */
+.ret { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 520px) { .ret { grid-template-columns: minmax(0, 1fr); } }
+.ret .box { background: rgba(255,255,255,.35); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
+.ret .pct { font-family: "Cinzel", Georgia, serif; font-size: 2rem; font-weight: 700; color: #3b2208; }
+.ret .bar, .bar { height: 10px; border-radius: 5px; background: rgba(43,27,14,.15); overflow: hidden; margin: 4px 0; }
+.ret .bar > i, .bar > i { display: block; height: 100%; background: linear-gradient(90deg, #8a5a00, #c58a1a); }
+.ret .meta { font-size: .8rem; color: var(--ink-soft); }
+
+/* listes */
+ul.plain { list-style: none; margin: 0; padding: 0; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { background: #3a2514; color: var(--parch); border-radius: 999px; padding: 6px 12px; font-size: .92rem; }
+.chip b { color: var(--gold-soft); font-weight: 600; }
+.chip small { color: #d6c6a4; }
+ul.rows li { display: flex; justify-content: space-between; gap: 12px; padding: 6px 0; border-bottom: 1px dashed var(--line); }
+ul.rows li:last-child { border-bottom: 0; }
+ul.rows .when { color: var(--ink-soft); white-space: nowrap; font-size: .9rem; }
+
+table.data { width: 100%; border-collapse: collapse; font-size: .95rem; }
+table.data th { text-align: left; font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-soft); padding: 4px 6px; border-bottom: 2px solid var(--gold); }
+table.data td { padding: 6px; border-bottom: 1px dashed var(--line); vertical-align: middle; }
+table.data td.num, table.data th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+table.data td.rank { width: 2.2em; color: var(--ink-soft); }
+.tablewrap { overflow-x: auto; }
+
+.log li { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; padding: 6px 0; border-bottom: 1px dashed var(--line); }
+.log li:last-child { border-bottom: 0; }
+.log .time { grid-column: 1 / -1; font-size: .78rem; color: var(--ink-soft); }
+.badge { display: inline-block; font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; padding: 2px 8px; border-radius: 4px; border: 1px solid; align-self: start; white-space: nowrap; }
+.b-join { color: #1f5a2a; border-color: #1f5a2a; background: rgba(31,106,44,.1); }
+.b-first { color: #5a2b8a; border-color: #5a2b8a; background: rgba(90,43,138,.1); }
+.b-quit { color: #4a3d2b; border-color: #6a5a40; background: rgba(0,0,0,.05); }
+.b-death { color: #8f2416; border-color: #8f2416; background: rgba(161,42,26,.1); }
+.b-record { color: #6b4400; border-color: #6b4400; background: rgba(217,164,65,.3); }
+.loglist { max-height: 460px; overflow-y: auto; padding-right: 6px; }
+
+dl.mach { display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; margin: 0 0 12px; }
+dl.mach dt { color: var(--ink-soft); }
+dl.mach dd { margin: 0; font-weight: 600; overflow-wrap: anywhere; }
+
+footer { margin-top: 26px; text-align: center; color: #cdbb97; font-size: .85rem; }
+
+@media (max-width: 520px) {
+  .chart { height: 260px; }
+  section.card { padding: 14px 12px 16px; }
+  .status .val { font-size: 1.1rem; }
+  table.heat td { height: 22px; }
+}
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+<a class="skip" href="#contenu">Aller au contenu</a>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <h1>Aethoria</h1>
+      <p>Registre du royaume : les chiffres du serveur en direct</p>
+    </div>
+    <div class="status" id="status" role="status" aria-live="polite">
+      <div><span class="lbl">Serveur</span><span class="val" id="st-state">Chargement...</span><span class="sub" id="st-age">&nbsp;</span></div>
+      <div><span class="lbl">Joueurs</span><span class="val" id="st-players">-</span><span class="sub" id="st-peak">&nbsp;</span></div>
+      <div><span class="lbl">TPS (1 min)</span><span class="val" id="st-tps">-</span><span class="sub" id="st-tps-sub">&nbsp;</span></div>
+      <div><span class="lbl">En marche depuis</span><span class="val" id="st-uptime">-</span><span class="sub" id="st-version">&nbsp;</span></div>
+    </div>
+    <p class="notice" id="notice" hidden></p>
+  </header>
+
+  <main id="contenu">
+    <section class="card" aria-labelledby="h-kpi">
+      <h2 id="h-kpi">En un coup d'oeil</h2>
+      <div class="kpis" id="kpis"></div>
+    </section>
+
+    <section class="card" aria-labelledby="h-hist">
+      <h2 id="h-hist">Joueurs et fluidité du serveur</h2>
+      <div class="toolbar">
+        <div class="seg" role="group" aria-label="Période affichée" id="range">
+          <button type="button" data-h="24" aria-pressed="true">24 h</button>
+          <button type="button" data-h="168" aria-pressed="false">7 jours</button>
+          <button type="button" data-h="336" aria-pressed="false">14 jours</button>
+        </div>
+      </div>
+      <div class="chart"><canvas id="ch-hist" role="img" aria-label="Courbe du nombre de joueurs et du TPS"></canvas></div>
+      <p class="hint" id="hist-sum"></p>
+    </section>
+
+    <div class="grid cols-2">
+      <section class="card" aria-labelledby="h-heat">
+        <h2 id="h-heat">Quand le royaume est-il animé ?</h2>
+        <div class="heat-scroll"><table class="heat" id="heat"></table></div>
+        <div class="legend"><span>Calme</span><span class="ramp" aria-hidden="true"></span><span>Très animé</span></div>
+        <p class="hint" id="heat-sum"></p>
+      </section>
+
+      <section class="card" aria-labelledby="h-ret">
+        <h2 id="h-ret">Les nouveaux reviennent-ils ?</h2>
+        <div class="ret" id="ret"></div>
+        <p class="hint">Part des joueurs arrivés il y a au moins 1, 7 ou 30 jours qui sont revenus jouer au moins une fois ce jour-là ou après.</p>
+      </section>
+    </div>
+
+    <div class="grid cols-2">
+      <section class="card" aria-labelledby="h-new">
+        <h2 id="h-new">Nouveaux joueurs par jour</h2>
+        <div class="chart small"><canvas id="ch-new" role="img" aria-label="Nombre de nouveaux joueurs par jour sur 30 jours"></canvas></div>
+        <p class="hint" id="new-sum"></p>
+      </section>
+      <section class="card" aria-labelledby="h-ses">
+        <h2 id="h-ses">Connexions par jour</h2>
+        <div class="chart small"><canvas id="ch-ses" role="img" aria-label="Nombre de sessions de jeu par jour sur 30 jours"></canvas></div>
+        <p class="hint">Une connexion = un joueur qui arrive sur le serveur.</p>
+      </section>
+    </div>
+
+    <div class="grid cols-2">
+      <section class="card" aria-labelledby="h-online">
+        <h2 id="h-online">Joueurs en ligne</h2>
+        <div id="online"></div>
+      </section>
+      <section class="card" aria-labelledby="h-recent">
+        <h2 id="h-recent">Derniers arrivés</h2>
+        <ul class="plain rows" id="recent"></ul>
+      </section>
+    </div>
+
+    <section class="card" aria-labelledby="h-board">
+      <h2 id="h-board">Classements</h2>
+      <div class="tabs" role="tablist" aria-label="Choisir un classement" id="tabs"></div>
+      <div id="board" role="tabpanel" tabindex="0"></div>
+    </section>
+
+    <div class="grid cols-2">
+      <section class="card" aria-labelledby="h-log">
+        <h2 id="h-log">Journal du royaume</h2>
+        <div class="loglist" tabindex="0" aria-label="Journal, défilement possible"><ul class="plain log" id="log"></ul></div>
+      </section>
+      <div class="grid">
+        <section class="card" aria-labelledby="h-worlds">
+          <h2 id="h-worlds">Les mondes</h2>
+          <div class="tablewrap"><table class="data" id="worlds"></table></div>
+        </section>
+        <section class="card" aria-labelledby="h-mach">
+          <h2 id="h-mach">La machine</h2>
+          <dl class="mach" id="mach"></dl>
+          <div class="bar" id="ram-bar" role="img"><i></i></div>
+          <div class="chart small"><canvas id="ch-ram" role="img" aria-label="Mémoire utilisée au fil du temps"></canvas></div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>Aethoria - données envoyées par le serveur toutes les 2 minutes. Aucune adresse IP n'est publiée.</p>
+    <p id="foot-gen"></p>
+  </footer>
+</div>
+<noscript><p class="notice">Cette page a besoin de JavaScript pour afficher les statistiques.</p></noscript>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" integrity="sha384-bs/nf9FbdNouRbMiFcrcZfLXYPKiPaGVGplVbv7dLGECccEXDW+S3zjqSKR5ZEaD" crossorigin="anonymous"></script>
+<script>
+"use strict";
+/* ==========================================================
+   RÉGLAGES : changer ici l'adresse du Gist.
+   Format : https://gist.githubusercontent.com/<pseudo-github>/<gist-id>/raw/stats.json
+   (Sans numéro de version dans l'adresse, GitHub renvoie toujours la dernière.)
+   ========================================================== */
+const GIST_URL = "https://gist.githubusercontent.com/VOTRE_PSEUDO/VOTRE_GIST_ID/raw/stats.json";
+const REFRESH_MS = 60000;      // relecture du fichier
+const FRESH_MIN = 8;           // données plus récentes que ça : "En ligne"
+const STALE_MIN = 20;          // au-delà : "Hors ligne"
+const DEMO_URL = "stats.sample.json";
+
+const params = new URLSearchParams(location.search);
+const DEMO = params.get("demo") === "1";
+const SOURCE = DEMO ? DEMO_URL : (params.get("src") || GIST_URL);
+
+const $ = (id) => document.getElementById(id);
+const nf = new Intl.NumberFormat("fr-FR");
+const DAYS = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"];
+const DAYS_SHORT = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
+
+let data = null;
+let lastFetchOk = 0;
+let fetchError = "";
+let rangeHours = 24;
+let boardKey = "playtime";
+const charts = {};
+
+/* ---------- aides ---------- */
+function h(tag, attrs, ...kids) {
+  const e = document.createElement(tag);
+  if (attrs) for (const [k, v] of Object.entries(attrs)) {
+    if (v === null || v === undefined || v === false) continue;
+    if (k === "text") e.textContent = v;
+    else if (k === "class") e.className = v;
+    else e.setAttribute(k, v === true ? "" : v);
+  }
+  for (const c of kids) if (c !== null && c !== undefined) e.append(c.nodeType ? c : document.createTextNode(String(c)));
+  return e;
+}
+function clear(el) { while (el.firstChild) el.removeChild(el.firstChild); return el; }
+function num(n) { return n === null || n === undefined ? "-" : nf.format(Math.round(n)); }
+function dec(n, d) { return n === null || n === undefined ? "-" : n.toLocaleString("fr-FR", { minimumFractionDigits: d, maximumFractionDigits: d }); }
+function dur(ms) {
+  ms = Math.max(0, ms);
+  const m = Math.floor(ms / 60000), hh = Math.floor(m / 60), d = Math.floor(hh / 24);
+  if (d >= 1) return d + " j " + (hh % 24) + " h";
+  if (hh >= 1) return hh + " h " + String(m % 60).padStart(2, "0") + " min";
+  return m + " min";
+}
+function ago(ts) {
+  const s = Math.max(0, (Date.now() - ts) / 1000);
+  if (s < 45) return "à l'instant";
+  if (s < 3600) return "il y a " + Math.round(s / 60) + " min";
+  if (s < 86400) return "il y a " + Math.round(s / 3600) + " h";
+  const d = Math.round(s / 86400);
+  return "il y a " + d + (d > 1 ? " jours" : " jour");
+}
+function tz() { return (data && data.timezone) || undefined; }
+function fmtDateTime(ts) {
+  try { return new Intl.DateTimeFormat("fr-FR", { dateStyle: "long", timeStyle: "short", timeZone: tz() }).format(ts); }
+  catch (e) { return new Date(ts).toLocaleString("fr-FR"); }
+}
+function fmtDate(ts) {
+  try { return new Intl.DateTimeFormat("fr-FR", { dateStyle: "long", timeZone: tz() }).format(ts); }
+  catch (e) { return new Date(ts).toLocaleDateString("fr-FR"); }
+}
+function fmtClock(ts) {
+  try { return new Intl.DateTimeFormat("fr-FR", { hour: "2-digit", minute: "2-digit", timeZone: tz() }).format(ts); }
+  catch (e) { return new Date(ts).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" }); }
+}
+function fmtShort(ts, withDay) {
+  try {
+    return new Intl.DateTimeFormat("fr-FR", withDay ? { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit", timeZone: tz() } : { hour: "2-digit", minute: "2-digit", timeZone: tz() }).format(ts);
+  } catch (e) { return new Date(ts).toLocaleString("fr-FR"); }
+}
+function tpsClass(t) { return t >= 19 ? "ok" : t >= 17 ? "warn" : "bad"; }
+function tpsLabel(t) { return t >= 19 ? "Fluide" : t >= 17 ? "Un peu ralenti" : "Ralenti"; }
+
+/* ---------- chargement ---------- */
+function shiftTimes(d) {
+  const delta = Date.now() - d.generatedAt;
+  const s = (o, k) => { if (o && typeof o[k] === "number" && o[k] > 0) o[k] += delta; };
+  s(d, "generatedAt"); s(d.server, "startedAt"); s(d.players.record, "at");
+  d.players.list.forEach((p) => s(p, "since"));
+  d.newPlayers.recent.forEach((p) => s(p, "first"));
+  d.history.points.forEach((p) => { p[0] += delta; });
+  d.playerList.forEach((p) => { s(p, "first"); s(p, "last"); });
+  d.log.forEach((l) => s(l, "ts"));
+  return d;
+}
+async function load() {
+  if (/VOTRE_/.test(SOURCE)) {
+    fetchError = "L'adresse du Gist n'est pas encore réglée dans la page (voir GIST_URL en haut du script). Essaie ?demo=1 pour voir un exemple.";
+    renderStatus();
+    return;
+  }
+  try {
+    const sep = SOURCE.includes("?") ? "&" : "?";
+    const r = await fetch(SOURCE + sep + "t=" + Date.now(), { cache: "no-store" });
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    let d = await r.json();
+    if (DEMO) d = shiftTimes(d);
+    data = d;
+    lastFetchOk = Date.now();
+    fetchError = "";
+    renderAll();
+  } catch (e) {
+    fetchError = "Impossible de lire les statistiques (" + e.message + "). " + (data ? "Les dernières données connues restent affichées." : "Réessai automatique dans une minute.");
+    renderStatus();
+  }
+}
+
+/* ---------- bandeau ---------- */
+function stateOf() {
+  if (!data) return { cls: "warn", text: "Chargement...", sub: "" };
+  const ageMin = (Date.now() - data.generatedAt) / 60000;
+  if (ageMin <= FRESH_MIN) return { cls: "ok", text: "En ligne", sub: "Mis à jour " + ago(data.generatedAt) };
+  if (ageMin <= STALE_MIN) return { cls: "warn", text: "Données anciennes", sub: "Mis à jour " + ago(data.generatedAt) };
+  return { cls: "bad", text: "Hors ligne", sub: "Dernier signe de vie " + ago(data.generatedAt) };
+}
+function renderStatus() {
+  const st = stateOf();
+  const s = $("st-state");
+  clear(s).append(h("span", { class: "t-" + st.cls }, h("span", { class: "dot", "aria-hidden": "true" }), st.text));
+  $("st-age").textContent = st.sub || " ";
+  const note = $("notice");
+  note.hidden = !fetchError && !(DEMO);
+  note.textContent = fetchError || (DEMO ? "Mode démonstration : ces chiffres sont fictifs." : "");
+  if (!data) return;
+  const p = data.players, up = st.cls === "bad" ? null : data.server.uptimeMs + (Date.now() - data.generatedAt);
+  $("st-players").textContent = st.cls === "bad" ? "0 / " + p.max : p.online + " / " + p.max;
+  $("st-peak").textContent = "Pic du jour : " + p.peakToday;
+  const t = data.tps.m1;
+  clear($("st-tps")).append(h("span", { class: "t-" + tpsClass(t) }, dec(t, 1)));
+  $("st-tps-sub").textContent = tpsLabel(t) + " (5 min : " + dec(data.tps.m5, 1) + ")";
+  $("st-uptime").textContent = up === null ? "-" : dur(up);
+  $("st-version").textContent = "Mohist " + (data.server.version.match(/1\.\d+(\.\d+)?/) || [""])[0];
+  document.title = "Aethoria - " + (st.cls === "bad" ? "hors ligne" : p.online + "/" + p.max + " en ligne");
+  $("foot-gen").textContent = "Dernière mise à jour du serveur : " + fmtDateTime(data.generatedAt);
+}
+
+/* ---------- cartes KPI ---------- */
+function kpi(n, l, s) { return h("div", { class: "kpi" }, h("div", { class: "n" }, n), h("div", { class: "l" }, l), s ? h("div", { class: "s" }, s) : null); }
+function renderKpis() {
+  const d = data, r = d.retention, n = d.newPlayers;
+  const totalPlay = d.playerList.reduce((a, p) => a + p.playMs, 0);
+  const totalSess = d.playerList.reduce((a, p) => a + p.sessions, 0);
+  const box = clear($("kpis"));
+  box.append(
+    kpi(num(d.players.online), "En ligne maintenant", "sur " + d.players.max + " places"),
+    kpi(num(d.players.peakToday), "Pic du jour"),
+    kpi(num(d.players.record.count), "Record absolu", d.players.record.at ? fmtDate(d.players.record.at) : "pas encore de record"),
+    kpi(num(n.total), "Joueurs uniques", "depuis le début des relevés"),
+    kpi("+" + num(n.today), "Nouveaux aujourd'hui", num(n.d7) + " en 7 j, " + num(n.d30) + " en 30 j"),
+    kpi(num(r.active24h), "Actifs sur 24 h", num(r.active7d) + " sur 7 j, " + num(r.active30d) + " sur 30 j"),
+    kpi(num(r.regulars), "Joueurs qui restent", "au moins 3 jours sur les 7 derniers"),
+    kpi(totalSess ? dur(totalPlay / totalSess) : "-", "Durée moyenne d'une visite", num(totalSess) + " visites au total")
+  );
+}
+
+/* ---------- graphiques ---------- */
+const TEXT = "#4a3520", GRID = "rgba(43,27,14,.16)";
+function baseOptions() {
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  return {
+    responsive: true, maintainAspectRatio: false, animation: reduce ? false : { duration: 300 },
+    interaction: { mode: "index", intersect: false },
+    plugins: { legend: { labels: { color: TEXT, boxWidth: 14, font: { size: 13 } } } },
+    scales: {
+      x: { ticks: { color: TEXT, maxRotation: 0, autoSkip: true, maxTicksLimit: 8 }, grid: { color: GRID } },
+      y: { ticks: { color: TEXT, precision: 0 }, grid: { color: GRID }, beginAtZero: true }
+    }
+  };
+}
+function setChart(key, canvasId, config) {
+  if (!window.Chart) return;
+  if (charts[key]) {
+    charts[key].data = config.data;
+    charts[key].update();
+  } else {
+    charts[key] = new Chart($(canvasId), config);
+  }
+}
+function bucketed() {
+  const from = data.generatedAt - rangeHours * 3600000;
+  const pts = data.history.points.filter((p) => p[0] >= from);
+  const size = Math.max(1, Math.ceil(pts.length / 300));
+  const out = [];
+  for (let i = 0; i < pts.length; i += size) {
+    const sl = pts.slice(i, i + size);
+    const avg = (k) => sl.reduce((a, p) => a + p[k], 0) / sl.length;
+    out.push({ ts: sl[sl.length - 1][0], players: avg(1), tps: avg(2), ram: avg(3), max: Math.max(...sl.map((p) => p[1])) });
+  }
+  return out;
+}
+function renderHistory() {
+  const pts = bucketed();
+  const withDay = rangeHours > 24;
+  const labels = pts.map((p) => fmtShort(p.ts, withDay));
+  const o = baseOptions();
+  o.scales.y.title = { display: true, text: "Joueurs", color: TEXT };
+  o.scales.y.suggestedMax = 4;
+  o.scales.y2 = { position: "right", min: 0, max: 20, ticks: { color: TEXT, stepSize: 5 }, grid: { drawOnChartArea: false }, title: { display: true, text: "TPS", color: TEXT } };
+  setChart("hist", "ch-hist", {
+    type: "line",
+    data: {
+      labels,
+      datasets: [
+        { label: "Joueurs en ligne", data: pts.map((p) => +p.players.toFixed(2)), borderColor: "#8a5a00", backgroundColor: "rgba(217,164,65,.38)", fill: true, tension: .25, pointRadius: 0, borderWidth: 2, yAxisID: "y" },
+        { label: "TPS", data: pts.map((p) => +p.tps.toFixed(2)), borderColor: "#1f6b2c", borderDash: [6, 4], tension: .25, pointRadius: 0, borderWidth: 2, yAxisID: "y2" }
+      ]
+    },
+    options: o
+  });
+  if (charts.hist) charts.hist.options = o;
+  const peak = pts.length ? Math.max(...pts.map((p) => p.max)) : 0;
+  const minTps = pts.length ? Math.min(...pts.map((p) => p.tps)) : 20;
+  const label = "Courbe sur " + (rangeHours === 24 ? "24 heures" : rangeHours / 24 + " jours") + " : maximum " + peak + " joueurs, TPS le plus bas " + dec(minTps, 1) + ".";
+  $("ch-hist").setAttribute("aria-label", label);
+  $("hist-sum").textContent = label;
+  // RAM
+  const o2 = baseOptions();
+  o2.plugins.legend.display = false;
+  o2.scales.y.title = { display: true, text: "Mo", color: TEXT };
+  setChart("ram", "ch-ram", {
+    type: "line",
+    data: { labels, datasets: [{ label: "Mémoire utilisée (Mo)", data: pts.map((p) => Math.round(p.ram)), borderColor: "#4b3a8a", backgroundColor: "rgba(75,58,138,.15)", fill: true, tension: .25, pointRadius: 0, borderWidth: 2 }] },
+    options: o2
+  });
+}
+function renderDailyCharts() {
+  const nb = data.newByDay, sb = data.sessionsByDay;
+  const lab = (a) => a.map((x) => x.day.slice(8, 10) + "/" + x.day.slice(5, 7));
+  const o = baseOptions();
+  o.plugins.legend.display = false;
+  o.scales.y.suggestedMax = 3;
+  setChart("new", "ch-new", {
+    type: "bar",
+    data: { labels: lab(nb), datasets: [{ label: "Nouveaux joueurs", data: nb.map((x) => x.n), backgroundColor: "#8a5a00", borderRadius: 3 }] },
+    options: o
+  });
+  const o2 = baseOptions();
+  o2.plugins.legend.display = false;
+  setChart("ses", "ch-ses", {
+    type: "bar",
+    data: { labels: lab(sb), datasets: [{ label: "Connexions", data: sb.map((x) => x.n), backgroundColor: "#9a2f1a", borderRadius: 3 }] },
+    options: o2
+  });
+  const tot = nb.reduce((a, x) => a + x.n, 0);
+  const best = nb.reduce((a, x) => (x.n > a.n ? x : a), { n: -1, day: "" });
+  $("new-sum").textContent = tot + " nouveaux joueurs sur 30 jours" + (best.n > 0 ? ", record le " + best.day.slice(8, 10) + "/" + best.day.slice(5, 7) + " (" + best.n + ")." : ".");
+  $("ch-new").setAttribute("aria-label", "Nouveaux joueurs par jour sur 30 jours : " + tot + " au total.");
+  $("ch-ses").setAttribute("aria-label", "Connexions par jour sur 30 jours : " + sb.reduce((a, x) => a + x.n, 0) + " au total.");
+}
+
+/* ---------- heatmap ---------- */
+function renderHeat() {
+  const g = data.activity.heatmap, max = Math.max(1, ...g.flat());
+  const t = clear($("heat"));
+  const head = h("tr", null, h("td"));
+  for (let c = 0; c < 24; c++) head.append(h("th", { scope: "col" }, h("span", { "aria-hidden": "true" }, c % 3 === 0 ? c : ""), h("span", { class: "sr-only" }, c + " h")));
+  t.append(h("thead", null, head));
+  const body = h("tbody");
+  let best = { v: -1, r: 0, c: 0 };
+  g.forEach((row, r) => {
+    const tr = h("tr", null, h("th", { scope: "row", class: "row" }, DAYS_SHORT[r]));
+    row.forEach((v, c) => {
+      if (v > best.v) best = { v, r, c };
+      const a = v <= 0 ? 0 : 0.1 + 0.9 * Math.pow(v / max, 0.7);
+      const td = h("td", { title: DAYS[r] + " " + c + " h : " + num(v / 60) + " h de jeu cumulées" }, h("span", { class: "sr-only" }, DAYS[r] + " " + c + " h : " + num(v) + " minutes"));
+      if (a > 0) td.style.background = "rgba(138,90,0," + a.toFixed(2) + ")";
+      tr.append(td);
+    });
+    body.append(tr);
+  });
+  t.append(body);
+  t.setAttribute("aria-label", "Activité par jour de la semaine et par heure");
+  $("heat-sum").textContent = best.v > 0 ? "Créneau le plus animé : " + DAYS[best.r].toLowerCase() + " vers " + best.c + " h." : "Pas encore assez de données.";
+}
+
+/* ---------- rétention ---------- */
+function renderRetention() {
+  const box = clear($("ret"));
+  [["d1", "J+1", "le lendemain"], ["d7", "J+7", "au bout d'une semaine"], ["d30", "J+30", "au bout d'un mois"]].forEach(([k, name, txt]) => {
+    const r = data.retention[k], rate = r.rate;
+    const bar = h("div", { class: "bar", role: "img", "aria-label": rate === null ? "Pas encore de données" : dec(rate, 0) + " pour cent" }, h("i"));
+    bar.firstChild.style.width = (rate === null ? 0 : Math.min(100, rate)) + "%";
+    box.append(h("div", { class: "box" },
+      h("div", { class: "meta" }, name + " : revenus " + txt),
+      h("div", { class: "pct" }, rate === null ? "-" : dec(rate, 0) + " %"),
+      bar,
+      h("div", { class: "meta" }, rate === null ? "Pas encore assez de recul." : r.returned + " sur " + r.cohort + " joueurs")
+    ));
+  });
+}
+
+/* ---------- joueurs, arrivées, journal ---------- */
+function renderOnline() {
+  const box = clear($("online")), l = data.players.list, st = stateOf();
+  if (st.cls === "bad") { box.append(h("p", { class: "empty" }, "Le serveur ne répond plus : liste indisponible.")); return; }
+  if (!l.length) { box.append(h("p", { class: "empty" }, "Personne en ligne pour l'instant. Le royaume dort.")); return; }
+  const ul = h("ul", { class: "plain chips" });
+  l.slice().sort((a, b) => a.since - b.since).forEach((p) => {
+    ul.append(h("li", { class: "chip" }, h("b", null, p.name), " ", h("small", null, "depuis " + dur(Date.now() - p.since) + (p.ping !== null && p.ping !== undefined ? ", " + p.ping + " ms" : ""))));
+  });
+  box.append(ul);
+}
+function renderRecent() {
+  const ul = clear($("recent")), r = data.newPlayers.recent;
+  if (!r.length) { ul.append(h("li", { class: "empty" }, "Personne pour l'instant.")); return; }
+  r.forEach((p) => ul.append(h("li", null, h("strong", null, p.name), h("span", { class: "when" }, ago(p.first)))));
+}
+const LOG_LABEL = { first: "Première visite", join: "Arrivée", quit: "Départ", death: "Mort", record: "Record" };
+function renderLog() {
+  const ul = clear($("log"));
+  if (!data.log.length) { ul.append(h("li", { class: "empty" }, "Rien à signaler.")); return; }
+  data.log.forEach((e) => {
+    ul.append(h("li", null,
+      h("span", { class: "badge b-" + e.type }, LOG_LABEL[e.type] || e.type),
+      h("span", null, e.text),
+      h("span", { class: "time" }, fmtShort(e.ts, true) + " - " + ago(e.ts))));
+  });
+}
+
+/* ---------- classements ---------- */
+const BOARDS = [
+  ["playtime", "Temps de jeu", (v) => dur(v)],
+  ["kills", "Joueurs vaincus", (v) => num(v)],
+  ["mobKills", "Monstres tués", (v) => num(v)],
+  ["deaths", "Morts", (v) => num(v)],
+  ["broken", "Blocs cassés", (v) => num(v)],
+  ["placed", "Blocs posés", (v) => num(v)],
+  ["distance", "Distance parcourue", (v) => (v >= 1000 ? dec(v / 1000, 1) + " km" : num(v) + " m")]
+];
+function renderTabs() {
+  const tabs = clear($("tabs"));
+  BOARDS.forEach(([k, name]) => {
+    const b = h("button", { type: "button", role: "tab", id: "tab-" + k, "aria-selected": String(k === boardKey), "aria-controls": "board", tabindex: k === boardKey ? "0" : "-1" }, name);
+    b.addEventListener("click", () => { boardKey = k; renderTabs(); renderBoard(); });
+    b.addEventListener("keydown", (ev) => {
+      const i = BOARDS.findIndex((x) => x[0] === boardKey);
+      let n = null;
+      if (ev.key === "ArrowRight") n = (i + 1) % BOARDS.length;
+      else if (ev.key === "ArrowLeft") n = (i + BOARDS.length - 1) % BOARDS.length;
+      if (n !== null) { ev.preventDefault(); boardKey = BOARDS[n][0]; renderTabs(); renderBoard(); $("tab-" + boardKey).focus(); }
+    });
+    tabs.append(b);
+  });
+}
+function renderBoard() {
+  const box = clear($("board")), def = BOARDS.find((b) => b[0] === boardKey), rows = (data.leaderboards[boardKey] || []).slice(0, 15);
+  box.setAttribute("aria-labelledby", "tab-" + boardKey);
+  if (!rows.length) { box.append(h("p", { class: "empty" }, "Pas encore de données pour ce classement.")); return; }
+  const max = rows[0].value || 1;
+  const t = h("table", { class: "data" }, h("thead", null, h("tr", null, h("th", { scope: "col" }, "#"), h("th", { scope: "col" }, "Joueur"), h("th", { scope: "col", class: "num" }, def[1]), h("th", { scope: "col" }, h("span", { class: "sr-only" }, "Part du premier")))));
+  const tb = h("tbody");
+  rows.forEach((r, i) => {
+    const bar = h("div", { class: "bar", "aria-hidden": "true", style: "min-width:60px" }, h("i"));
+    bar.firstChild.style.width = Math.max(2, 100 * r.value / max) + "%";
+    tb.append(h("tr", null, h("td", { class: "rank" }, String(i + 1)), h("td", null, h("strong", null, r.name)), h("td", { class: "num" }, def[2](r.value)), h("td", { style: "width:35%" }, bar)));
+  });
+  t.append(tb);
+  box.append(h("div", { class: "tablewrap" }, t));
+}
+
+/* ---------- mondes et machine ---------- */
+const ENV = { NORMAL: "Surface", NETHER: "Nether", THE_END: "L'End" };
+function gameClock(t) { const x = ((t / 1000 + 6) % 24); const hh = Math.floor(x); return hh + " h " + String(Math.floor((x - hh) * 60)).padStart(2, "0"); }
+function renderWorlds() {
+  const t = clear($("worlds"));
+  t.append(h("thead", null, h("tr", null, ...["Monde", "Chunks", "Entités", "Vivants", "Objets", "Heure", "Météo"].map((x, i) => h("th", { scope: "col", class: i > 0 && i < 5 ? "num" : null }, x)))));
+  const tb = h("tbody");
+  data.worlds.forEach((w) => tb.append(h("tr", null,
+    h("td", null, h("strong", null, w.name), h("div", { class: "hint", style: "margin:0" }, ENV[w.env] || w.env)),
+    h("td", { class: "num" }, num(w.chunks)), h("td", { class: "num" }, num(w.entities)),
+    h("td", { class: "num" }, num(w.living)), h("td", { class: "num" }, num(w.items)),
+    h("td", null, gameClock(w.time)), h("td", null, w.weather))));
+  t.append(tb);
+}
+function renderMachine() {
+  const s = data.server, pct = s.ramMaxMb ? 100 * s.ramUsedMb / s.ramMaxMb : 0;
+  const dl = clear($("mach"));
+  const row = (a, b) => { dl.append(h("dt", null, a), h("dd", null, b)); };
+  row("Mémoire", num(s.ramUsedMb) + " Mo sur " + num(s.ramMaxMb) + " Mo (" + dec(pct, 0) + " %)");
+  row("Coeurs", num(s.cores));
+  row("Temps par tick", dec(data.tps.mspt, 1) + " ms (approximatif)");
+  row("TPS 5 / 15 min", dec(data.tps.m5, 1) + " / " + dec(data.tps.m15, 1));
+  row("Plugins", num(s.plugins));
+  row("Démarré le", fmtDateTime(s.startedAt));
+  row("Version", s.version);
+  const bar = $("ram-bar");
+  bar.firstChild.style.width = Math.min(100, pct) + "%";
+  bar.setAttribute("aria-label", "Mémoire utilisée : " + dec(pct, 0) + " pour cent");
+}
+
+function renderAll() {
+  renderStatus(); renderKpis(); renderHistory(); renderDailyCharts(); renderHeat(); renderRetention();
+  renderOnline(); renderRecent(); renderLog(); renderTabs(); renderBoard(); renderWorlds(); renderMachine();
+}
+
+/* ---------- démarrage ---------- */
+$("range").addEventListener("click", (ev) => {
+  const b = ev.target.closest("button[data-h]");
+  if (!b) return;
+  rangeHours = +b.dataset.h;
+  document.querySelectorAll("#range button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+  if (data) renderHistory();
+});
+renderStatus();
+load();
+setInterval(load, REFRESH_MS);
+setInterval(() => { if (data) { renderStatus(); renderOnline(); renderRecent(); } }, 20000);
+</script>
+</body>
+</html>

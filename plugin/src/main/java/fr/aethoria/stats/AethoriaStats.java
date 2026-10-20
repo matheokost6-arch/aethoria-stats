@@ -476,14 +476,14 @@ public final class AethoriaStats extends JavaPlugin implements Listener, Command
     private static final java.util.Set<String> SECRET_COMMANDS = java.util.Set.of("login", "l", "log", "register", "reg",
             "changepassword", "cp", "unregister", "email", "captcha", "verification", "totp", "2fa");
     private static final java.util.regex.Pattern CLEARLAG = java.util.regex.Pattern.compile(
-            "(?i)(?:clear\\s?lag.*?removed\\s+(\\d+))|(?:removed\\s+(\\d+)\\s+(?:entities|entit))");
+            "(?i)(?:clear\\s?lag.*?removed\\s+(\\d+))|(?:removed\\s+(\\d+)\\s+(?:entities|entit))|(?:balayeurs.*?:\\s*(\\d+))");
 
     private void hookConsoleForClearLag() {
         console.setListener(text -> {
             if (text.length() > 300) return;
             java.util.regex.Matcher m = CLEARLAG.matcher(text);
             if (m.find()) {
-                String n = m.group(1) != null ? m.group(1) : m.group(2);
+                String n = m.group(1) != null ? m.group(1) : m.group(2) != null ? m.group(2) : m.group(3);
                 try {
                     clearPending.add(new long[] {System.currentTimeMillis(), Long.parseLong(n)});
                 } catch (NumberFormatException ignored) {

@@ -1,0 +1,22 @@
+# AethoriaStats : envoie les statistiques dans un Gist GitHub.
+
+# Identifiant du Gist (la fin de son adresse : gist.github.com/<pseudo>/<gist-id>).
+# Le Gist doit déjà exister et contenir un fichier nommé comme "gist-file".
+gist-id: ""
+
+# Token GitHub "fine-grained" avec UNE SEULE permission : Gists (read and write).
+# Ne le partage jamais et ne le mets pas dans un dépôt.
+github-token: ""
+
+# Nom du fichier dans le Gist.
+gist-file: "stats.json"
+
+# Délai entre deux envois, en secondes (30 minimum).
+send-interval-seconds: 120
+
+# true : les pseudos sont remplacés par "Joueur-xxxx" dans le fichier envoyé.
+hide-player-names: false
+
+# Fuseau horaire pour les jours et heures des graphiques (ex. "Europe/Paris").
+# Vide = fuseau du serveur.
+timezone: ""

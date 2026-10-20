@@ -1,0 +1,15 @@
+name: AethoriaStats
+version: 1.0.0
+main: fr.aethoria.stats.AethoriaStats
+api-version: '1.20'
+description: Statistiques du serveur envoyées vers un Gist GitHub pour le tableau de bord Aethoria.
+softdepend: [AuthMe]
+commands:
+  astats:
+    description: État de l'envoi des statistiques
+    usage: /astats [send|reload]
+    permission: aethoria.stats.admin
+permissions:
+  aethoria.stats.admin:
+    description: Voir l'état de l'envoi et forcer un envoi
+    default: op

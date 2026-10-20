@@ -990,11 +990,12 @@ function sentence() {
   const st = stateOf();
   if (st.cls === "bad") return { cls: "bad", text: "Le serveur semble éteint ou ne répond plus (dernier signe de vie " + ago(data.generatedAt) + ")." };
   const n = data.players.online, t = data.tps.m1;
-  const who = n === 0 ? "personne n'est connecté pour l'instant" : n === 1 ? "1 joueur est connecté" : n + " joueurs sont connectés";
-  const lag = t >= 19.5 ? "aucun lag" : t >= 17 ? "un petit ralentissement" : t >= 15 ? "ça ralentit un peu" : "ça lague";
-  const head = t >= 19 ? "Tout va bien : " : "Attention : ";
+  const who = n === 0 ? "Personne n'est connecté pour l'instant." : n === 1 ? "1 joueur est connecté." : n + " joueurs sont connectés.";
   const stale = st.cls === "warn" ? " (données un peu anciennes)" : "";
-  return { cls: t >= 19 ? "ok" : t >= 15 ? "warn" : "bad", text: head + who + ", " + lag + "." + stale };
+  const warm = data.server.warmupSec || 0;
+  if (warm > 0) return { cls: "warn", text: "Le serveur vient de démarrer : les mesures de vitesse se stabilisent (encore " + warm + " s). " + who + stale };
+  const lag = t >= 19.5 ? "Tout va bien : aucun lag." : t >= 17 ? "Petit ralentissement : le serveur est un peu moins rapide que d'habitude." : t >= 15 ? "Attention : le serveur ralentit." : "Attention : le serveur lague.";
+  return { cls: t >= 19 ? "ok" : t >= 15 ? "warn" : "bad", text: lag + " " + who + stale };
 }
 function renderStatus() {
   const st = stateOf();
@@ -1012,8 +1013,8 @@ function renderStatus() {
   $("st-players").textContent = st.cls === "bad" ? "0 / " + p.max : p.online + " / " + p.max;
   $("st-peak").textContent = "Pic du jour : " + p.peakToday;
   const t = data.tps.m1;
-  clear($("st-tps")).append(h("span", { class: "t-" + tpsClass(t) }, dec(t, 1)));
-  $("st-tps-sub").textContent = tpsLabel(t) + " (5 min : " + dec(data.tps.m5, 1) + ")";
+  clear($("st-tps")).append(h("span", { class: "t-" + ((data.server.warmupSec || 0) > 0 ? "warn" : tpsClass(t)) }, dec(t, 1)));
+  $("st-tps-sub").textContent = (data.server.warmupSec || 0) > 0 ? "Démarrage en cours" : tpsLabel(t) + " (5 min : " + dec(data.tps.m5, 1) + ")";
   $("st-uptime").textContent = up === null ? "-" : dur(up);
   $("st-version").textContent = "Mohist " + (data.server.version.match(/1\.\d+(\.\d+)?/) || [""])[0];
   document.title = "Aethoria - " + (st.cls === "bad" ? "hors ligne" : p.online + "/" + p.max + " en ligne");
@@ -1095,7 +1096,7 @@ function renderEtat() {
   const ul = clear($("lag-spikes"));
   if (!s.lagSpikes.length) ul.append(h("li", { class: "empty" }, "Aucun gros lag dans les dernières 24 heures."));
   s.lagSpikes.forEach((p) => ul.append(h("li", null, h("span", null, fmtDay(p.ts) + " à " + fmtClock(p.ts)), h("span", { class: "when" }, "TPS " + dec(p.tps, 1)))));
-  $("cap-etat").textContent = t.m1 >= 19 ? "Le serveur tourne à pleine vitesse : " + dec(t.m1, 1) + " TPS sur 20." : "Le serveur est un peu ralenti : " + dec(t.m1, 1) + " TPS sur 20.";
+  $("cap-etat").textContent = (s.warmupSec || 0) > 0 ? "Le serveur vient de démarrer : on ignore les 2 premières minutes pour ne pas fausser les chiffres." : t.m1 >= 19 ? "Le serveur tourne à pleine vitesse : " + dec(t.m1, 1) + " TPS sur 20." : "Le serveur est un peu ralenti : " + dec(t.m1, 1) + " TPS sur 20.";
 }
 function renderMachine() {
   const s = data.server, pct = s.ramMaxMb ? 100 * s.ramUsedMb / s.ramMaxMb : 0;

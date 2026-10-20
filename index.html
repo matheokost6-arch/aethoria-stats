@@ -960,7 +960,7 @@ function stateOf() {
   return { cls: "bad", text: "Hors ligne", sub: "Dernier signe de vie " + ago(data.generatedAt), age: ageMin };
 }
 function nameButton(name, rp) {
-  const label = rp ? rp + " (" + name + ")" : name;
+  const label = rp && rp.toLowerCase() !== name.toLowerCase() ? rp + " (" + name + ")" : name;
   const b = h("button", { type: "button", class: "namelink", "aria-label": "Voir la fiche de " + label }, label);
   b.addEventListener("click", () => { location.hash = "#/joueur/" + encodeURIComponent(name); });
   return b;
@@ -1584,7 +1584,8 @@ function factionLinks(ids) {
   return box;
 }
 const ROLE_FR = { chef: "Chef", officier: "Officier", membre: "Membre" };
-const PHASE_FR = { regne: "Règne", "règne": "Règne", election: "Élection", "élection": "Élection", candidature: "Candidatures", vote: "Vote" };
+const PHASE_FR = { aucune: "Aucune élection", candidatures: "Candidatures ouvertes", vote: "Vote en cours", regne: "Règne", "règne": "Règne", election: "Élection", "élection": "Élection", candidature: "Candidatures", vote: "Vote" };
+function eraName(e) { return e === null || e === undefined ? "-" : typeof e === "number" ? "Ère " + e : String(e); }
 function phaseName(p) { if (!p) return "-"; const k = String(p).toLowerCase(); return PHASE_FR[k] || (k.charAt(0).toUpperCase() + k.slice(1).replace(/_/g, " ")); }
 function treeBar(f) {
   const tot = f.skillsTotal || 0, un = f.skillsUnlocked || 0;
@@ -1604,8 +1605,10 @@ function renderCrown() {
     kpi(f ? f.name : "-", "Sa faction", f ? num(f.members) + " membres" : null),
     kpi(c.termEnd ? fmtDate(c.termEnd) : "-", "Fin du mandat", left === null ? null : left > 0 ? "dans " + left + (left > 1 ? " jours" : " jour") : "terminé"),
     kpi(phaseName(c.phase), "Phase en cours"),
-    kpi(c.era || "-", "Ère du royaume"),
-    kpi(c.royalTreeUnlocked ? "Débloqué" : "Fermé", "Arbre royal"));
+    kpi(eraName(c.era), "Ère du royaume"),
+    typeof c.royalTreeUnlocked === "number"
+      ? kpi(c.royalTreeUnlocked ? c.royalTreeUnlocked + (c.royalTreeUnlocked > 1 ? " édits" : " édit") : "Aucun édit", "Arbre royal", c.royalTreeUnlocked ? "adoptés" : null)
+      : kpi(c.royalTreeUnlocked ? "Débloqué" : "Fermé", "Arbre royal"));
   box.append(grid);
   $("cap-crown").textContent = (c.kingRpName ? "Le roi actuel est " + c.kingRpName : "Le trône est tenu") + (f ? ", de la faction " + f.name : "") + "." + (left !== null && left > 0 ? " Son mandat se termine dans " + left + (left > 1 ? " jours." : " jour.") : "");
 }
@@ -1616,7 +1619,7 @@ function renderFactionList() {
     const head = h("div", { class: "fhead" }, h("strong", null, f.name), f.isKing ? crownIcon(18) : null, f.tag ? h("span", { class: "ftag" }, "[" + f.tag + "]") : null);
     const a = h("a", { class: "fcard", href: "#/royaume/" + encodeURIComponent(f.id), "aria-label": "Fiche de la faction " + f.name }, head,
       h("div", { class: "fmeta" }, "Chef : " + (f.leaderRpName || f.leaderName || "-")),
-      h("div", { class: "fmeta" }, num(f.members) + " membres, " + num(f.cities) + (f.cities > 1 ? " cités" : " cité") + (f.era ? ", " + f.era : "")),
+      h("div", { class: "fmeta" }, num(f.members) + " membres, " + num(f.cities) + (f.cities > 1 ? " cités" : " cité") + (f.era ? ", " + eraName(f.era) : "")),
       treeBar(f), h("div", { class: "fmeta" }, "Arbre : " + num(f.skillsUnlocked) + " / " + num(f.skillsTotal)));
     a.style.borderTopColor = f.color || "#888";
     box.append(a);
@@ -1673,7 +1676,7 @@ async function openFactionModal(id) {
   const sz = f.suzerain === null || f.suzerain === undefined ? null : h("p", null, h("strong", null, "Suzerain : "), factionLinks([f.suzerain]));
   put(dlg, title,
     f.description ? h("p", { class: "caption", style: "margin-top:4px" }, f.description) : null,
-    h("div", { class: "statgrid" }, stat(num(f.members), "Membres"), stat(num(f.cities), f.cities > 1 ? "Cités" : "Cité"), stat(num(f.skillsUnlocked) + " / " + num(f.skillsTotal), "Arbre de compétences"), stat(f.era || "-", "Ère"), stat(f.founded ? fmtDate(f.founded) : "-", "Fondée le")),
+    h("div", { class: "statgrid" }, stat(num(f.members), "Membres"), stat(num(f.cities), f.cities > 1 ? "Cités" : "Cité"), stat(num(f.skillsUnlocked) + " / " + num(f.skillsTotal), "Arbre de compétences"), stat(eraName(f.era), "Ère"), stat(f.founded ? fmtDate(f.founded) : "-", "Fondée le")),
     treeBar(f),
     h("h3", { class: "panel-h3" }, "Activité"),
     h("div", { class: "statgrid" }, stat(dur(st.playMs || 0), "Temps de jeu cumulé"), stat(num(st.active7d), "Actifs sur 7 jours"), stat(num(st.online), "En ligne maintenant"), stat("+" + num(st.new7d), "Nouveaux membres (7 j)")),
@@ -1707,7 +1710,7 @@ async function refreshAdminFactions() {
     const tb = h("tbody");
     j.factions.forEach((f) => {
       const cities = h("ul", { class: "plain", style: "margin:0" });
-      (f.cities || []).forEach((c) => cities.append(h("li", null, h("strong", null, c.name), " : niveau " + c.level + ", x " + c.x + ", z " + c.z + ", " + String(c.dimension || "").replace("minecraft:", ""))));
+      (f.cities || []).forEach((c) => cities.append(h("li", null, h("strong", null, c.name), " : " + (typeof c.level === "number" ? "niveau " + c.level : c.level) + ", x " + c.x + ", z " + c.z + ", " + String(c.dimension || "").replace("minecraft:", ""))));
       if (!(f.cities || []).length) cities.append(h("li", { class: "empty" }, "Aucune cité"));
       tb.append(h("tr", null, h("td", null, h("strong", null, f.factionName)), h("td", { class: "num" }, num(f.treasury)), h("td", { class: "num" }, num(f.claims)), h("td", null, cities)));
     });

@@ -943,12 +943,15 @@ function hourOf(ts) { return +fmt({ hour: "2-digit", hourCycle: "h23" }, ts); }
 function tpsClass(t) { return t >= 19 ? "ok" : t >= 17 ? "warn" : "bad"; }
 function tpsLabel(t) { return t >= 19 ? "Fluide" : t >= 17 ? "Un peu ralenti" : "Ralenti"; }
 function mobName(t) { return MOB_FR[t] || (t.charAt(0) + t.slice(1).toLowerCase().replace(/_/g, " ")); }
+const ADV_TITLE_FR = { "Stone Age": "Âge de pierre", "Getting an Upgrade": "Une meilleure pioche", "Acquire Hardware": "Acquérir du matériel", "Suit Up": "Fais-toi chic", "Isn't It Iron Pick": "Une pioche en fer", "We Need to Go Deeper": "Nous devons aller plus profond", "Eye Spy": "L'oeil qui voit tout", "The End?": "La fin ?", "Monster Hunter": "Chasseur de monstres", "What a Deal!": "Quel marché !", "Sweet Dreams": "Doux rêves", "The Parrots and the Bats": "Les parents", "A Seedy Place": "Un petit coup de semis", "Best Friends Forever": "Meilleurs amis pour la vie", "A Terrible Fortress": "Une forteresse terrible", "Free the End": "Libérer l'End", "Diamonds!": "Des diamants !", "Ice Bucket Challenge": "Chasseur de glaçons" };
 function advName(k) {
+  if (k.startsWith("log/")) return ADV_TITLE_FR[k.slice(4)] || k.slice(4);
   if (ADV_FR[k]) return ADV_FR[k];
   const last = k.split("/").pop().replace(/_/g, " ");
   return last.charAt(0).toUpperCase() + last.slice(1);
 }
-function advCat(k) { return ADV_CAT[k.split("/")[0]] || "Autre"; }
+function advCat(k) {
+  if (k.startsWith("log/")) return "Succès"; return ADV_CAT[k.split("/")[0]] || "Autre"; }
 function stateOf() {
   if (!data) return { cls: "warn", text: "Chargement...", sub: "" };
   const ageMin = (Date.now() - data.generatedAt) / 60000;
